@@ -29,6 +29,7 @@ Focused unit and component tests may be colocated with the source they exercise.
 - `pnpm test:scripts` verifies the common script inventory and safe database-operation contract.
 - `pnpm test:infra` validates the Compose model, image pins, health gates, bucket provisioning, and persistent shutdown contract without requiring Docker.
 - `pnpm test:adr` verifies the accepted ADR inventory, metadata, required decision sections, and index links.
+- `pnpm test:dod` verifies that the pull-request template and definition-of-done policy retain every required delivery gate.
 - `pnpm verify` runs formatting, lint, strict typecheck, all deterministic tests, and a production build.
 
 ## Test boundaries

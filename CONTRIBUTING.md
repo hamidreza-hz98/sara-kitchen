@@ -80,6 +80,11 @@ changes and does not grant permission to modify unrelated files. Hooks are a fas
 they do not replace `pnpm verify` or CI. See [`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md)
 for the exact contract and executable acceptance test.
 
+Every completed task must also satisfy the evidence-based
+[`definition of done`](./docs/definition-of-done.md). When a pull request is used, copy no informal
+substitute: complete [the repository template](./.github/pull_request_template.md), checking every
+gate or documenting a specific N/A reason.
+
 ## Production approval
 
 Committing to `master` does not authorize or automatically trigger a production release.

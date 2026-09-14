@@ -79,10 +79,15 @@ shutdown.
 | `pnpm lint:fix`         | Apply safe ESLint fixes and fail on remaining violations.     |
 | `pnpm typecheck`        | Run strict TypeScript checking without emitting files.        |
 | `pnpm check:boundaries` | Validate source-layer and domain-module import rules.         |
+| `pnpm security:audit`   | Fail on Critical production dependency advisories.            |
 
 Formatting, staged-file behavior, and architectural restrictions are documented in
 [`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md) and
 [`docs/code-quality.md`](./docs/code-quality.md).
+
+`pnpm security:audit` queries the package registry and therefore stays outside the deterministic
+`pnpm verify` command. Run it whenever production dependencies or the lockfile change and before a
+production release.
 
 ## Test commands
 
@@ -105,11 +110,15 @@ Formatting, staged-file behavior, and architectural restrictions are documented 
 | `pnpm test:scripts`     | Verify this common command contract and database-operation safety.        |
 | `pnpm test:infra`       | Verify the local infrastructure definition without starting Docker.       |
 | `pnpm test:adr`         | Verify the accepted ADR inventory, structure, and index links.            |
+| `pnpm test:dod`         | Verify the pull-request template retains every delivery gate.             |
 
 See [`tests/README.md`](./tests/README.md) for suite boundaries and external-service safety rules.
 
 Foundational architecture choices and their trade-offs are indexed in
 [`docs/adr/README.md`](./docs/adr/README.md).
+
+Every completed change follows the evidence requirements in
+[`docs/definition-of-done.md`](./docs/definition-of-done.md), reflected in the repository's pull-request template.
 
 ## Database operation commands
 
