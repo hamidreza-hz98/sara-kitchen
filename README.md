@@ -13,7 +13,7 @@ available merely because its module boundary exists.
 - Node.js `>=24.0.0 <25`
 - pnpm `>=11.19.0 <12` through Corepack
 - local values for the variables described in [the environment guide](./docs/environment.md)
-- MongoDB and MinIO when a task exercises persistence or object storage
+- Docker Desktop with Compose v2 for local MongoDB and MinIO
 - Chromium installed through Playwright before the first end-to-end run
 
 Package and runtime ranges are enforced by `package.json`. The pnpm lockfile is committed and must
@@ -33,6 +33,7 @@ Replace every `replace-with-*` value in `.env.local` as documented in
 Start the development server and open [http://localhost:3000](http://localhost:3000):
 
 ```powershell
+pnpm infra:up
 pnpm dev
 ```
 
@@ -50,6 +51,20 @@ pnpm verify
 | `pnpm build`  | Validate configuration and create an optimized production build.      |
 | `pnpm start`  | Serve an existing production build; run `pnpm build` first.           |
 | `pnpm verify` | Run formatting, lint, types, tests, boundaries, and production build. |
+
+## Local infrastructure commands
+
+| Command             | Purpose                                                                |
+| ------------------- | ---------------------------------------------------------------------- |
+| `pnpm infra:up`     | Build/start MongoDB and MinIO, wait for health, and create the bucket. |
+| `pnpm infra:down`   | Stop containers without deleting named-volume data.                    |
+| `pnpm infra:status` | Show current service and health state.                                 |
+| `pnpm infra:logs`   | Print the latest 100 MongoDB and MinIO log lines.                      |
+| `pnpm infra:config` | Render and validate the resolved Compose model.                        |
+
+Use the local application credentials and endpoints documented in
+[`docs/local-infrastructure.md`](./docs/local-infrastructure.md). The stack is loopback-only and its
+committed credentials must never be reused outside local development.
 
 Development and production startup are intentionally long-running. Use `Ctrl+C` for a graceful local
 shutdown.

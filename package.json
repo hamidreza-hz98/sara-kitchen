@@ -11,7 +11,7 @@
     "lint": "eslint --max-warnings=0",
     "lint:fix": "eslint --fix --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm test:unit && pnpm test:integration && pnpm test:boundaries && pnpm check:boundaries && pnpm test:quality && pnpm test:hooks && pnpm test:scripts",
+    "test": "pnpm test:unit && pnpm test:integration && pnpm test:boundaries && pnpm check:boundaries && pnpm test:quality && pnpm test:hooks && pnpm test:scripts && pnpm test:infra",
     "test:unit": "vitest run --config vitest.config.mts",
     "unit": "pnpm test:unit",
     "test:integration": "vitest run --config vitest.integration.config.mts",
@@ -27,6 +27,12 @@
     "test:quality": "node --test scripts/check-quality-rules.test.mjs",
     "test:hooks": "node --test scripts/check-git-hooks.test.mjs",
     "test:scripts": "node --test scripts/check-common-scripts.test.mjs",
+    "test:infra": "node --test scripts/check-local-infrastructure.test.mjs",
+    "infra:up": "node scripts/local-infrastructure.mjs up",
+    "infra:down": "node scripts/local-infrastructure.mjs down",
+    "infra:status": "node scripts/local-infrastructure.mjs status",
+    "infra:logs": "node scripts/local-infrastructure.mjs logs",
+    "infra:config": "node scripts/local-infrastructure.mjs config",
     "db:seed": "node scripts/run-database-operation.mjs seed",
     "seed": "pnpm db:seed",
     "db:migrate": "node scripts/run-database-operation.mjs migrate",
@@ -96,7 +102,8 @@
     "prettier": "3.9.6",
     "typescript": "^5.9.3",
     "vite": "8.3.0",
-    "vitest": "5.0.0"
+    "vitest": "5.0.0",
+    "yaml": "2.9.1"
   },
   "engines": {
     "node": ">=24.0.0 <25",

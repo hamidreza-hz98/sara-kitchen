@@ -27,6 +27,7 @@ Focused unit and component tests may be colocated with the source they exercise.
 - `pnpm test:e2e` starts Next.js on port 3100 and runs Playwright plus axe checks.
 - `pnpm e2e` is the short alias for the same browser suite.
 - `pnpm test:scripts` verifies the common script inventory and safe database-operation contract.
+- `pnpm test:infra` validates the Compose model, image pins, health gates, bucket provisioning, and persistent shutdown contract without requiring Docker.
 - `pnpm verify` runs formatting, lint, strict typecheck, all deterministic tests, and a production build.
 
 ## Test boundaries

@@ -1,0 +1,89 @@
+name: sara-kitchen
+
+services:
+  mongo:
+    image: mongo:8.0.30-noble
+    restart: unless-stopped
+    env_file:
+      - ./infra/local.env
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+      - ./infra/mongodb/init-app-user.js:/docker-entrypoint-initdb.d/10-app-user.js:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --host 127.0.0.1 --port 27017
+          --username "$${MONGO_INITDB_ROOT_USERNAME}"
+          --password "$${MONGO_INITDB_ROOT_PASSWORD}"
+          --authenticationDatabase admin
+          --eval "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 2)"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    stop_grace_period: 30s
+    networks:
+      - local-infrastructure
+
+  minio:
+    build:
+      context: .
+      dockerfile: infra/minio/Dockerfile
+      args:
+        MINIO_RELEASE: RELEASE.2025-10-15T17-29-55Z
+    image: sara-kitchen/minio:RELEASE.2025-10-15T17-29-55Z
+    restart: unless-stopped
+    env_file:
+      - ./infra/local.env
+    command: ["server", "/data", "--console-address", ":9001"]
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --quiet --output-document=/dev/null http://127.0.0.1:9000/minio/health/ready
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    stop_grace_period: 30s
+    networks:
+      - local-infrastructure
+
+  minio-init:
+    image: quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+    restart: "no"
+    env_file:
+      - ./infra/local.env
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}" &&
+        mc mb --ignore-existing --region "$${MINIO_REGION}" "local/$${MINIO_BUCKET}" &&
+        mc anonymous set none "local/$${MINIO_BUCKET}" &&
+        mc stat "local/$${MINIO_BUCKET}"
+    networks:
+      - local-infrastructure
+
+volumes:
+  mongo-data:
+    name: sara-kitchen-mongo-data
+  mongo-config:
+    name: sara-kitchen-mongo-config
+  minio-data:
+    name: sara-kitchen-minio-data
+
+networks:
+  local-infrastructure:
+    name: sara-kitchen-local
+    driver: bridge

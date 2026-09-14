@@ -88,6 +88,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
 | `@axe-core/playwright`             |         `4.13.0` | Automated WCAG rule scans within Playwright journeys.                                                                   |
 | `husky`                            |          `9.1.7` | Repository-owned native Git hook setup.                                                                                 |
 | `lint-staged`                      |         `17.5.1` | Runs formatting and lint fixes only against files staged for commit.                                                    |
+| `yaml`                             |          `2.9.1` | Parses Compose YAML in deterministic local-infrastructure contract tests.                                               |
 
 ## Integration rules
 

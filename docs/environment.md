@@ -13,6 +13,10 @@ configuration fails with field-level guidance rather than later connection error
    deployment provider's secret manager.
 4. Run `pnpm dev` or `pnpm build`; either command validates the complete configuration immediately.
 
+For the Docker Compose development values for MongoDB and MinIO, follow
+[`local-infrastructure.md`](./local-infrastructure.md). The committed `.env.example` remains
+provider-agnostic and non-operational by design.
+
 The committed example contains no operational credentials. It intentionally fails validation until
 its secret and kitchen-coordinate placeholders are replaced.
 
