@@ -103,8 +103,13 @@ Formatting, staged-file behavior, and architectural restrictions are documented 
 | `pnpm test:quality`     | Prove deliberate type, lint, and import violations fail.                  |
 | `pnpm test:hooks`       | Exercise malformed and valid commits in a disposable Git repository.      |
 | `pnpm test:scripts`     | Verify this common command contract and database-operation safety.        |
+| `pnpm test:infra`       | Verify the local infrastructure definition without starting Docker.       |
+| `pnpm test:adr`         | Verify the accepted ADR inventory, structure, and index links.            |
 
 See [`tests/README.md`](./tests/README.md) for suite boundaries and external-service safety rules.
+
+Foundational architecture choices and their trade-offs are indexed in
+[`docs/adr/README.md`](./docs/adr/README.md).
 
 ## Database operation commands
 

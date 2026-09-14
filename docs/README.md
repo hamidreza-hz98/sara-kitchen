@@ -15,6 +15,7 @@ Documentation must describe the implemented system. Update the relevant document
 
 Current records:
 
+- [`adr/`](./adr/README.md) — accepted architecture decisions, alternatives, consequences, and revisit triggers;
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.

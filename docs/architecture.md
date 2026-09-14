@@ -1,5 +1,10 @@
 # Sara Kitchen architecture
 
+The accepted decisions that govern this architecture are indexed in
+[`docs/adr/README.md`](./adr/README.md). This document describes the resulting system shape and
+enforceable boundaries; ADRs retain the context, rejected alternatives, consequences, and revisit
+triggers.
+
 ## System shape
 
 Sara Kitchen is a Next.js App Router application with a serverless-compatible modular-monolith backend in the same deployable unit. The browser, Server Components, Server Actions when appropriate, Route Handlers, scheduled jobs, and provider webhooks all reach the same domain services rather than duplicating business rules.
