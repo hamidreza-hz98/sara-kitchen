@@ -4,6 +4,7 @@
   :root {
     --background: var(--sara-palette-background-default);
     --foreground: var(--sara-palette-text-primary);
+    --font-sara-active: var(--font-sara-latin);
   }
 
   html {
@@ -23,8 +24,9 @@
     color: var(--foreground);
     background: var(--background);
     font-family:
-      var(--font-sara-latin), var(--font-sara-persian), "Plus Jakarta Sans", "Segoe UI", Arial,
-      sans-serif;
+      var(--font-sara-active), var(--font-sara-latin), var(--font-sara-persian),
+      "Plus Jakarta Sans", Vazirmatn, Tahoma, "Segoe UI", Arial, sans-serif;
+    font-synthesis: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -43,5 +45,12 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+}
+
+@layer components {
+  :lang(fa) {
+    --font-sara-active: var(--font-sara-persian);
+    font-family: var(--font-sara-persian), Vazirmatn, Tahoma, "Segoe UI", Arial, sans-serif;
   }
 }

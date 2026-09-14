@@ -49,13 +49,14 @@ precedence accidental.
 
 ## Font integration
 
-`src/theme/fonts.server.ts` uses `next/font/google`, so font files are downloaded at build time and
-self-hosted by Next.js rather than requested from Google by the browser.
+`src/theme/fonts.server.ts` uses `next/font/local` with repository-owned, licensed variable WOFF2
+files. Next.js emits optimized same-origin assets and the browser never requests a font host.
 
 - Plus Jakarta Sans supplies Latin and Latin Extended for English and Portuguese.
 - Vazirmatn supplies Arabic-script glyphs for Farsi and is not preloaded on the default English
   document.
-- Both expose CSS variables on `<html>` with `display: swap` and explicit system fallbacks.
+- Both expose CSS variables on `<html>` with `display: swap`, adjusted metric fallbacks, and explicit
+  system fallbacks. `:lang(fa)` selects Vazirmatn as the active face for Persian fragments.
 - The MUI theme and base CSS use the same variable order, preventing a server/client font-family
   disagreement.
 - The variable names are literal strings at each `next/font` loader call because Next.js statically

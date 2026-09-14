@@ -1,20 +1,27 @@
 import "server-only";
 
-import { Plus_Jakarta_Sans, Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 
-const latinFont = Plus_Jakarta_Sans({
+const latinFont = localFont({
+  src: "./fonts/plus-jakarta-sans-latin-variable.woff2",
   variable: "--font-sara-latin",
-  subsets: ["latin", "latin-ext"],
+  weight: "200 800",
+  style: "normal",
   display: "swap",
-  fallback: ["Segoe UI", "Arial", "sans-serif"],
+  preload: true,
+  fallback: ["system-ui", "Segoe UI", "Arial", "sans-serif"],
+  adjustFontFallback: "Arial",
 });
 
-const persianFont = Vazirmatn({
+const persianFont = localFont({
+  src: "./fonts/vazirmatn-persian-variable.woff2",
   variable: "--font-sara-persian",
-  subsets: ["arabic"],
+  weight: "100 900",
+  style: "normal",
   display: "swap",
-  fallback: ["Segoe UI", "Arial", "sans-serif"],
-  preload: false,
+  preload: true,
+  fallback: ["Tahoma", "Segoe UI", "Arial", "sans-serif"],
+  adjustFontFallback: "Arial",
 });
 
 export const applicationFontVariables = `${latinFont.variable} ${persianFont.variable}`;

@@ -214,6 +214,19 @@ export function ThemeShowcase() {
                 <Typography color="text.secondary" variant="body2">
                   Secondary copy stays legible while preserving hierarchy.
                 </Typography>
+                <Box
+                  data-testid="persian-font-sample"
+                  dir="rtl"
+                  lang="fa"
+                  sx={{ textAlign: "right" }}
+                >
+                  <Typography component="p" variant="h3">
+                    آشپزخانه سارا؛ غذای خانگی ایرانی
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ mt: 2 }}>
+                    طعم اصیل، مواد تازه و آماده‌سازی با حوصله
+                  </Typography>
+                </Box>
               </Stack>
             </CardContent>
           </Card>

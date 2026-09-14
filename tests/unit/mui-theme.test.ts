@@ -21,6 +21,7 @@ describe("MUI App Router theme contract", () => {
   });
 
   it("uses the same optimized font variables in MUI and document CSS", () => {
+    expect(applicationFontFamily).toContain(`var(${fontVariableNames.active})`);
     expect(applicationFontFamily).toContain(`var(${fontVariableNames.latin})`);
     expect(applicationFontFamily).toContain(`var(${fontVariableNames.persian})`);
     expect(appTheme.typography.fontFamily).toBe(applicationFontFamily);
