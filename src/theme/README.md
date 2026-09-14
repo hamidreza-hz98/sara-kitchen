@@ -9,3 +9,8 @@ Sara Kitchen design tokens and Material UI theme configuration belong here.
 - Treat the approved UI/UX and brand assets as the visual source of truth while preserving accessibility and responsive behavior.
 
 The MUI App Router cache/provider integration will be added in the dedicated theme tasks.
+
+The framework-neutral values are exported from [`tokens.ts`](./tokens.ts). Their source evidence,
+normalization decisions, and accessibility derivations are recorded in
+[`docs/design-tokens.md`](../../docs/design-tokens.md). MUI adaptation remains the responsibility of
+the next theme task; components must not import raw values from the Stitch exports.
