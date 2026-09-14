@@ -12,3 +12,8 @@ Planned documents include:
 - content import formats and launch acceptance records.
 
 Documentation must describe the implemented system. Update the relevant document in the same change whenever behavior, operations, or an accepted decision changes.
+
+Current records:
+
+- [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
+- [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
