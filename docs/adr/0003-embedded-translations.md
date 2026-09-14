@@ -21,7 +21,7 @@ Store translatable content as a typed `translations` subdocument array inside th
 the content.
 
 ```ts
-type SupportedLocale = "en" | "pt" | "fa";
+type SupportedLocale = "en" | "pt-PT" | "fa";
 
 type DishTranslation = {
   locale: SupportedLocale;

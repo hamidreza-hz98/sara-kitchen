@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { ThemeShowcase } from "@/app/theme-showcase/theme-showcase";
+import { ThemeShowcase } from "@/app/[locale]/theme-showcase/theme-showcase";
 import { appTheme } from "@/theme";
 
 describe("ThemeShowcase", () => {

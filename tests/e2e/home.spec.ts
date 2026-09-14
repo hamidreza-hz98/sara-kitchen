@@ -42,7 +42,9 @@ test("MUI styles stream before content and hydrate without duplicates", async ({
   }
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Deploy Now" })).toHaveClass(/MuiButton-root/);
+  await expect(page.getByRole("link", { name: "View theme showcase" })).toHaveClass(
+    /MuiButton-root/,
+  );
 
   const emotionIdentifiers = await page
     .locator('head style[data-emotion^="sara-mui"]')

@@ -1,0 +1,17 @@
+{
+  "Metadata": {
+    "title": "Sara Kitchen",
+    "description": "Comida persa caseira no Porto, Portugal."
+  },
+  "Home": {
+    "eyebrow": "Comida persa caseira no Porto",
+    "title": "A Sara Kitchen está quase pronta para o servir.",
+    "description": "Esta base multilingue está pronta para o menu, a experiência de encomenda e o painel de gestão.",
+    "showcase": "Ver apresentação do tema"
+  },
+  "NotFound": {
+    "title": "Página não encontrada",
+    "description": "A página que pediu não existe.",
+    "home": "Voltar ao início"
+  }
+}

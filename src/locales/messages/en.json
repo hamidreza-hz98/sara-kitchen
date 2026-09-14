@@ -1,0 +1,17 @@
+{
+  "Metadata": {
+    "title": "Sara Kitchen",
+    "description": "Persian homemade food in Porto, Portugal."
+  },
+  "Home": {
+    "eyebrow": "Persian homemade food in Porto",
+    "title": "Sara Kitchen is getting ready to serve you.",
+    "description": "This multilingual foundation is ready for the menu, ordering experience, and management panel.",
+    "showcase": "View theme showcase"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you requested does not exist.",
+    "home": "Return home"
+  }
+}
