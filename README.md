@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sara Kitchen
 
-## Getting Started
+Online menu, ordering, and administration platform for Sara Kitchen, a Persian homemade-food
+business serving Porto, Portugal. The application is a TypeScript modular monolith built with the
+Next.js App Router, Mongoose, next-intl, MUI, and serverless-compatible backend modules.
 
-First, run the development server:
+The product is in foundation development. The implemented architecture and operational truth live
+in [`docs`](./docs/README.md); planned functionality in the project task list is not implied to be
+available merely because its module boundary exists.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Requirements
+
+- Node.js `>=24.0.0 <25`
+- pnpm `>=11.19.0 <12` through Corepack
+- local values for the variables described in [the environment guide](./docs/environment.md)
+- MongoDB and MinIO when a task exercises persistence or object storage
+- Chromium installed through Playwright before the first end-to-end run
+
+Package and runtime ranges are enforced by `package.json`. The pnpm lockfile is committed and must
+not be regenerated with npm, Yarn, or Bun.
+
+## Clean-checkout setup
+
+```powershell
+corepack enable
+pnpm install --frozen-lockfile
+Copy-Item .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Replace every `replace-with-*` value in `.env.local` as documented in
+[`docs/environment.md`](./docs/environment.md). Never commit `.env.local` or real credentials.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Start the development server and open [http://localhost:3000](http://localhost:3000):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+pnpm dev
+```
 
-## Learn More
+Run the complete local/CI-equivalent gate before committing:
 
-To learn more about Next.js, take a look at the following resources:
+```powershell
+pnpm verify
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Application commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command       | Purpose                                                               |
+| ------------- | --------------------------------------------------------------------- |
+| `pnpm dev`    | Start the Next.js development server with hot reload.                 |
+| `pnpm build`  | Validate configuration and create an optimized production build.      |
+| `pnpm start`  | Serve an existing production build; run `pnpm build` first.           |
+| `pnpm verify` | Run formatting, lint, types, tests, boundaries, and production build. |
 
-## Deploy on Vercel
+Development and production startup are intentionally long-running. Use `Ctrl+C` for a graceful local
+shutdown.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Code-quality commands
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command                 | Purpose                                                       |
+| ----------------------- | ------------------------------------------------------------- |
+| `pnpm format`           | Format supported repository files with pinned Prettier rules. |
+| `pnpm format:check`     | Verify formatting without writing files.                      |
+| `pnpm lint`             | Run zero-warning, type-aware ESLint without fixes.            |
+| `pnpm lint:fix`         | Apply safe ESLint fixes and fail on remaining violations.     |
+| `pnpm typecheck`        | Run strict TypeScript checking without emitting files.        |
+| `pnpm check:boundaries` | Validate source-layer and domain-module import rules.         |
+
+Formatting, staged-file behavior, and architectural restrictions are documented in
+[`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md) and
+[`docs/code-quality.md`](./docs/code-quality.md).
+
+## Test commands
+
+| Command                 | Purpose                                                                   |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `pnpm test`             | Run all deterministic non-browser suites once.                            |
+| `pnpm unit`             | Alias for the unit/component Vitest suite.                                |
+| `pnpm test:unit`        | Run unit and component tests once.                                        |
+| `pnpm integration`      | Alias for integration and contract tests.                                 |
+| `pnpm test:integration` | Run Node-based integration and contract tests once.                       |
+| `pnpm test:watch`       | Start Vitest in watch mode.                                               |
+| `pnpm test:coverage`    | Generate V8 text, HTML, and LCOV coverage.                                |
+| `pnpm e2e`              | Alias for the Playwright browser suite.                                   |
+| `pnpm test:e2e`         | Start the app and run Playwright/axe checks.                              |
+| `pnpm test:e2e:ui`      | Open Playwright's interactive test UI.                                    |
+| `pnpm test:e2e:install` | Install the pinned Chromium runtime for CI or machines without a browser. |
+| `pnpm test:boundaries`  | Unit-test the architecture checker.                                       |
+| `pnpm test:quality`     | Prove deliberate type, lint, and import violations fail.                  |
+| `pnpm test:hooks`       | Exercise malformed and valid commits in a disposable Git repository.      |
+| `pnpm test:scripts`     | Verify this common command contract and database-operation safety.        |
+
+See [`tests/README.md`](./tests/README.md) for suite boundaries and external-service safety rules.
+
+## Database operation commands
+
+| Command           | Alias          | Purpose                                           |
+| ----------------- | -------------- | ------------------------------------------------- |
+| `pnpm db:seed`    | `pnpm seed`    | Plan deterministic application-data seeding.      |
+| `pnpm db:migrate` | `pnpm migrate` | Plan ordered, idempotent data migrations.         |
+| `pnpm db:indexes` | `pnpm indexes` | Plan synchronization of declared MongoDB indexes. |
+
+These commands default to non-mutating `--plan` mode and currently report zero registered steps.
+That is the truthful foundation state: persistence handlers arrive in their dedicated tasks. An
+attempt to use `--apply` fails closed until those handlers exist.
+
+```powershell
+pnpm db:migrate
+pnpm db:migrate --help
+pnpm db:migrate --apply
+```
+
+Once implemented, apply mode will require validated environment configuration and an explicit
+operator action. Never run seed, migration, or index mutation commands against production without a
+reviewed runbook and backup/rollback plan.
+
+## Contribution workflow
+
+Development currently happens directly on `master` under the rules in
+[`CONTRIBUTING.md`](./CONTRIBUTING.md). Commits use Conventional Commits and must pass the staged
+Husky checks. Production deployment always requires separate project-owner approval.
