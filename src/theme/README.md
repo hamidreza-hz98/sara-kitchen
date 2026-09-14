@@ -8,9 +8,17 @@ Sara Kitchen design tokens and Material UI theme configuration belong here.
 - Prefer logical CSS properties for direction-aware layout.
 - Treat the approved UI/UX and brand assets as the visual source of truth while preserving accessibility and responsive behavior.
 
-The MUI App Router cache/provider integration will be added in the dedicated theme tasks.
-
 The framework-neutral values are exported from [`tokens.ts`](./tokens.ts). Their source evidence,
 normalization decisions, and accessibility derivations are recorded in
 [`docs/design-tokens.md`](../../docs/design-tokens.md). MUI adaptation remains the responsibility of
-the next theme task; components must not import raw values from the Stitch exports.
+the component-override task; components must not import raw values from the Stitch exports.
+
+The App Router integration consists of:
+
+- `fonts.server.ts`, which self-hosts the Latin and Persian fonts through `next/font`;
+- `emotion-cache.ts`, which defines the stable cache key and MUI cascade layer;
+- `app-theme.ts`, the client-side MUI theme factory and font-variable bridge; and
+- `AppThemeProvider` in `src/providers`, nested under MUI's streaming cache provider by the root
+  layout.
+
+See [`docs/mui-app-router.md`](../../docs/mui-app-router.md) for provider order and SSR acceptance.

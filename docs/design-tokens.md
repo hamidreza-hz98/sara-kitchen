@@ -102,9 +102,10 @@ line heights, not rem values, so MUI can convert them consistently in the next t
 | `designTokens.typography.letterSpacing.normal`                                                                   | `0`                            | S01–S09; default body rhythm        |
 | `designTokens.typography.letterSpacing.wide`                                                                     | `0.08em`                       | S02/S04/S05; labels and overlines   |
 
-English and Portuguese use this family directly. Farsi inherits the same tokenized stack until the
-dedicated localization/font task validates and adds a Persian-capable face; no unsupported font was
-invented from these English-only exports.
+English and Portuguese use this family directly. The Stitch exports contain no Persian typography
+evidence, so the design token does not pretend otherwise. The App Router font integration adds
+Vazirmatn as a Persian-capable runtime companion and records that implementation decision separately
+in `docs/mui-app-router.md`.
 
 ## Spacing source map
 

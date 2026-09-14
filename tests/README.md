@@ -25,6 +25,9 @@ Focused unit and component tests may be colocated with the source they exercise.
 - `pnpm test:coverage` writes V8 text, HTML, and LCOV coverage reports.
 - `pnpm test:e2e:install` installs the pinned Chromium browser once per machine or CI image.
 - `pnpm test:e2e` starts Next.js on port 3100 and runs Playwright plus axe checks.
+- The homepage browser contract also verifies that MUI/Emotion styles arrive in the SSR `<head>`, use
+  the `mui` cascade layer, retain unique identifiers across hydration/reload, and emit no runtime
+  errors.
 - `pnpm e2e` is the short alias for the same browser suite.
 - `pnpm test:scripts` verifies the common script inventory and safe database-operation contract.
 - `pnpm test:infra` validates the Compose model, image pins, health gates, bucket provisioning, and persistent shutdown contract without requiring Docker.

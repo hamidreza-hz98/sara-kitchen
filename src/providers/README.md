@@ -7,3 +7,8 @@ Application-level React context providers and their composition belong here.
 - Providers may coordinate UI concerns such as theme, locale, notifications, and query state.
 - Authentication and authoritative business data remain server-owned; a provider may expose sanitized state but must not become the source of truth.
 - Provider order and server/client boundaries must be covered by integration tests when behavior depends on them.
+
+`AppThemeProvider` is the narrow client boundary for the MUI theme and baseline. The root Server
+Component places it inside MUI's official `AppRouterCacheProvider`, which owns streaming Emotion
+style insertion. Keep locale, query, and notification providers inside this boundary only when they
+are introduced by their dedicated tasks.
