@@ -63,15 +63,17 @@ Before committing:
 4. Run the checks relevant to the change.
 5. Update documentation, translations, tests, and the master task list when the task requires them.
 
-The minimum source-change verification is:
+The complete local verification command is:
 
 ```powershell
-pnpm lint
-pnpm typecheck
-pnpm build
+pnpm verify
 ```
 
-Add focused tests as the project acquires test suites. A commit may not knowingly leave the repository with failing required checks.
+This runs formatting checks, ESLint, strict TypeScript checking, unit and architecture tests, and the production build. Run focused Playwright or integration suites when the affected behavior requires them. A commit may not knowingly leave the repository with failing required checks.
+
+The Husky pre-commit hook runs `lint-staged`. Staged source files are linted and formatted, while
+staged configuration, styles, and documentation are formatted. Hooks are a fast local safeguard;
+they do not replace `pnpm verify` or CI.
 
 ## Production approval
 

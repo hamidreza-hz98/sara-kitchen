@@ -1,7 +1,8 @@
 allowBuilds:
-  '@parcel/watcher': true
-  '@swc/core': true
+  "@parcel/watcher": true
+  "@swc/core": true
   argon2: true
+  msw: true
   sharp: false
   unrs-resolver: false
 minimumReleaseAgeExclude:
@@ -10,3 +11,4 @@ minimumReleaseAgeExclude:
   - next-intl@4.14.5
   - use-intl@4.14.5
   - zod@4.6.5
+  - "@testing-library/dom@10.4.2"

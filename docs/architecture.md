@@ -60,26 +60,26 @@ Layers materialize when real behavior is implemented. Empty directories, placeho
 
 Dependencies point from consumer to provider. “None” means the module accepts opaque identifiers/context and has no domain-module import.
 
-| Module | Owns | May depend on public APIs of |
-| --- | --- | --- |
-| Auth | Authentication orchestration and password/account flows | Admins, Customers, Sessions |
-| Admins | Administrator identity, credentials, roles, status | None |
-| Customers | Customer identity, profile, credentials, consent/privacy state | None |
-| Sessions | Hashed sessions, device metadata, expiry/revocation | None |
-| Media | Upload metadata, storage coordination, variants, usage/deletion | None |
-| Categories | Category content, slug, status, ordering | Media |
-| Ingredients | Ingredient content, allergens, status | Media |
-| Dishes | Catalog content, pricing source, availability, lead time, relations | Categories, Ingredients, Media |
-| Addresses | Customer delivery addresses and ownership | Customers |
-| Carts | Cart identity/items, merge, pricing and availability coordination | Addresses, Customers, Dishes |
-| Transactions | Payment state/events, idempotency, webhooks, reconciliation | Customers |
-| Orders | Checkout, immutable snapshots, code/status/history | Addresses, Carts, Customers, Dishes, Transactions |
-| Contacts | Contact submissions, workflow and retention | None |
-| Blogs | Articles, publishing, relations and views | Admins, Dishes, Media |
-| SEO | Static/entity metadata, sitemap and structured-data inputs | Blogs, Categories, Dishes, Media |
-| Settings | Versioned site, content, delivery and notification configuration | Blogs, Categories, Dishes, Media |
-| Logs | Append-only audit events and authorized reads | None |
-| Analytics | Derived dashboard/report queries and rollups | Customers, Dishes, Logs, Orders |
+| Module       | Owns                                                                | May depend on public APIs of                      |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------------------- |
+| Auth         | Authentication orchestration and password/account flows             | Admins, Customers, Sessions                       |
+| Admins       | Administrator identity, credentials, roles, status                  | None                                              |
+| Customers    | Customer identity, profile, credentials, consent/privacy state      | None                                              |
+| Sessions     | Hashed sessions, device metadata, expiry/revocation                 | None                                              |
+| Media        | Upload metadata, storage coordination, variants, usage/deletion     | None                                              |
+| Categories   | Category content, slug, status, ordering                            | Media                                             |
+| Ingredients  | Ingredient content, allergens, status                               | Media                                             |
+| Dishes       | Catalog content, pricing source, availability, lead time, relations | Categories, Ingredients, Media                    |
+| Addresses    | Customer delivery addresses and ownership                           | Customers                                         |
+| Carts        | Cart identity/items, merge, pricing and availability coordination   | Addresses, Customers, Dishes                      |
+| Transactions | Payment state/events, idempotency, webhooks, reconciliation         | Customers                                         |
+| Orders       | Checkout, immutable snapshots, code/status/history                  | Addresses, Carts, Customers, Dishes, Transactions |
+| Contacts     | Contact submissions, workflow and retention                         | None                                              |
+| Blogs        | Articles, publishing, relations and views                           | Admins, Dishes, Media                             |
+| SEO          | Static/entity metadata, sitemap and structured-data inputs          | Blogs, Categories, Dishes, Media                  |
+| Settings     | Versioned site, content, delivery and notification configuration    | Blogs, Categories, Dishes, Media                  |
+| Logs         | Append-only audit events and authorized reads                       | None                                              |
+| Analytics    | Derived dashboard/report queries and rollups                        | Customers, Dishes, Logs, Orders                   |
 
 ## Reference and snapshot policy
 

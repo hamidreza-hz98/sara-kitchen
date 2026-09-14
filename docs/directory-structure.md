@@ -2,22 +2,22 @@
 
 Sara Kitchen keeps routes in `src/app` and shared application code in sibling folders. This follows the installed Next.js App Router guidance while making ownership explicit.
 
-| Path | Responsibility |
-| --- | --- |
-| `src/app` | Route groups, layouts, pages, Route Handlers, metadata, and route-level loading/error UI. |
-| `src/components` | Reusable React UI and design-system components. |
-| `src/hooks` | Shared client-side React hooks. |
-| `src/lib` | Framework-agnostic utilities and infrastructure adapters. |
-| `src/providers` | Application-level React provider composition. |
-| `src/theme` | Design tokens, Material UI theme, Emotion, and direction-aware styling. |
-| `src/validations` | Shared boundary-validation schemas and stable issue contracts. |
-| `src/types` | Cross-cutting serializable TypeScript contracts not owned by a domain module. |
-| `src/constants` | Stable project-wide constants such as supported locales and currency. |
-| `src/server` | Modular-monolith domain modules and server-only infrastructure. |
-| `src/locales` | Application interface message catalogs and localization configuration. |
-| `public` | Version-controlled static assets served from the site root. |
-| `tests` | Cross-feature integration, contract, end-to-end, fixture, and test-helper code. |
-| `docs` | Architecture, decisions, setup, operations, and acceptance records. |
+| Path              | Responsibility                                                                            |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| `src/app`         | Route groups, layouts, pages, Route Handlers, metadata, and route-level loading/error UI. |
+| `src/components`  | Reusable React UI and design-system components.                                           |
+| `src/hooks`       | Shared client-side React hooks.                                                           |
+| `src/lib`         | Framework-agnostic utilities and infrastructure adapters.                                 |
+| `src/providers`   | Application-level React provider composition.                                             |
+| `src/theme`       | Design tokens, Material UI theme, Emotion, and direction-aware styling.                   |
+| `src/validations` | Shared boundary-validation schemas and stable issue contracts.                            |
+| `src/types`       | Cross-cutting serializable TypeScript contracts not owned by a domain module.             |
+| `src/constants`   | Stable project-wide constants such as supported locales and currency.                     |
+| `src/server`      | Modular-monolith domain modules and server-only infrastructure.                           |
+| `src/locales`     | Application interface message catalogs and localization configuration.                    |
+| `public`          | Version-controlled static assets served from the site root.                               |
+| `tests`           | Cross-feature integration, contract, end-to-end, fixture, and test-helper code.           |
+| `docs`            | Architecture, decisions, setup, operations, and acceptance records.                       |
 
 ## Placement rules
 

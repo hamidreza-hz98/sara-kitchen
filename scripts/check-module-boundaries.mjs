@@ -78,9 +78,7 @@ function moduleFromResolvedPath(resolvedPath, modulesRoot) {
 
 export function validateImport({ sourceFile, specifier, modulesRoot }) {
   const sourceModule = moduleFromFile(sourceFile, modulesRoot);
-  const absoluteMatch = specifier.match(
-    /^@\/server\/modules\/([^/]+)(\/.*)?$/,
-  );
+  const absoluteMatch = specifier.match(/^@\/server\/modules\/([^/]+)(\/.*)?$/);
 
   if (absoluteMatch) {
     const [, targetModule, internalPath = ""] = absoluteMatch;
@@ -178,9 +176,7 @@ export function checkModuleBoundaries(projectRoot = process.cwd()) {
       const violation = validateImport({ sourceFile, specifier, modulesRoot });
 
       if (violation) {
-        errors.push(
-          `${normalizePath(path.relative(projectRoot, sourceFile))}: ${violation}`,
-        );
+        errors.push(`${normalizePath(path.relative(projectRoot, sourceFile))}: ${violation}`);
       }
     }
   }
@@ -189,8 +185,7 @@ export function checkModuleBoundaries(projectRoot = process.cwd()) {
 }
 
 const isMain =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 
 if (isMain) {
   const errors = checkModuleBoundaries();
