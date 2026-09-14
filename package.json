@@ -10,7 +10,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm test:unit && pnpm test:boundaries && pnpm check:boundaries && pnpm test:quality",
+    "test": "pnpm test:unit && pnpm test:boundaries && pnpm check:boundaries && pnpm test:quality && pnpm test:hooks",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -20,6 +20,7 @@
     "check:boundaries": "node scripts/check-module-boundaries.mjs",
     "test:boundaries": "node --test scripts/check-module-boundaries.test.mjs",
     "test:quality": "node --test scripts/check-quality-rules.test.mjs",
+    "test:hooks": "node --test scripts/check-git-hooks.test.mjs",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "prepare": "husky"
   },

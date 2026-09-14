@@ -74,9 +74,11 @@ import-boundary scan, negative quality-gate fixtures, and the production build. 
 Playwright or integration suites when the affected behavior requires them. A commit may not
 knowingly leave the repository with failing required checks.
 
-The Husky pre-commit hook runs `lint-staged`. Staged source files are linted and formatted, while
-staged configuration, styles, and documentation are formatted. Hooks are a fast local safeguard;
-they do not replace `pnpm verify` or CI.
+The Husky pre-commit hook runs `lint-staged` serially. Staged source files are linted and formatted,
+while staged configuration, styles, and documentation are formatted. lint-staged protects unstaged
+changes and does not grant permission to modify unrelated files. Hooks are a fast local safeguard;
+they do not replace `pnpm verify` or CI. See [`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md)
+for the exact contract and executable acceptance test.
 
 ## Production approval
 

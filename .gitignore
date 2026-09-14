@@ -15,6 +15,7 @@
 /playwright-report
 /test-results
 /quality-fixture-*
+/hook-fixture-*
 
 # next.js
 /.next/

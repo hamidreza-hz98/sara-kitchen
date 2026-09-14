@@ -19,3 +19,4 @@ Current records:
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
 - [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
+- [`formatting-and-hooks.md`](./formatting-and-hooks.md) — deterministic formatting and staged-commit safeguards.

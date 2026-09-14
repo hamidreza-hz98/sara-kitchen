@@ -16,13 +16,14 @@ Focused unit and component tests may be colocated with the source they exercise.
 
 ## Commands
 
-- `pnpm test` runs deterministic Vitest suites, architecture tests, and negative quality-gate tests once.
+- `pnpm test` runs deterministic Vitest, architecture, negative quality-gate, and Git-hook tests once.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
+- `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.
 - `pnpm test:watch` starts the Vitest development watcher.
 - `pnpm test:coverage` writes V8 text, HTML, and LCOV coverage reports.
 - `pnpm test:e2e:install` installs the pinned Chromium browser once per machine or CI image.
 - `pnpm test:e2e` starts Next.js on port 3100 and runs Playwright plus axe checks.
-- `pnpm verify` runs formatting, lint, strict typecheck, unit/boundary tests, and a production build.
+- `pnpm verify` runs formatting, lint, strict typecheck, all deterministic tests, and a production build.
 
 ## Test boundaries
 
