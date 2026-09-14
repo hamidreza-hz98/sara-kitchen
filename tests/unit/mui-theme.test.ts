@@ -2,8 +2,15 @@
 
 import { describe, expect, it } from "vitest";
 
-import { appTheme } from "@/theme/app-theme";
+import { appColorSchemes, appTheme } from "@/theme/app-theme";
 import { applicationFontFamily, emotionCacheOptions, fontVariableNames } from "@/theme";
+import {
+  breakpointTokens,
+  colorTokens,
+  motionTokens,
+  radiusTokens,
+  shadowTokens,
+} from "@/theme/tokens";
 
 describe("MUI App Router theme contract", () => {
   it("uses a stable layered Emotion cache configuration", () => {
@@ -22,5 +29,23 @@ describe("MUI App Router theme contract", () => {
   it("enables namespaced MUI CSS variables", () => {
     expect(appTheme.vars).toBeDefined();
     expect(appTheme.vars?.font).toBeDefined();
+  });
+
+  it("maps the approved foundations into both color schemes", () => {
+    expect(appColorSchemes.light.palette.primary.main).toBe(colorTokens.brand.primary);
+    expect(appColorSchemes.light.palette.background.default).toBe(colorTokens.light.canvas);
+    expect(appColorSchemes.dark.palette.background.default).toBe(colorTokens.dark.canvas);
+    expect(appTheme.breakpoints.values).toEqual(breakpointTokens);
+    expect(appTheme.shape.borderRadius).toBe(radiusTokens.md);
+    expect(appTheme.shadows[2]).toBe(shadowTokens.card);
+  });
+
+  it("maps motion and shared component treatments into the MUI theme", () => {
+    expect(appTheme.transitions.duration.standard).toBe(motionTokens.duration.standard);
+    expect(appTheme.components?.MuiButton?.styleOverrides).toBeDefined();
+    expect(appTheme.components?.MuiCard?.styleOverrides).toBeDefined();
+    expect(appTheme.components?.MuiOutlinedInput?.styleOverrides).toBeDefined();
+    expect(appTheme.components?.MuiDialog?.styleOverrides).toBeDefined();
+    expect(appTheme.components?.MuiTableCell?.styleOverrides).toBeDefined();
   });
 });

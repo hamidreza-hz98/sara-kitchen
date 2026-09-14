@@ -2,9 +2,8 @@
 
 @layer base {
   :root {
-    color-scheme: light;
-    --background: #f8f5f5;
-    --foreground: #2c2c47;
+    --background: var(--sara-palette-background-default);
+    --foreground: var(--sara-palette-text-primary);
   }
 
   html {

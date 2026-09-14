@@ -24,8 +24,10 @@ streaming, and inserts flushed style tags into `<head>`. Its options are central
 - `enableCssLayer: true`, which wraps generated rules in `@layer mui`; and
 - no manually created second cache or nested Emotion `CacheProvider`.
 
-The application does not use `suppressHydrationWarning`. A mismatch must remain visible and fail the
-browser acceptance test.
+The root `<html>` uses the narrow `suppressHydrationWarning` exception required by MUI's
+`InitColorSchemeScript`, because that script sets the selected color-scheme class before React
+hydrates. Application mismatches remain visible and fail the browser acceptance test; the exception
+is not used on application content.
 
 ## Cascade-layer strategy
 

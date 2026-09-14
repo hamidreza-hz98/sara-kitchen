@@ -8,7 +8,12 @@ import { appTheme } from "@/theme/app-theme";
 
 export function AppThemeProvider({ children }: PropsWithChildren) {
   return (
-    <ThemeProvider theme={appTheme}>
+    <ThemeProvider
+      theme={appTheme}
+      defaultMode="light"
+      disableTransitionOnChange
+      modeStorageKey="sara-kitchen-mode"
+    >
       <CssBaseline enableColorScheme />
       {children}
     </ThemeProvider>

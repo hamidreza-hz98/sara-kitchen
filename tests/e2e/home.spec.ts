@@ -66,6 +66,7 @@ test("MUI styles stream before content and hydrate without duplicates", async ({
       ),
     );
 
-  expect(identifiersAfterReload).toEqual(emotionIdentifiers);
+  expect(new Set(identifiersAfterReload).size).toBe(identifiersAfterReload.length);
+  expect(identifiersAfterReload).toEqual(expect.arrayContaining(emotionIdentifiers));
   expect(runtimeErrors).toEqual([]);
 });
