@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {/* config options here */};
+import { validateEnvironment } from "./src/validations/env/server";
+
+validateEnvironment();
+
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

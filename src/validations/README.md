@@ -9,3 +9,7 @@ Reusable boundary-validation schemas belong here.
 - Never trust client-calculated prices, permissions, ownership, payment state, or file metadata.
 
 Feature-specific schemas may live in their server module and be re-exported only when a client form genuinely shares them.
+
+Implemented contracts:
+
+- [`env`](./env/README.md) — fail-fast server/client environment parsing and exposure controls.

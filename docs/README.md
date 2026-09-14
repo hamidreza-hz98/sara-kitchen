@@ -17,3 +17,4 @@ Current records:
 
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
+- [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
