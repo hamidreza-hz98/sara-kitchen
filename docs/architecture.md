@@ -32,7 +32,12 @@ Server Components call public module services directly. They do not make HTTP re
 7. Public module APIs expose use cases plus serializable inputs/DTOs. They never expose Mongoose documents, secrets, raw provider payloads, or persistence sessions unintentionally.
 8. Cyclic imports are forbidden. When two domains reference one another, assign orchestration to one owner, store opaque references, use immutable snapshots, or publish an application event rather than importing both ways.
 9. Cross-cutting request correlation and audit behavior are injected or invoked through public contracts; domain modules do not reach into Logs persistence.
-10. The executable boundary checker and its tests are required verification for changes under `src/server`.
+10. The executable boundary checker and its tests are required verification for all source changes.
+11. Top-level source layers follow the dependency directions documented in
+    [`code-quality.md`](./code-quality.md); reusable/shared layers never import application routes or
+    server infrastructure.
+12. Client Components cannot import server-only modules. Dedicated `use server` action entrypoints
+    are the explicit framework-supported exception.
 
 Run:
 

@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-import { validateEnvironment } from "./src/validations/env/server";
+import { validateEnvironment } from "./src/server/environment-core";
 
 validateEnvironment();
 

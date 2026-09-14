@@ -69,7 +69,10 @@ The complete local verification command is:
 pnpm verify
 ```
 
-This runs formatting checks, ESLint, strict TypeScript checking, unit and architecture tests, and the production build. Run focused Playwright or integration suites when the affected behavior requires them. A commit may not knowingly leave the repository with failing required checks.
+This runs formatting checks, type-aware ESLint, strict TypeScript checking, unit tests, the live
+import-boundary scan, negative quality-gate fixtures, and the production build. Run focused
+Playwright or integration suites when the affected behavior requires them. A commit may not
+knowingly leave the repository with failing required checks.
 
 The Husky pre-commit hook runs `lint-staged`. Staged source files are linted and formatted, while
 staged configuration, styles, and documentation are formatted. Hooks are a fast local safeguard;

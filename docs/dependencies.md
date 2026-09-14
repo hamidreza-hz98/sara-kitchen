@@ -51,6 +51,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
 | `@tiptap/starter-kit`     |       `3.31.3` | Curated baseline of rich-text nodes, marks, history, and editing commands.                                                       |
 | `@tiptap/static-renderer` |       `3.31.3` | Converts trusted Tiptap JSON to display markup without mounting an editor.                                                       |
 | `sanitize-html`           |       `2.17.7` | Server-side allowlist sanitizer for rendered, imported, or legacy rich-text HTML.                                                |
+| `server-only`             |        `0.0.1` | Next.js build-time guard that prevents marked server modules from entering Client Component graphs.                              |
 | `leaflet`                 |        `1.9.4` | Map geometry, markers, coordinates, and distance-friendly browser map primitives.                                                |
 | `react-leaflet`           |        `5.0.0` | React 19 bindings for Leaflet on address and settings map screens.                                                               |
 | `@tanstack/react-table`   |        `9.2.4` | Headless sorting, filtering, pagination, and row models for complex admin grids.                                                 |
@@ -58,33 +59,35 @@ whenever a direct dependency is added, removed, or materially repurposed.
 
 ## Development dependencies
 
-| Package                       | Declared version | Purpose                                                                                                                 |
-| ----------------------------- | ---------------: | ----------------------------------------------------------------------------------------------------------------------- |
-| `typescript`                  |         `^5.9.3` | Strict static checking and build-time type analysis.                                                                    |
-| `eslint`                      |        `^9.39.5` | JavaScript and TypeScript lint engine.                                                                                  |
-| `eslint-config-next`          |         `16.3.5` | Next.js and React lint rules aligned with the framework version.                                                        |
-| `@types/node`                 |        `^24.1.0` | Node.js 24 API declarations.                                                                                            |
-| `@types/react`                |        `^19.3.0` | React 19 declarations.                                                                                                  |
-| `@types/react-dom`            |        `^19.3.0` | React DOM 19 declarations.                                                                                              |
-| `@types/leaflet`              |         `1.9.22` | Leaflet declarations for map components and geographic data.                                                            |
-| `@types/sanitize-html`        |         `2.16.1` | Type declarations for the server-side sanitizer.                                                                        |
-| `prettier`                    |          `3.9.6` | Deterministic formatting for source, configuration, styles, and documentation.                                          |
-| `eslint-config-prettier`      |         `10.1.8` | Disables ESLint formatting rules that conflict with Prettier.                                                           |
-| `vite`                        |          `8.3.0` | Version-pinned transform/runtime foundation used by Vitest and its plugins.                                             |
-| `vitest`                      |          `5.0.0` | Fast unit, component, contract, and integration test runner.                                                            |
-| `@vitest/coverage-v8`         |          `5.0.0` | Native V8 coverage collection with text, HTML, and LCOV reports.                                                        |
-| `@vitejs/plugin-react`        |          `6.1.1` | React JSX transformation for component tests.                                                                           |
-| `jsdom`                       |         `29.1.1` | Browser DOM simulation for React component tests; selected over 30.x to support the full declared Node 24 engine range. |
-| `@testing-library/dom`        |         `10.4.2` | Accessible, user-oriented DOM queries used by Testing Library adapters.                                                 |
-| `@testing-library/react`      |         `16.3.3` | React 19 component rendering and interaction test utilities.                                                            |
-| `@testing-library/jest-dom`   |          `7.0.1` | Semantic DOM matchers integrated with Vitest assertions.                                                                |
-| `@testing-library/user-event` |         `14.6.7` | Realistic keyboard, pointer, and form interactions for component tests.                                                 |
-| `msw`                         |         `2.15.0` | Network-level mocks for deterministic payment, messaging, and other external HTTP contracts.                            |
-| `mongodb-memory-server-core`  |         `11.2.0` | On-demand isolated MongoDB for repository integration tests without install-time binary downloads.                      |
-| `@playwright/test`            |         `1.63.0` | Browser-level customer, dashboard, and async Server Component journeys.                                                 |
-| `@axe-core/playwright`        |         `4.13.0` | Automated WCAG rule scans within Playwright journeys.                                                                   |
-| `husky`                       |          `9.1.7` | Repository-owned native Git hook setup.                                                                                 |
-| `lint-staged`                 |         `17.5.1` | Runs formatting and lint fixes only against files staged for commit.                                                    |
+| Package                            | Declared version | Purpose                                                                                                                 |
+| ---------------------------------- | ---------------: | ----------------------------------------------------------------------------------------------------------------------- |
+| `typescript`                       |         `^5.9.3` | Strict static checking and build-time type analysis.                                                                    |
+| `eslint`                           |        `^9.39.5` | JavaScript and TypeScript lint engine.                                                                                  |
+| `eslint-config-next`               |         `16.3.5` | Next.js and React lint rules aligned with the framework version.                                                        |
+| `@types/node`                      |        `^24.1.0` | Node.js 24 API declarations.                                                                                            |
+| `@types/react`                     |        `^19.3.0` | React 19 declarations.                                                                                                  |
+| `@types/react-dom`                 |        `^19.3.0` | React DOM 19 declarations.                                                                                              |
+| `@types/leaflet`                   |         `1.9.22` | Leaflet declarations for map components and geographic data.                                                            |
+| `@types/sanitize-html`             |         `2.16.1` | Type declarations for the server-side sanitizer.                                                                        |
+| `prettier`                         |          `3.9.6` | Deterministic formatting for source, configuration, styles, and documentation.                                          |
+| `eslint-config-prettier`           |         `10.1.8` | Disables ESLint formatting rules that conflict with Prettier.                                                           |
+| `@typescript-eslint/eslint-plugin` |         `8.70.0` | Type-aware promise, switch exhaustiveness, and type-import rules used directly by ESLint.                               |
+| `@typescript-eslint/parser`        |         `8.70.0` | Supplies TypeScript project-service type information to ESLint.                                                         |
+| `vite`                             |          `8.3.0` | Version-pinned transform/runtime foundation used by Vitest and its plugins.                                             |
+| `vitest`                           |          `5.0.0` | Fast unit, component, contract, and integration test runner.                                                            |
+| `@vitest/coverage-v8`              |          `5.0.0` | Native V8 coverage collection with text, HTML, and LCOV reports.                                                        |
+| `@vitejs/plugin-react`             |          `6.1.1` | React JSX transformation for component tests.                                                                           |
+| `jsdom`                            |         `29.1.1` | Browser DOM simulation for React component tests; selected over 30.x to support the full declared Node 24 engine range. |
+| `@testing-library/dom`             |         `10.4.2` | Accessible, user-oriented DOM queries used by Testing Library adapters.                                                 |
+| `@testing-library/react`           |         `16.3.3` | React 19 component rendering and interaction test utilities.                                                            |
+| `@testing-library/jest-dom`        |          `7.0.1` | Semantic DOM matchers integrated with Vitest assertions.                                                                |
+| `@testing-library/user-event`      |         `14.6.7` | Realistic keyboard, pointer, and form interactions for component tests.                                                 |
+| `msw`                              |         `2.15.0` | Network-level mocks for deterministic payment, messaging, and other external HTTP contracts.                            |
+| `mongodb-memory-server-core`       |         `11.2.0` | On-demand isolated MongoDB for repository integration tests without install-time binary downloads.                      |
+| `@playwright/test`                 |         `1.63.0` | Browser-level customer, dashboard, and async Server Component journeys.                                                 |
+| `@axe-core/playwright`             |         `4.13.0` | Automated WCAG rule scans within Playwright journeys.                                                                   |
+| `husky`                            |          `9.1.7` | Repository-owned native Git hook setup.                                                                                 |
+| `lint-staged`                      |         `17.5.1` | Runs formatting and lint fixes only against files staged for commit.                                                    |
 
 ## Integration rules
 
@@ -110,3 +113,5 @@ whenever a direct dependency is added, removed, or materially repurposed.
 - [MSW documentation](https://mswjs.io/docs/)
 - [Husky setup](https://typicode.github.io/husky/get-started.html)
 - [lint-staged documentation](https://github.com/lint-staged/lint-staged)
+- [typescript-eslint typed linting](https://typescript-eslint.io/getting-started/typed-linting/)
+- [Next.js server/client component boundaries](https://nextjs.org/docs/app/getting-started/server-and-client-components)

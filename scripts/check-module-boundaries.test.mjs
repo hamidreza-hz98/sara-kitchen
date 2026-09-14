@@ -5,10 +5,13 @@ import test from "node:test";
 import {
   extractImportSpecifiers,
   findDependencyCycles,
+  hasDirective,
   validateImport,
+  validateLayerImport,
 } from "./check-module-boundaries.mjs";
 
 const projectRoot = path.resolve("C:/workspace/sara-kitchen");
+const srcRoot = path.join(projectRoot, "src");
 const modulesRoot = path.join(projectRoot, "src", "server", "modules");
 
 function sourceFile(moduleName) {
@@ -97,5 +100,34 @@ test("accepts the project dependency graph and detects a cycle", () => {
       gamma: ["alpha"],
     }),
     [["alpha", "beta", "gamma", "alpha"]],
+  );
+});
+
+test("recognizes client directives after leading comments", () => {
+  assert.equal(hasDirective('/* component */\n"use client";\nexport {};', "use client"), true);
+  assert.equal(hasDirective('"use server";\nexport {};', "use client"), false);
+});
+
+test("rejects forbidden top-level layer dependencies", () => {
+  assert.match(
+    validateLayerImport({
+      sourceFile: path.join(srcRoot, "components", "dish-card.tsx"),
+      source: 'import Page from "@/app/page";',
+      specifier: "@/app/page",
+      srcRoot,
+    }),
+    /forbidden layer dependency components -> app/,
+  );
+});
+
+test("rejects server-only imports from Client Components", () => {
+  assert.match(
+    validateLayerImport({
+      sourceFile: path.join(srcRoot, "app", "client-component.tsx"),
+      source: '"use client";\nimport { getServerEnvironment } from "@/server/environment";',
+      specifier: "@/server/environment",
+      srcRoot,
+    }),
+    /Client Component imports server-only module/,
   );
 });

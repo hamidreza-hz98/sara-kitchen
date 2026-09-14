@@ -43,8 +43,9 @@ frozen when the application is built and must therefore be correct in the build 
 | `KITCHEN_LATITUDE`           | Yes      | Delivery origin latitude from -90 through 90    |
 | `KITCHEN_LONGITUDE`          | Yes      | Delivery origin longitude from -180 through 180 |
 
-These values are available only through `getServerEnvironment()` and must never be imported into a
-Client Component.
+These values are available only through the `server-only` guarded
+`@/server/environment#getServerEnvironment()` accessor and must never be imported into a Client
+Component.
 
 ## Conditional integrations
 

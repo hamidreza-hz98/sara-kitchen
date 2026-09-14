@@ -24,7 +24,52 @@ export const dependencyMap = Object.freeze({
 });
 
 const moduleNames = Object.freeze(Object.keys(dependencyMap));
-const sourceExtensions = new Set([".ts", ".tsx", ".mts", ".cts"]);
+const sourceExtensions = new Set([".js", ".jsx", ".ts", ".tsx", ".mts", ".cts"]);
+
+export const allowedLayerDependencies = Object.freeze({
+  app: [
+    "app",
+    "components",
+    "constants",
+    "hooks",
+    "lib",
+    "locales",
+    "providers",
+    "server",
+    "theme",
+    "types",
+    "validations",
+  ],
+  components: [
+    "components",
+    "constants",
+    "hooks",
+    "lib",
+    "locales",
+    "theme",
+    "types",
+    "validations",
+  ],
+  constants: ["constants", "types"],
+  hooks: ["constants", "hooks", "lib", "types", "validations"],
+  lib: ["constants", "lib", "types", "validations"],
+  locales: ["constants", "locales", "types", "validations"],
+  providers: [
+    "components",
+    "constants",
+    "hooks",
+    "lib",
+    "locales",
+    "providers",
+    "theme",
+    "types",
+    "validations",
+  ],
+  server: ["constants", "lib", "locales", "server", "types", "validations"],
+  theme: ["constants", "theme", "types"],
+  types: ["constants", "types"],
+  validations: ["constants", "types", "validations"],
+});
 
 export function findDependencyCycles(modules = dependencyMap) {
   const cycles = [];
@@ -64,6 +109,79 @@ export function findDependencyCycles(modules = dependencyMap) {
 
 function normalizePath(value) {
   return value.replaceAll("\\", "/");
+}
+
+function sourceLayer(sourceFile, srcRoot) {
+  const relative = normalizePath(path.relative(srcRoot, sourceFile));
+  const [candidate] = relative.split("/");
+  return Object.hasOwn(allowedLayerDependencies, candidate) ? candidate : null;
+}
+
+function projectImportTarget(sourceFile, specifier, srcRoot) {
+  if (specifier.startsWith("@/")) {
+    return path.join(srcRoot, specifier.slice(2));
+  }
+
+  return specifier.startsWith(".") ? path.resolve(path.dirname(sourceFile), specifier) : null;
+}
+
+function resolveSourceFile(candidate) {
+  const candidates = [
+    candidate,
+    ...[...sourceExtensions].map((extension) => `${candidate}${extension}`),
+    ...[...sourceExtensions].map((extension) => path.join(candidate, `index${extension}`)),
+  ];
+
+  return candidates.find((file) => fs.existsSync(file) && fs.statSync(file).isFile()) ?? null;
+}
+
+export function hasDirective(source, directive) {
+  const escapedDirective = directive.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `^\\s*(?:(?://[^\\n]*|/\\*[\\s\\S]*?\\*/)\\s*)*["']${escapedDirective}["']\\s*;?`,
+  ).test(source);
+}
+
+function targetIsServerOnly(targetPath) {
+  const normalized = normalizePath(targetPath);
+  const resolved = resolveSourceFile(targetPath);
+
+  if (
+    normalized.includes("/src/server/") ||
+    /(?:^|\/)server(?:-schema)?$/.test(normalized) ||
+    /\.server$/.test(normalized)
+  ) {
+    return resolved && hasDirective(fs.readFileSync(resolved, "utf8"), "use server") ? false : true;
+  }
+
+  return resolved
+    ? /\bimport\s+["']server-only["']/.test(fs.readFileSync(resolved, "utf8"))
+    : false;
+}
+
+export function validateLayerImport({ sourceFile, source, specifier, srcRoot }) {
+  const fromLayer = sourceLayer(sourceFile, srcRoot);
+  const targetPath = projectImportTarget(sourceFile, specifier, srcRoot);
+
+  if (hasDirective(source, "use client") && specifier === "server-only") {
+    return "a Client Component imports the server-only guard";
+  }
+
+  if (!targetPath || !fromLayer) {
+    return null;
+  }
+
+  const toLayer = sourceLayer(targetPath, srcRoot);
+
+  if (toLayer && !allowedLayerDependencies[fromLayer].includes(toLayer)) {
+    return `uses forbidden layer dependency ${fromLayer} -> ${toLayer}`;
+  }
+
+  if (hasDirective(source, "use client") && targetIsServerOnly(targetPath)) {
+    return `a Client Component imports server-only module ${normalizePath(path.relative(srcRoot, targetPath))}`;
+  }
+
+  return null;
 }
 
 function moduleFromFile(sourceFile, modulesRoot) {
@@ -144,6 +262,7 @@ function walkSourceFiles(directory) {
 }
 
 export function checkModuleBoundaries(projectRoot = process.cwd()) {
+  const srcRoot = path.join(projectRoot, "src");
   const modulesRoot = path.join(projectRoot, "src", "server", "modules");
   const errors = [];
 
@@ -169,13 +288,16 @@ export function checkModuleBoundaries(projectRoot = process.cwd()) {
     errors.push(`dependency cycle: ${cycle.join(" -> ")}`);
   }
 
-  for (const sourceFile of walkSourceFiles(path.join(projectRoot, "src", "server"))) {
+  for (const sourceFile of walkSourceFiles(srcRoot)) {
     const source = fs.readFileSync(sourceFile, "utf8");
 
     for (const specifier of extractImportSpecifiers(source)) {
-      const violation = validateImport({ sourceFile, specifier, modulesRoot });
+      const violations = [
+        validateImport({ sourceFile, specifier, modulesRoot }),
+        validateLayerImport({ sourceFile, source, specifier, srcRoot }),
+      ].filter(Boolean);
 
-      if (violation) {
+      for (const violation of violations) {
         errors.push(`${normalizePath(path.relative(projectRoot, sourceFile))}: ${violation}`);
       }
     }
@@ -191,10 +313,10 @@ if (isMain) {
   const errors = checkModuleBoundaries();
 
   if (errors.length > 0) {
-    console.error("Module boundary violations:\n");
+    console.error("Import boundary violations:\n");
     console.error(errors.map((error) => `- ${error}`).join("\n"));
     process.exitCode = 1;
   } else {
-    console.log(`Module boundaries valid for ${moduleNames.length} modules.`);
+    console.log(`Import boundaries valid across ${moduleNames.length} domain modules.`);
   }
 }

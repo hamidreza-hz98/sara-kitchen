@@ -16,7 +16,8 @@ Focused unit and component tests may be colocated with the source they exercise.
 
 ## Commands
 
-- `pnpm test` runs deterministic Vitest suites and the architecture boundary tests once.
+- `pnpm test` runs deterministic Vitest suites, architecture tests, and negative quality-gate tests once.
+- `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:watch` starts the Vitest development watcher.
 - `pnpm test:coverage` writes V8 text, HTML, and LCOV coverage reports.
 - `pnpm test:e2e:install` installs the pinned Chromium browser once per machine or CI image.

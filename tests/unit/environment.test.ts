@@ -8,7 +8,7 @@ import {
   clientEnvironmentSchema,
   parseClientEnvironment,
 } from "@/validations/env/client-schema";
-import { validateEnvironment } from "@/validations/env/server";
+import { validateEnvironment } from "@/server/environment-core";
 import { SERVER_ENVIRONMENT_KEYS, serverEnvironmentSchema } from "@/validations/env/server-schema";
 
 const validEnvironment = {

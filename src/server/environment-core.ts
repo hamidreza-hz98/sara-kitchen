@@ -2,13 +2,13 @@ import {
   CLIENT_ENVIRONMENT_KEYS,
   type ClientEnvironment,
   parseClientEnvironment,
-} from "./client-schema";
-import { type EnvironmentIssue, EnvironmentValidationError } from "./error";
+} from "../validations/env/client-schema";
+import { type EnvironmentIssue, EnvironmentValidationError } from "../validations/env/error";
 import {
   parseServerEnvironment,
   SERVER_ENVIRONMENT_KEYS,
   type ServerEnvironment,
-} from "./server-schema";
+} from "../validations/env/server-schema";
 
 type EnvironmentSource = Record<string, string | undefined>;
 

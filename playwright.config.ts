@@ -1,31 +1,35 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = 3100;
-const localBrowserChannel = !process.env.CI && process.platform === "win32" ? "msedge" : undefined;
+const isCI = Boolean(process.env.CI);
+const localBrowserChannel = !isCI && process.platform === "win32" ? "msedge" : undefined;
 
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  ...(isCI ? { workers: 1 } : {}),
+  reporter: isCI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    video: process.env.CI ? "retain-on-failure" : "off",
+    video: isCI ? "retain-on-failure" : "off",
   },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"], channel: localBrowserChannel },
+      use: {
+        ...devices["Desktop Chrome"],
+        ...(localBrowserChannel ? { channel: localBrowserChannel } : {}),
+      },
     },
   ],
   webServer: {
     command: `pnpm dev --hostname 127.0.0.1 --port ${port}`,
     url: `http://127.0.0.1:${port}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !isCI,
     timeout: 120_000,
   },
 });
