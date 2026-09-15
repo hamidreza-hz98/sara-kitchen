@@ -6,4 +6,4 @@ export {
   isSupportedLocale,
   type SupportedLocale,
 } from "./locales";
-export { PROJECT_CURRENCY, PROJECT_NAME } from "./project";
+export { PROJECT_CURRENCY, PROJECT_NAME, PROJECT_TIME_ZONE } from "./project";

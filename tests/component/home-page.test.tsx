@@ -3,12 +3,13 @@ import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 
 import Home from "@/app/[locale]/page";
+import { PROJECT_TIME_ZONE } from "@/constants";
 import messages from "@/locales/messages/en";
 
 describe("Home", () => {
   it("renders the current starter page with an accessible primary heading", () => {
     render(
-      <NextIntlClientProvider locale="en" messages={messages} timeZone="Europe/Lisbon">
+      <NextIntlClientProvider locale="en" messages={messages} timeZone={PROJECT_TIME_ZONE}>
         <Home />
       </NextIntlClientProvider>,
     );

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getMessages, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
-import { isRtlLocale, isSupportedLocale } from "@/constants";
+import { isRtlLocale, isSupportedLocale, PROJECT_TIME_ZONE } from "@/constants";
 import { routing } from "@/locales/routing";
 import { AppThemeProvider, DirectionAwareCacheProvider, LocaleProvider } from "@/providers";
 import { applicationFontVariables } from "@/theme/fonts.server";
@@ -59,7 +59,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           modeStorageKey="sara-kitchen-mode"
         />
         <DirectionAwareCacheProvider direction={direction}>
-          <LocaleProvider locale={locale} messages={messages} timeZone="Europe/Lisbon">
+          <LocaleProvider locale={locale} messages={messages} timeZone={PROJECT_TIME_ZONE}>
             <AppThemeProvider direction={direction}>{children}</AppThemeProvider>
           </LocaleProvider>
         </DirectionAwareCacheProvider>

@@ -47,6 +47,14 @@ development. Production logs the error and renders its stable key so the UI rema
 - Never concatenate localized currency, date, number, plural, or unit text; use `next-intl` formatters.
 - Keep database entity translation arrays separate from application message catalogs.
 
+## Value formatting
+
+Import the pure helpers from `@/locales` for EUR currency, decimal numbers, units, relative time,
+dates, and times. They enforce integer cents for money, use the canonical `Europe/Lisbon` time zone,
+and cache `Intl` formatter instances. Persian intentionally uses its locale-default calendar and
+digits. See [`localized-formatting.md`](./localized-formatting.md) for the complete contracts and
+examples.
+
 ## Verification
 
 `pnpm check:locales` checks all seven namespace files, key parity, non-empty leaf values, JSON shape,

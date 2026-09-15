@@ -22,6 +22,8 @@ or placeholder-incompatible messages.
   zone to `Europe/Lisbon`.
 - `navigation.ts` exports locale-aware `Link`, redirect, pathname, and router helpers. Import these
   instead of their Next.js equivalents when navigation changes or depends on locale.
+- `formatters.ts` centralizes cached `Intl` formatters for integer-cent EUR, decimal numbers, units,
+  relative time, and Porto-zone dates/times. It validates inputs before formatting.
 - `messages.ts` uses an exhaustive loader map and merges localized copy over English defensively.
 - `global.d.ts` derives valid translation namespaces and keys from the English source catalog.
 - `messages/<locale>/*.json` contains UI copy only. Every locale must preserve the English shape.
