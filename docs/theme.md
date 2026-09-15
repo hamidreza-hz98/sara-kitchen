@@ -18,10 +18,12 @@ from search indexing and exercises the same theme used by the product.
 
 ## Global component contract
 
-Buttons, icon buttons, paper, cards, chips, text fields, outlined inputs, alerts, dialogs, app bars,
-tables, tabs, tooltips, and snackbars have shared defaults or overrides. Overrides stay in the
-theme when they represent a system-wide rule; page-only composition stays in the page `sx` props.
-Existing MUI variants are restyled rather than extended with one-off product variants.
+Buttons, links, icon buttons, paper, cards, badges, chips, text fields, outlined inputs, alerts,
+dialogs, drawers, skeletons, pagination, app bars, tables, tabs, tooltips, and snackbars have shared
+defaults or overrides. Overrides stay in the theme when they represent a system-wide rule; page-only
+composition stays in the page `sx` props. Existing MUI variants are restyled rather than extended
+with one-off product variants. Application-level contracts are documented in
+[`ui-primitives.md`](./ui-primitives.md).
 
 The theme uses MUI CSS variables with the `--sara` prefix and class-based `light`/`dark` schemes.
 The root layout runs `InitColorSchemeScript` before content and the provider uses the matching

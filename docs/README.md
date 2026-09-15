@@ -30,3 +30,4 @@ Current records:
 - [`mui-app-router.md`](./mui-app-router.md) — streaming Emotion cache, provider order, cascade layers, fonts, and hydration acceptance.
 - [`right-to-left.md`](./right-to-left.md) — locale direction, RTL Emotion processing, logical CSS, icon policy, and visual verification.
 - [`theme.md`](./theme.md) — executable palette, typography, shape, elevation, motion, component overrides, and responsive showcase verification.
+- [`ui-primitives.md`](./ui-primitives.md) — shared component contracts, accessibility/localization rules, rich-content safety, and showcase coverage.

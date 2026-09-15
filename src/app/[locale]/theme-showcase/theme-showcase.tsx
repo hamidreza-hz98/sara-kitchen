@@ -2,10 +2,11 @@
 
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
-import CloseRounded from "@mui/icons-material/CloseRounded";
 import DarkModeRounded from "@mui/icons-material/DarkModeRounded";
 import LightModeRounded from "@mui/icons-material/LightModeRounded";
 import LocalDiningRounded from "@mui/icons-material/LocalDiningRounded";
+import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
+import RefreshRounded from "@mui/icons-material/RefreshRounded";
 import ShoppingBagRounded from "@mui/icons-material/ShoppingBagRounded";
 import Alert from "@mui/material/Alert";
 import AppBar from "@mui/material/AppBar";
@@ -15,10 +16,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Container from "@mui/material/Container";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
@@ -34,12 +31,29 @@ import TableRow from "@mui/material/TableRow";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useColorScheme, useTheme } from "@mui/material/styles";
 import { useState } from "react";
 
 import { DirectionalIcon } from "@/components";
+import {
+  ActionButton,
+  AppDialog,
+  AppDrawer,
+  AppImage,
+  AppLink,
+  AppPagination,
+  AppTooltip,
+  ContentSkeleton,
+  EmptyState,
+  ErrorState,
+  FormField,
+  NotificationBadge,
+  RichContent,
+  SelectField,
+  StatusChip,
+  type RichTextDocument,
+} from "@/components/ui";
 import { colorTokens, radiusTokens, shadowTokens } from "@/theme";
 
 const swatches = [
@@ -55,6 +69,44 @@ const orderRows = [
   { item: "Fesenjan", status: "Preparing", quantity: 2, total: "€24.00" },
   { item: "Kuku Sabzi", status: "Ready", quantity: 1, total: "€5.50" },
 ] as const;
+
+const categoryOptions = [
+  { label: "Main course", value: "main" },
+  { label: "Starter", value: "starter" },
+] as const;
+
+const richContentExample = {
+  type: "doc",
+  content: [
+    {
+      type: "heading",
+      attrs: { level: 3 },
+      content: [{ type: "text", text: "A recipe story" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        { type: "text", text: "Fresh herbs", marks: [{ type: "bold" }] },
+        { type: "text", text: " and patient preparation give Persian dishes their character." },
+      ],
+    },
+    {
+      type: "bulletList",
+      content: [
+        {
+          type: "listItem",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Cooked at home" }] }],
+        },
+        {
+          type: "listItem",
+          content: [
+            { type: "paragraph", content: [{ type: "text", text: "Prepared for your order" }] },
+          ],
+        },
+      ],
+    },
+  ],
+} as const satisfies RichTextDocument;
 
 function ShowcaseSection({
   eyebrow,
@@ -78,6 +130,8 @@ export function ThemeShowcase() {
   const { mode, setMode } = useColorScheme();
   const theme = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const [tab, setTab] = useState(0);
   const isDark = mode === "dark";
 
@@ -112,17 +166,18 @@ export function ThemeShowcase() {
               Design system · v1
             </Typography>
           </Box>
-          <Tooltip title={isDark ? "Use light theme" : "Use dark theme"}>
-            <span>
-              <IconButton
-                aria-label={isDark ? "Use light theme" : "Use dark theme"}
-                disabled={mode === undefined}
-                onClick={() => setMode(isDark ? "light" : "dark")}
-              >
-                {isDark ? <LightModeRounded /> : <DarkModeRounded />}
-              </IconButton>
-            </span>
-          </Tooltip>
+          <AppTooltip
+            disabled={mode === undefined}
+            title={isDark ? "Use light theme" : "Use dark theme"}
+          >
+            <IconButton
+              aria-label={isDark ? "Use light theme" : "Use dark theme"}
+              disabled={mode === undefined}
+              onClick={() => setMode(isDark ? "light" : "dark")}
+            >
+              {isDark ? <LightModeRounded /> : <DarkModeRounded />}
+            </IconButton>
+          </AppTooltip>
         </Toolbar>
       </AppBar>
 
@@ -206,6 +261,118 @@ export function ThemeShowcase() {
                 </CardContent>
               </Card>
             ))}
+          </Box>
+        </ShowcaseSection>
+
+        <ShowcaseSection eyebrow="Shared UI" title="Accessible product primitives">
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "repeat(2, minmax(0, 1fr))" },
+              gap: 5,
+            }}
+          >
+            <Card>
+              <CardContent>
+                <Typography variant="h3">Actions, links, and indicators</Typography>
+                <Stack direction="row" useFlexGap spacing={3} sx={{ mt: 5, flexWrap: "wrap" }}>
+                  <ActionButton variant="contained" onClick={() => setDrawerOpen(true)}>
+                    Open order drawer
+                  </ActionButton>
+                  <AppLink href="/menu">View the menu</AppLink>
+                  <AppTooltip title="Three unread notifications">
+                    <IconButton aria-label="Notifications">
+                      <NotificationBadge
+                        badgeContent={3}
+                        badgeLabel="3 unread notifications"
+                        color="primary"
+                      >
+                        <NotificationsRounded />
+                      </NotificationBadge>
+                    </IconButton>
+                  </AppTooltip>
+                </Stack>
+                <Stack direction="row" useFlexGap spacing={2} sx={{ mt: 5, flexWrap: "wrap" }}>
+                  <StatusChip color="success" label="Ready" />
+                  <StatusChip color="warning" label="Preparing" />
+                  <StatusChip color="error" label="Cancelled" variant="outlined" />
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <Typography variant="h3">Fields and selection</Typography>
+                <Box
+                  sx={{
+                    mt: 5,
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                    gap: 4,
+                  }}
+                >
+                  <FormField
+                    helperText="Shown on the menu"
+                    label="Public dish name"
+                    name="dishName"
+                    defaultValue="Fesenjan"
+                  />
+                  <SelectField
+                    label="Dish category"
+                    name="dishCategory"
+                    options={categoryOptions}
+                    defaultValue="main"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+
+            <Box sx={{ display: "grid", gap: 5 }}>
+              <EmptyState
+                title="No saved addresses"
+                description="Add an address now or choose pickup during checkout."
+                action={<ActionButton variant="outlined">Add address</ActionButton>}
+              />
+              <ErrorState
+                title="Orders could not load"
+                description="Check the connection and try again."
+                action={<ActionButton startIcon={<RefreshRounded />}>Try again</ActionButton>}
+              />
+            </Box>
+
+            <Card>
+              <CardContent>
+                <Typography variant="h3">Loading, media, and rich content</Typography>
+                <Stack spacing={4} sx={{ mt: 5 }}>
+                  <ContentSkeleton height={24} label="Loading dish details" variant="rounded" />
+                  <ContentSkeleton height={80} label="Loading dish image" variant="rounded" />
+                  <Box sx={{ display: "flex", gap: 4, alignItems: "flex-start" }}>
+                    <AppImage
+                      alt="Media component example"
+                      height={88}
+                      objectFit="contain"
+                      src="/window.svg"
+                      style={{ flexShrink: 0 }}
+                      width={88}
+                    />
+                    <RichContent content={richContentExample} />
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card sx={{ gridColumn: { lg: "1 / -1" } }}>
+              <CardContent>
+                <Typography variant="h3">Pagination</Typography>
+                <AppPagination
+                  count={8}
+                  label="Dish pages"
+                  page={page}
+                  onChange={(_event, value) => setPage(value)}
+                  sx={{ mt: 5 }}
+                />
+              </CardContent>
+            </Card>
           </Box>
         </ShowcaseSection>
 
@@ -399,29 +566,38 @@ export function ThemeShowcase() {
         </Paper>
       </Container>
 
-      <Dialog fullWidth maxWidth="xs" open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle sx={{ paddingInlineEnd: 14 }}>
-          Preview order
-          <IconButton
-            aria-label="Close order preview"
-            onClick={() => setDialogOpen(false)}
-            sx={{ position: "absolute", insetInlineEnd: 12, insetBlockStart: 12 }}
-          >
-            <CloseRounded />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Typography color="text.secondary">
-            Dialog shape, elevation, spacing, and controls all inherit the global theme.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setDialogOpen(false)}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <AppDialog
+        actions={
+          <>
+            <ActionButton onClick={() => setDialogOpen(false)}>Cancel</ActionButton>
+            <ActionButton variant="contained" onClick={() => setDialogOpen(false)}>
+              Confirm
+            </ActionButton>
+          </>
+        }
+        closeLabel="Close order preview"
+        description="Dialog shape, elevation, spacing, focus trapping, and controls inherit the product contract."
+        fullWidth
+        maxWidth="xs"
+        open={dialogOpen}
+        title="Preview order"
+        onClose={() => setDialogOpen(false)}
+      />
+
+      <AppDrawer
+        closeLabel="Close order drawer"
+        description="A logical end-side drawer mirrors automatically in Persian."
+        open={drawerOpen}
+        title="Order summary"
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Stack spacing={4}>
+          <Typography>Fesenjan × 2</Typography>
+          <ActionButton variant="contained" onClick={() => setDrawerOpen(false)}>
+            Continue to checkout
+          </ActionButton>
+        </Stack>
+      </AppDrawer>
     </Box>
   );
 }

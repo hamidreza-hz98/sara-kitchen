@@ -70,3 +70,31 @@ for (const mode of ["light", "dark"] as const) {
     expect(scan.violations).toEqual([]);
   });
 }
+
+test("shared primitives support keyboard operation and restore overlay focus", async ({ page }) => {
+  await page.goto("/theme-showcase");
+
+  const dialogTrigger = page.getByRole("button", { name: "Preview order" });
+  await dialogTrigger.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "Preview order" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Preview order" })).toBeHidden();
+  await expect(dialogTrigger).toBeFocused();
+
+  const drawerTrigger = page.getByRole("button", { name: "Open order drawer" });
+  await drawerTrigger.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Order summary" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("heading", { name: "Order summary" })).toBeHidden();
+  await expect(drawerTrigger).toBeFocused();
+
+  await page.getByRole("button", { name: "Notifications" }).focus();
+  await expect(page.getByRole("tooltip", { name: "Three unread notifications" })).toBeVisible();
+
+  const secondPage = page.getByRole("button", { name: "Go to page 2" });
+  await secondPage.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator('[aria-current="page"]')).toHaveText("2");
+});

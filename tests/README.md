@@ -20,6 +20,9 @@ Focused unit and component tests may be colocated with the source they exercise.
 - `pnpm test:unit` (or `pnpm unit`) runs unit and component tests in jsdom.
 - Localized formatter tests pin English, European Portuguese, and Persian output for EUR cents,
   decimal numbers, units, relative time, and Porto-zone date/time values.
+- Shared primitive component tests cover accessible names/roles, safe form actions, focus-triggered
+  tooltips, keyboard overlay dismissal, locale-aware links, pagination, image alt intent, loading and
+  state announcements, semantic rich content, and unsafe-link rejection.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.

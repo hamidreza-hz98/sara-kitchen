@@ -305,6 +305,27 @@ const appThemeOptions = {
         }),
       },
     },
+    MuiBadge: {
+      styleOverrides: {
+        badge: {
+          minWidth: 20,
+          height: 20,
+          paddingInline: spacingTokens.compact,
+          borderRadius: radiusTokens.pill,
+          fontWeight: typographyTokens.fontWeight.bold,
+          boxShadow: `0 0 0 2px var(--sara-palette-background-paper)`,
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: "var(--sara-palette-primary-dark)",
+          fontWeight: typographyTokens.fontWeight.semiBold,
+          textUnderlineOffset: spacingTokens.xs,
+        },
+      },
+    },
     MuiTextField: { defaultProps: { size: "small", variant: "outlined" } },
     MuiOutlinedInput: {
       styleOverrides: {
@@ -330,6 +351,29 @@ const appThemeOptions = {
     MuiDialog: {
       styleOverrides: {
         paper: { borderRadius: radiusTokens.xl, boxShadow: shadowTokens.dialog },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backgroundImage: "none",
+          boxShadow: shadowTokens.dialog,
+        },
+      },
+    },
+    MuiSkeleton: {
+      styleOverrides: {
+        root: { borderRadius: radiusTokens.md },
+      },
+    },
+    MuiPaginationItem: {
+      styleOverrides: {
+        root: {
+          minWidth: 40,
+          height: 40,
+          borderRadius: radiusTokens.md,
+          fontWeight: typographyTokens.fontWeight.semiBold,
+        },
       },
     },
     MuiAppBar: {

@@ -23,6 +23,10 @@ describe("ThemeShowcase", () => {
       }),
     ).toBeVisible();
     expect(screen.getByText("Primary coral")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Accessible product primitives" })).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "Public dish name" })).toBeVisible();
+    expect(screen.getByRole("navigation", { name: "Dish pages" })).toBeVisible();
+    expect(screen.getByRole("article")).toBeVisible();
     expect(screen.getByRole("table")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Preview order" }));
