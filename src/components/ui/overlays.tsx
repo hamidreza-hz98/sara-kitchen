@@ -104,6 +104,14 @@ export function AppDrawer({
         paper: {
           "aria-describedby": description ? descriptionId : undefined,
           "aria-labelledby": titleId,
+          sx: {
+            // MUI's horizontal anchor and RTL Emotion processing can each transform
+            // physical inset rules. Pin the paper to one logical side explicitly.
+            left: "auto",
+            right: "auto",
+            insetInlineStart: isStart ? 0 : "auto",
+            insetInlineEnd: isStart ? "auto" : 0,
+          },
         },
       }}
       {...props}

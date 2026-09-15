@@ -18,6 +18,7 @@ Current records:
 - [`adr/`](./adr/README.md) — accepted architecture decisions, alternatives, consequences, and revisit triggers;
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
+- [`dashboard-shell.md`](./dashboard-shell.md) — protected management route, responsive shell, permission-filtered navigation, and admin-session handoff;
 - [`definition-of-done.md`](./definition-of-done.md) — required delivery evidence for tests, translations, authorization, logging, validation, accessibility, responsive layout, documentation, and security;
 - [`design-tokens.md`](./design-tokens.md) — typed color, typography, spacing, breakpoint, radius, shadow, and motion decisions traced to the supplied UI/UX exports;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.

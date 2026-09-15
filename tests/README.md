@@ -30,6 +30,9 @@ Focused unit and component tests may be colocated with the source they exercise.
 - Storefront-shell browser tests cover the 390, 768, 1024, and 1440px navigation modes, overflow,
   screenshots, skip-link focus, account-menu and drawer keyboard behavior, cart labelling, clean-URL
   locale switching, Persian drawer mirroring, and axe checks.
+- Dashboard policy unit tests cover permission filtering and deep-link resolution. Dashboard-shell
+  browser tests cover fail-closed real routes and the data-free development fixture at four
+  breakpoints, persistent collapse, keyboard operation, RTL mirroring, and axe checks.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.

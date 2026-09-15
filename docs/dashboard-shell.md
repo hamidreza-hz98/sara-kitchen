@@ -1,0 +1,13 @@
+# Responsive dashboard shell (SK-0034)
+
+The dashboard shell follows the supplied light/dark management dashboard designs: a 272px desktop sidebar, a 76px collapsed rail, a top bar, and an RTL-aware mobile drawer. Its content area provides a skip target, breadcrumbs, and a responsive container. The app theme supplies the approved palette, spacing, and fonts.
+
+`DashboardShell` receives a **server-derived** `DashboardActor` DTO. The navigation policy requires `dashboard:view` and filters each entry by its explicit read permission. Role labels are display copy, not authorization. The currently known route sections are overview, categories, dishes, ingredients, media, blog, customers, admins, orders, transactions, contact, activity, and settings. A deep link selects the longest matching section and displays remaining URL segments as breadcrumbs. Unknown or unauthorized sections show a denial state inside the preview shell.
+
+At this foundation stage, the actual `/dashboard` route and every deep link redirect to `/authentication`. There is deliberately no cookie-based bypass or fake admin login. Database-backed, audience-bound admin sessions and server-side permission enforcement are scheduled in SK-0047–SK-0052. That integration must replace the fail-closed layout gate, resolve actor permissions on the server, enforce access on each route/action, and wire account sign-out to session revocation. The account menu currently identifies the actor; sign-out remains disabled until revocation is implemented. `/authentication` explains the pending setup and is marked `noindex`.
+
+In development only, `/theme-showcase/dashboard-shell` is a data-free visual fixture with a synthetic actor and identical shell behavior. It is `notFound()` in production and grants no session. Its nested URLs support deep-link and refresh tests without exposing admin data. The shell accepts a `basePath` so the fixture and future dashboard use the same component.
+
+The sidebar collapse preference is stored in browser local storage using `useSyncExternalStore` with a server snapshot, avoiding hydration differences while retaining state after refresh. The mobile drawer restores focus on Escape and closes on navigation. `AppDrawer` accepts logical `start`/`end` sides; MUI mirrors its physical anchor for Persian. Labels and section names are supplied in all three launch locales.
+
+Verification: `tests/unit/dashboard-policy.test.ts` checks permission filtering and route selection. `tests/e2e/dashboard-shell.spec.ts` checks the protected redirect, four viewports, deep links/refresh, collapse persistence, keyboard controls, RTL drawer position, and axe accessibility. Real role/session and action authorization tests belong to the authentication tasks.

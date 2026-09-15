@@ -12,7 +12,28 @@
     "activity": "فعالیت‌ها",
     "settings": "تنظیمات",
     "blogs": "وبلاگ",
-    "ingredients": "مواد اولیه"
+    "ingredients": "مواد اولیه",
+    "transactions": "تراکنش‌ها"
+  },
+  "shell": {
+    "brand": "Sara Kitchen",
+    "management": "مدیریت",
+    "navigation": "پیمایش داشبورد",
+    "sidebar": "نوار کناری داشبورد",
+    "sections": { "main": "اصلی", "management": "مدیریت", "settings": "تنظیمات" },
+    "skipToContent": "رفتن به محتوای داشبورد",
+    "openMenu": "باز کردن پیمایش داشبورد",
+    "closeMenu": "بستن پیمایش داشبورد",
+    "collapseSidebar": "جمع کردن نوار کناری",
+    "expandSidebar": "باز کردن نوار کناری",
+    "breadcrumbs": "مسیر صفحه",
+    "accountMenu": "حساب مدیر",
+    "signOutPending": "خروج از حساب پس از راه‌اندازی احراز هویت فعال می‌شود",
+    "unknownSection": "بخش داشبورد",
+    "permissionDenied": "شما اجازه مشاهده این بخش را ندارید.",
+    "previewTitle": "پیش‌نمایش داشبورد",
+    "previewDescription": "پیش‌نمایش پیمایش و چیدمان. داده‌های واقعی در مراحل بعدی اضافه می‌شوند.",
+    "authPending": "ورود مدیر هنوز فعال نیست. داشبورد تا زمان پیاده‌سازی احراز هویت محافظت می‌شود."
   },
   "metrics": {
     "sales": "فروش",

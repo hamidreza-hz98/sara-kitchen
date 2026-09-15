@@ -12,7 +12,28 @@
     "activity": "Atividade",
     "settings": "Definições",
     "blogs": "Blogue",
-    "ingredients": "Ingredientes"
+    "ingredients": "Ingredientes",
+    "transactions": "Transações"
+  },
+  "shell": {
+    "brand": "Sara Kitchen",
+    "management": "GESTÃO",
+    "navigation": "Navegação do painel",
+    "sidebar": "Barra lateral do painel",
+    "sections": { "main": "Principal", "management": "Gestão", "settings": "Definições" },
+    "skipToContent": "Saltar para o conteúdo do painel",
+    "openMenu": "Abrir navegação do painel",
+    "closeMenu": "Fechar navegação do painel",
+    "collapseSidebar": "Recolher barra lateral",
+    "expandSidebar": "Expandir barra lateral",
+    "breadcrumbs": "Navegação estrutural",
+    "accountMenu": "Conta do administrador",
+    "signOutPending": "Terminar sessão disponível após configurar a autenticação",
+    "unknownSection": "Secção do painel",
+    "permissionDenied": "Não tem permissão para ver esta secção.",
+    "previewTitle": "Pré-visualização do painel",
+    "previewDescription": "Pré-visualização da navegação e do layout. Os dados reais serão adicionados em tarefas futuras.",
+    "authPending": "O início de sessão de administrador ainda não está disponível. O painel permanece protegido enquanto a autenticação é implementada."
   },
   "metrics": {
     "sales": "Vendas",

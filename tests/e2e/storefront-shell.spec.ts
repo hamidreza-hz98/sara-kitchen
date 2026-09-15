@@ -109,10 +109,8 @@ test("Persian shell mirrors the end-side drawer and has no detectable accessibil
 
   await page.getByRole("button", { name: "باز کردن منوی پیمایش" }).click();
   const drawer = page.getByRole("dialog", { name: "منو" });
-  const drawerBox = await drawer.boundingBox();
-
-  expect(drawerBox).not.toBeNull();
-  if (drawerBox) expect(drawerBox.x).toBeLessThan(10);
+  // The physical anchor is correct after MUI's slide transition completes.
+  await expect.poll(async () => (await drawer.boundingBox())?.x ?? Infinity).toBeLessThan(10);
 
   await page.keyboard.press("Escape");
   const scan = await new AxeBuilder({ page }).analyze();

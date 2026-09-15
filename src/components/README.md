@@ -29,3 +29,8 @@ provides the localized route-level loading contract. See `docs/feedback.md`.
 `layout/` contains shared visual shells. `StorefrontShell` owns the public skip link, responsive
 header/navigation, mobile drawer and bottom bar, cart/account access, and footer. Route content is
 passed through its named main-content landmark; domain data remains outside the shell.
+
+`DashboardShell` receives a server-derived actor/permission DTO and owns the protected management
+navigation, responsive sidebar/drawer, top bar, breadcrumbs, account affordance, and skip target.
+The real dashboard remains fail-closed until admin sessions are implemented; see
+`docs/dashboard-shell.md` for the integration handoff and development-only fixture.

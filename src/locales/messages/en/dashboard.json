@@ -12,7 +12,28 @@
     "activity": "Activity",
     "settings": "Settings",
     "blogs": "Blog",
-    "ingredients": "Ingredients"
+    "ingredients": "Ingredients",
+    "transactions": "Transactions"
+  },
+  "shell": {
+    "brand": "Sara Kitchen",
+    "management": "MANAGEMENT",
+    "navigation": "Dashboard navigation",
+    "sidebar": "Dashboard sidebar",
+    "sections": { "main": "Main", "management": "Management", "settings": "Settings" },
+    "skipToContent": "Skip to dashboard content",
+    "openMenu": "Open dashboard navigation",
+    "closeMenu": "Close dashboard navigation",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "breadcrumbs": "Breadcrumbs",
+    "accountMenu": "Administrator account",
+    "signOutPending": "Sign-out available after authentication setup",
+    "unknownSection": "Dashboard section",
+    "permissionDenied": "You do not have permission to view this section.",
+    "previewTitle": "Dashboard shell preview",
+    "previewDescription": "Navigation and layout preview. Live dashboard data will be added in later tasks.",
+    "authPending": "Administrator sign-in is not available yet. The dashboard remains protected while authentication is being implemented."
   },
   "metrics": {
     "sales": "Sales",
