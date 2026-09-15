@@ -2,8 +2,14 @@
 
 import { describe, expect, it } from "vitest";
 
-import { appColorSchemes, appTheme } from "@/theme/app-theme";
-import { applicationFontFamily, emotionCacheOptions, fontVariableNames } from "@/theme";
+import { appColorSchemes, appTheme, rtlAppTheme } from "@/theme/app-theme";
+import {
+  applicationFontFamily,
+  emotionCacheOptions,
+  fontVariableNames,
+  getEmotionCacheOptions,
+  rtlEmotionCacheOptions,
+} from "@/theme";
 import {
   breakpointTokens,
   colorTokens,
@@ -18,6 +24,18 @@ describe("MUI App Router theme contract", () => {
       key: "sara-mui",
       enableCssLayer: true,
     });
+    expect(getEmotionCacheOptions("ltr")).toBe(emotionCacheOptions);
+    expect(getEmotionCacheOptions("rtl")).toBe(rtlEmotionCacheOptions);
+    expect(rtlEmotionCacheOptions).toMatchObject({
+      key: "sara-mui-rtl",
+      enableCssLayer: true,
+    });
+    expect(rtlEmotionCacheOptions.stylisPlugins).toHaveLength(2);
+  });
+
+  it("provides direction-specific themes", () => {
+    expect(appTheme.direction).toBe("ltr");
+    expect(rtlAppTheme.direction).toBe("rtl");
   });
 
   it("uses the same optimized font variables in MUI and document CSS", () => {

@@ -8,7 +8,8 @@ Application-level React context providers and their composition belong here.
 - Authentication and authoritative business data remain server-owned; a provider may expose sanitized state but must not become the source of truth.
 - Provider order and server/client boundaries must be covered by integration tests when behavior depends on them.
 
-`AppThemeProvider` is the narrow client boundary for the MUI theme and baseline. The root Server
-Component places it inside MUI's official `AppRouterCacheProvider`, which owns streaming Emotion
-style insertion. Keep locale, query, and notification providers inside this boundary only when they
-are introduced by their dedicated tasks.
+`DirectionAwareCacheProvider` is the narrow client boundary around MUI's official
+`AppRouterCacheProvider`; it selects the LTR or RTL streaming Emotion configuration without sending
+plugin functions across a Server Component boundary. `AppThemeProvider` selects a theme with the
+same direction and owns the baseline. Keep query and notification providers inside this boundary
+only when introduced by their dedicated tasks.

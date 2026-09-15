@@ -27,4 +27,5 @@ Current records:
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.
 - [`localization.md`](./localization.md) — locale routing, cookie persistence, catalogs, authoring rules, and acceptance coverage.
 - [`mui-app-router.md`](./mui-app-router.md) — streaming Emotion cache, provider order, cascade layers, fonts, and hydration acceptance.
+- [`right-to-left.md`](./right-to-left.md) — locale direction, RTL Emotion processing, logical CSS, icon policy, and visual verification.
 - [`theme.md`](./theme.md) — executable palette, typography, shape, elevation, motion, component overrides, and responsive showcase verification.

@@ -1,7 +1,7 @@
 "use client";
 
 import { createTheme } from "@mui/material/styles";
-import type { Shadows } from "@mui/material/styles";
+import type { Shadows, ThemeOptions } from "@mui/material/styles";
 
 import { applicationFontFamily } from "./font-family";
 import {
@@ -48,6 +48,8 @@ const responsiveHeading = (mobile: number, tablet: number, desktop: number) => (
   [`@media (min-width:${breakpointTokens.lg}px)`]: { fontSize: pxToRem(desktop) },
 });
 
+export type AppDirection = "ltr" | "rtl";
+
 export const appColorSchemes = {
   light: {
     palette: {
@@ -90,7 +92,7 @@ export const appColorSchemes = {
   },
 } as const;
 
-export const appTheme = createTheme({
+const appThemeOptions = {
   cssVariables: {
     cssVarPrefix: "sara",
     colorSchemeSelector: "class",
@@ -326,7 +328,9 @@ export const appTheme = createTheme({
       },
     },
     MuiDialog: {
-      styleOverrides: { paper: { borderRadius: radiusTokens.xl, boxShadow: shadowTokens.dialog } },
+      styleOverrides: {
+        paper: { borderRadius: radiusTokens.xl, boxShadow: shadowTokens.dialog },
+      },
     },
     MuiAppBar: {
       defaultProps: { color: "transparent", elevation: 0 },
@@ -334,7 +338,7 @@ export const appTheme = createTheme({
         root: {
           color: "var(--sara-palette-text-primary)",
           backgroundColor: "rgba(var(--sara-palette-background-paperChannel) / 0.92)",
-          borderBottom: "1px solid var(--sara-palette-divider)",
+          borderBlockEnd: "1px solid var(--sara-palette-divider)",
           backdropFilter: "blur(14px)",
         },
       },
@@ -377,4 +381,11 @@ export const appTheme = createTheme({
       },
     },
   },
-});
+} satisfies ThemeOptions;
+
+export function createAppTheme(direction: AppDirection) {
+  return createTheme({ ...appThemeOptions, direction });
+}
+
+export const appTheme = createAppTheme("ltr");
+export const rtlAppTheme = createAppTheme("rtl");

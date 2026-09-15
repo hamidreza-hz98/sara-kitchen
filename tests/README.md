@@ -25,6 +25,9 @@ Focused unit and component tests may be colocated with the source they exercise.
 - `pnpm test:coverage` writes V8 text, HTML, and LCOV coverage reports.
 - `pnpm test:e2e:install` installs the pinned Chromium browser once per machine or CI image.
 - `pnpm test:e2e` starts Next.js on port 3100 and runs Playwright plus axe checks.
+- The Windows/CI browser runner uses one worker and Next's Webpack development compiler for stable,
+  repeatable route manifests after production-build verification; the production build remains
+  Turbopack's default.
 - The homepage browser contract also verifies that MUI/Emotion styles arrive in the SSR `<head>`, use
   the `mui` cascade layer, retain unique identifiers across hydration/reload, and emit no runtime
   errors.

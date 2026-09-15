@@ -28,6 +28,10 @@ The root layout runs `InitColorSchemeScript` before content and the provider use
 `sara-kitchen-mode` browser-storage key. The first visit is light; subsequent mode choices persist
 without a server-render flicker.
 
+LTR and RTL use separate theme instances with identical design tokens and an explicit
+`theme.direction`. Application layout uses logical CSS properties; generated RTL CSS is processed by
+the direction-specific Emotion cache documented in [`right-to-left.md`](./right-to-left.md).
+
 ## Verification matrix
 
 Playwright verifies the showcase at 390, 700, 900, and 1440 px in both light and dark schemes. The

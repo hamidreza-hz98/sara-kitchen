@@ -1,5 +1,6 @@
 "use client";
 
+import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import DarkModeRounded from "@mui/icons-material/DarkModeRounded";
@@ -35,9 +36,10 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useColorScheme } from "@mui/material/styles";
+import { useColorScheme, useTheme } from "@mui/material/styles";
 import { useState } from "react";
 
+import { DirectionalIcon } from "@/components";
 import { colorTokens, radiusTokens, shadowTokens } from "@/theme";
 
 const swatches = [
@@ -74,6 +76,7 @@ function ShowcaseSection({
 
 export function ThemeShowcase() {
   const { mode, setMode } = useColorScheme();
+  const theme = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [tab, setTab] = useState(0);
   const isDark = mode === "dark";
@@ -81,6 +84,7 @@ export function ThemeShowcase() {
   return (
     <Box
       data-hydrated={mode !== undefined}
+      data-theme-direction={theme.direction}
       data-testid="theme-showcase"
       sx={{ minHeight: "100dvh", bgcolor: "background.default" }}
     >
@@ -98,7 +102,7 @@ export function ThemeShowcase() {
               color: "secondary.contrastText",
             }}
           >
-            <LocalDiningRounded />
+            <LocalDiningRounded data-testid="static-kitchen-icon" />
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             <Typography component="p" variant="h5">
@@ -141,8 +145,8 @@ export function ThemeShowcase() {
               position: "absolute",
               width: { xs: 160, md: 280 },
               height: { xs: 160, md: 280 },
-              right: { xs: -70, md: -80 },
-              bottom: { xs: -90, md: -130 },
+              insetInlineEnd: { xs: -70, md: -80 },
+              insetBlockEnd: { xs: -90, md: -130 },
               borderRadius: "50%",
               bgcolor: "secondary.main",
               opacity: 0.72,
@@ -158,6 +162,11 @@ export function ThemeShowcase() {
             <Stack direction={{ xs: "column", sm: "row" }} spacing={3} sx={{ mt: 7 }}>
               <Button
                 color="secondary"
+                endIcon={
+                  <DirectionalIcon mirrorInRtl testId="directional-arrow">
+                    <ArrowForwardRounded />
+                  </DirectionalIcon>
+                }
                 size="large"
                 startIcon={<ShoppingBagRounded />}
                 variant="contained"
@@ -218,7 +227,7 @@ export function ThemeShowcase() {
                   data-testid="persian-font-sample"
                   dir="rtl"
                   lang="fa"
-                  sx={{ textAlign: "right" }}
+                  sx={{ textAlign: "start" }}
                 >
                   <Typography component="p" variant="h3">
                     آشپزخانه سارا؛ غذای خانگی ایرانی
@@ -321,8 +330,8 @@ export function ThemeShowcase() {
                 <TableRow>
                   <TableCell>Dish</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell align="right">Quantity</TableCell>
-                  <TableCell align="right">Total</TableCell>
+                  <TableCell sx={{ textAlign: "end" }}>Quantity</TableCell>
+                  <TableCell sx={{ textAlign: "end" }}>Total</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -335,8 +344,8 @@ export function ThemeShowcase() {
                         color={row.status === "Ready" ? "success" : "warning"}
                       />
                     </TableCell>
-                    <TableCell align="right">{row.quantity}</TableCell>
-                    <TableCell align="right">{row.total}</TableCell>
+                    <TableCell sx={{ textAlign: "end" }}>{row.quantity}</TableCell>
+                    <TableCell sx={{ textAlign: "end" }}>{row.total}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -355,7 +364,7 @@ export function ThemeShowcase() {
                         Quantity {row.quantity}
                       </Typography>
                     </Box>
-                    <Box sx={{ textAlign: "right" }}>
+                    <Box sx={{ textAlign: "end" }}>
                       <Chip
                         label={row.status}
                         color={row.status === "Ready" ? "success" : "warning"}
@@ -391,12 +400,12 @@ export function ThemeShowcase() {
       </Container>
 
       <Dialog fullWidth maxWidth="xs" open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle sx={{ pr: 14 }}>
+        <DialogTitle sx={{ paddingInlineEnd: 14 }}>
           Preview order
           <IconButton
             aria-label="Close order preview"
             onClick={() => setDialogOpen(false)}
-            sx={{ position: "absolute", right: 12, top: 12 }}
+            sx={{ position: "absolute", insetInlineEnd: 12, insetBlockStart: 12 }}
           >
             <CloseRounded />
           </IconButton>

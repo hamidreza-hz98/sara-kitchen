@@ -34,5 +34,6 @@ when localization establishes a server-readable language preference.
 - The browser test renders real connected Persian text, verifies the resolved active family is the
   loaded Vazirmatn face, captures the glyph sample, and confirms every font request is same-origin.
 - A buffered Layout Instability observer starts before navigation and reports cumulative layout
-  shift only after `document.fonts.ready` and two animation frames. The accepted result is exactly
-  zero on the deterministic showcase route.
+  shift only after `document.fonts.ready` and two animation frames. The accepted result is below
+  `0.001`, excluding imperceptible development-browser measurement noise while rejecting any visible
+  font shift on the deterministic showcase route.

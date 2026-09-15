@@ -95,9 +95,12 @@ importers:
       sharp:
         specifier: 0.35.4
         version: 0.35.4(@types/node@24.1.0)
+      stylis:
+        specifier: ^4.4.0
+        version: 4.4.0
       stylis-plugin-rtl:
         specifier: 2.1.1
-        version: 2.1.1(stylis@4.2.0)
+        version: 2.1.1(stylis@4.4.0)
       zod:
         specifier: 4.6.5
         version: 4.6.5
@@ -135,6 +138,9 @@ importers:
       '@types/sanitize-html':
         specifier: 2.16.1
         version: 2.16.1
+      '@types/stylis':
+        specifier: ^4.2.7
+        version: 4.2.7
       '@typescript-eslint/eslint-plugin':
         specifier: 8.70.0
         version: 8.70.0(@typescript-eslint/parser@8.70.0(eslint@9.39.5(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3))(eslint@9.39.5(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3)
@@ -1598,6 +1604,9 @@ packages:
 
   '@types/statuses@2.0.6':
     resolution: {integrity: sha512-xMAgYwceFhRA2zY+XbEA7mxYbA093wdiW8Vu6gZPGWy9cmOyU9XesH1tNcEWsKFd5Vzrqx5T3D38PWx1FIIXkA==}
+
+  '@types/stylis@4.2.7':
+    resolution: {integrity: sha512-VgDNokpBoKF+wrdvhAAfS55OMQpL6QRglwTwNC3kIgBrzZxA4WsFj+2eLfEA/uMUDzBcEhYmjSbwQakn/i3ajA==}
 
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
@@ -3816,6 +3825,9 @@ packages:
   stylis@4.2.0:
     resolution: {integrity: sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==}
 
+  stylis@4.4.0:
+    resolution: {integrity: sha512-5Z9ZpRzfuH6l/UAvCPAPUo3665Nk2wLaZU3x+TLHKVzIz33+sbJqbtrYoC3KD4/uVOr2Zp+L0LySezP9OHV9yA==}
+
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -5401,6 +5413,8 @@ snapshots:
       '@types/node': 24.1.0
 
   '@types/statuses@2.0.6': {}
+
+  '@types/stylis@4.2.7': {}
 
   '@types/use-sync-external-store@0.0.6': {}
 
@@ -7870,12 +7884,14 @@ snapshots:
       '@babel/core': 7.29.7(supports-color@7.2.0)
       babel-plugin-macros: 3.1.0
 
-  stylis-plugin-rtl@2.1.1(stylis@4.2.0):
+  stylis-plugin-rtl@2.1.1(stylis@4.4.0):
     dependencies:
       cssjanus: 2.3.1
-      stylis: 4.2.0
+      stylis: 4.4.0
 
   stylis@4.2.0: {}
+
+  stylis@4.4.0: {}
 
   supports-color@7.2.0:
     dependencies:

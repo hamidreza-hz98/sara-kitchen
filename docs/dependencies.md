@@ -35,6 +35,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
 | `@emotion/react`          |      `11.14.0` | Emotion React runtime and theme-aware CSS composition required by MUI.                                                           |
 | `@emotion/server`         |      `11.11.0` | Server-side Emotion utilities required by the MUI Next.js integration.                                                           |
 | `@emotion/styled`         |      `11.14.1` | Styled component API used by MUI theme components and overrides.                                                                 |
+| `stylis`                  |        `4.4.0` | CSS preprocessing and vendor-prefix plugin used explicitly by the RTL Emotion cache.                                             |
 | `stylis-plugin-rtl`       |        `2.1.1` | Mirrors generated CSS for Farsi RTL presentation through the Emotion cache.                                                      |
 | `next-intl`               |       `4.14.5` | English, Portuguese, and Farsi messages, formatting, locale negotiation, and request configuration without locale path segments. |
 | `mongoose`                |       `9.10.0` | MongoDB schemas, indexes, validation hooks, and repositories; server-only Node.js runtime.                                       |
@@ -69,6 +70,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
 | `@types/react-dom`                 |        `^19.3.0` | React DOM 19 declarations.                                                                                              |
 | `@types/leaflet`                   |         `1.9.22` | Leaflet declarations for map components and geographic data.                                                            |
 | `@types/sanitize-html`             |         `2.16.1` | Type declarations for the server-side sanitizer.                                                                        |
+| `@types/stylis`                    |          `4.2.7` | Type declarations for the RTL cache's direct Stylis plugin integration.                                                 |
 | `prettier`                         |          `3.9.6` | Deterministic formatting for source, configuration, styles, and documentation.                                          |
 | `eslint-config-prettier`           |         `10.1.8` | Disables ESLint formatting rules that conflict with Prettier.                                                           |
 | `@typescript-eslint/eslint-plugin` |         `8.70.0` | Type-aware promise, switch exhaustiveness, and type-import rules used directly by ESLint.                               |

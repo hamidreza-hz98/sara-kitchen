@@ -1,4 +1,3 @@
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -8,8 +7,7 @@ import type { ReactNode } from "react";
 
 import { isRtlLocale, isSupportedLocale } from "@/constants";
 import { routing } from "@/locales/routing";
-import { AppThemeProvider } from "@/providers";
-import { emotionCacheOptions } from "@/theme";
+import { AppThemeProvider, DirectionAwareCacheProvider } from "@/providers";
 import { applicationFontVariables } from "@/theme/fonts.server";
 
 import "../globals.css";
@@ -46,11 +44,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   }
 
   const messages = await getMessages({ locale });
+  const direction = isRtlLocale(locale) ? "rtl" : "ltr";
 
   return (
     <html
       lang={locale}
-      dir={isRtlLocale(locale) ? "rtl" : "ltr"}
+      dir={direction}
       className={applicationFontVariables}
       suppressHydrationWarning
     >
@@ -60,11 +59,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           defaultMode="light"
           modeStorageKey="sara-kitchen-mode"
         />
-        <AppRouterCacheProvider options={emotionCacheOptions}>
+        <DirectionAwareCacheProvider direction={direction}>
           <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Lisbon">
-            <AppThemeProvider>{children}</AppThemeProvider>
+            <AppThemeProvider direction={direction}>{children}</AppThemeProvider>
           </NextIntlClientProvider>
-        </AppRouterCacheProvider>
+        </DirectionAwareCacheProvider>
       </body>
     </html>
   );

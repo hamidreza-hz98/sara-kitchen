@@ -9,20 +9,21 @@ client boundary for theme context.
 The root layout renders this order inside `<body>`:
 
 ```text
-AppRouterCacheProvider (@mui/material-nextjs/v16-appRouter)
-└── AppThemeProvider (client boundary)
-    ├── ThemeProvider
-    ├── CssBaseline
-    └── server-rendered route children
+DirectionAwareCacheProvider (client boundary)
+└── AppRouterCacheProvider (@mui/material-nextjs/v16-appRouter)
+    └── AppThemeProvider (client boundary)
+        ├── ThemeProvider
+        ├── CssBaseline
+        └── server-rendered route children
 ```
 
-`AppRouterCacheProvider` creates one Emotion cache for its mounted tree, tracks styles emitted during
-streaming, and inserts flushed style tags into `<head>`. Its options are centralized in
+`AppRouterCacheProvider` creates one direction-specific Emotion cache for its mounted tree, tracks
+styles emitted during streaming, and inserts flushed style tags into `<head>`. Its options are centralized in
 `src/theme/emotion-cache.ts`:
 
-- cache key: `sara-mui`, unique and stable across server and browser rendering;
+- LTR cache key: `sara-mui`; RTL cache key: `sara-mui-rtl`;
 - `enableCssLayer: true`, which wraps generated rules in `@layer mui`; and
-- no manually created second cache or nested Emotion `CacheProvider`.
+- RTL-only Stylis processing using the standard prefixer before the RTL transformation plugin.
 
 The root `<html>` uses the narrow `suppressHydrationWarning` exception required by MUI's
 `InitColorSchemeScript`, because that script sets the selected color-scheme class before React
@@ -62,8 +63,9 @@ files. Next.js emits optimized same-origin assets and the browser never requests
 - The variable names are literal strings at each `next/font` loader call because Next.js statically
   analyzes font options at build time; the identical public names are exported for theme consumers.
 
-Locale-specific `lang` and `dir` selection belongs to the localization tasks. The current root is
-truthfully `lang="en" dir="ltr"`; it does not guess a browser-only locale during SSR.
+The validated request locale sets both `lang` and `dir` during server rendering. It also selects the
+matching MUI theme direction and Emotion cache, so the document, portals, theme, and generated CSS
+share one direction before hydration.
 
 ## Theme boundary
 
