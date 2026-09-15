@@ -23,6 +23,10 @@ Focused unit and component tests may be colocated with the source they exercise.
 - Shared primitive component tests cover accessible names/roles, safe form actions, focus-triggered
   tooltips, keyboard overlay dismissal, locale-aware links, pagination, image alt intent, loading and
   state announcements, semantic rich content, and unsafe-link rejection.
+- Feedback component tests cover FIFO notification delivery, localized dismissal, safe confirmation
+  focus, offline/reconnected messaging, and route-loading announcements. Browser tests exercise all
+  five demo outcomes and localized not-found routing; the production build validates the global
+  fallback entry point.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.

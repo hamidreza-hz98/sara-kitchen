@@ -21,3 +21,7 @@ Reusable React UI belongs here when it is shared by multiple routes or features.
 The `ui` barrel is the approved public API. It keeps server-capable primitives free of client
 directives and isolates interactive overlay behavior in the smallest client module. Avoid importing
 implementation files directly or adding a client directive to the global component barrel.
+
+`feedback/` contains composed feedback behavior rather than low-level controls:
+`ConfirmationDialog` enforces safe focus and destructive-action styling, while `RouteLoading`
+provides the localized route-level loading contract. See `docs/feedback.md`.

@@ -8,6 +8,11 @@
     "title": "Ocorreu um erro",
     "description": "Tente novamente."
   },
+  "boundary": {
+    "title": "Ocorreu um problema nesta página",
+    "description": "Os seus outros dados estão seguros. Tente carregar esta página novamente.",
+    "retry": "Tentar novamente"
+  },
   "unauthorized": "Não tem autorização para realizar esta ação.",
   "network": "Verifique a sua ligação e tente novamente."
 }

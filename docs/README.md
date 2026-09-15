@@ -22,6 +22,7 @@ Current records:
 - [`design-tokens.md`](./design-tokens.md) — typed color, typography, spacing, breakpoint, radius, shadow, and motion decisions traced to the supplied UI/UX exports;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
 - [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
+- [`feedback.md`](./feedback.md) — localized notification queues, safe confirmations, connectivity status, and route/global recovery.
 - [`formatting-and-hooks.md`](./formatting-and-hooks.md) — deterministic formatting and staged-commit safeguards.
 - [`fonts.md`](./fonts.md) — local licensed font assets, script-aware fallback selection, provenance, and layout-shift verification.
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.

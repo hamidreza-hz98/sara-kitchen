@@ -22,5 +22,52 @@
     "contact": "Contact",
     "profile": "Profile",
     "dashboard": "Dashboard"
+  },
+  "feedback": {
+    "close": "Dismiss notification",
+    "loading": "Loading page",
+    "offline": {
+      "title": "You're offline",
+      "message": "Check your connection. We'll reconnect automatically."
+    },
+    "online": {
+      "title": "Back online",
+      "message": "Your connection has been restored."
+    },
+    "success": {
+      "title": "Order updated",
+      "message": "Your changes were saved successfully."
+    },
+    "validation": {
+      "title": "Check the form",
+      "message": "Some fields need your attention before continuing."
+    },
+    "permission": {
+      "title": "Permission required",
+      "message": "You do not have access to perform this action."
+    },
+    "network": {
+      "title": "Network error",
+      "message": "The request could not be completed. Check your connection and try again."
+    },
+    "unknown": {
+      "title": "Unexpected error",
+      "message": "Something unexpected happened. Please try again."
+    },
+    "actions": {
+      "success": "Show success",
+      "validation": "Show validation",
+      "permission": "Show permission",
+      "network": "Show network error",
+      "unknown": "Show unknown error",
+      "confirm": "Open confirmation"
+    },
+    "confirmation": {
+      "title": "Delete this draft?",
+      "description": "This action cannot be undone.",
+      "confirm": "Delete draft",
+      "cancel": "Keep draft",
+      "confirmed": "The draft was deleted."
+    }
   }
 }

@@ -19,7 +19,7 @@ import { useId } from "react";
 
 export type AppDialogProps = Omit<
   DialogProps,
-  "aria-describedby" | "aria-labelledby" | "onClose"
+  "aria-describedby" | "aria-labelledby" | "onClose" | "title"
 > & {
   actions?: ReactNode;
   closeLabel: string;
@@ -72,7 +72,7 @@ export function AppDialog({
 
 export type AppDrawerProps = Omit<
   DrawerProps,
-  "anchor" | "aria-describedby" | "aria-labelledby" | "onClose"
+  "anchor" | "aria-describedby" | "aria-labelledby" | "onClose" | "title"
 > & {
   closeLabel: string;
   description?: ReactNode;

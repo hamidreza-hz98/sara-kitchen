@@ -33,9 +33,11 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useColorScheme, useTheme } from "@mui/material/styles";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { DirectionalIcon } from "@/components";
+import { ConfirmationDialog } from "@/components/feedback";
 import {
   ActionButton,
   AppDialog,
@@ -54,6 +56,7 @@ import {
   StatusChip,
   type RichTextDocument,
 } from "@/components/ui";
+import { useFeedback } from "@/hooks";
 import { colorTokens, radiusTokens, shadowTokens } from "@/theme";
 
 const swatches = [
@@ -129,11 +132,24 @@ function ShowcaseSection({
 export function ThemeShowcase() {
   const { mode, setMode } = useColorScheme();
   const theme = useTheme();
+  const feedbackTranslations = useTranslations("shared.feedback");
+  const { notify } = useFeedback();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [tab, setTab] = useState(0);
   const isDark = mode === "dark";
+  const showFeedback = (
+    kind: "network" | "permission" | "success" | "unknown" | "validation",
+    severity: "error" | "success" | "warning",
+  ) => {
+    notify({
+      message: feedbackTranslations(`${kind}.message`),
+      severity,
+      title: feedbackTranslations(`${kind}.title`),
+    });
+  };
 
   return (
     <Box
@@ -490,6 +506,39 @@ export function ThemeShowcase() {
           </Box>
         </ShowcaseSection>
 
+        <ShowcaseSection eyebrow="System feedback" title="Localized and recoverable states">
+          <Card>
+            <CardContent>
+              <Typography color="text.secondary">
+                Trigger each supported outcome or open the reusable safe-default confirmation.
+              </Typography>
+              <Stack direction="row" useFlexGap spacing={3} sx={{ mt: 5, flexWrap: "wrap" }}>
+                <ActionButton
+                  variant="contained"
+                  onClick={() => showFeedback("success", "success")}
+                >
+                  {feedbackTranslations("actions.success")}
+                </ActionButton>
+                <ActionButton onClick={() => showFeedback("validation", "warning")}>
+                  {feedbackTranslations("actions.validation")}
+                </ActionButton>
+                <ActionButton onClick={() => showFeedback("permission", "error")}>
+                  {feedbackTranslations("actions.permission")}
+                </ActionButton>
+                <ActionButton onClick={() => showFeedback("network", "error")}>
+                  {feedbackTranslations("actions.network")}
+                </ActionButton>
+                <ActionButton onClick={() => showFeedback("unknown", "error")}>
+                  {feedbackTranslations("actions.unknown")}
+                </ActionButton>
+                <ActionButton variant="outlined" onClick={() => setConfirmationOpen(true)}>
+                  {feedbackTranslations("actions.confirm")}
+                </ActionButton>
+              </Stack>
+            </CardContent>
+          </Card>
+        </ShowcaseSection>
+
         <ShowcaseSection eyebrow="Responsive data" title="Orders adapt without losing context">
           <TableContainer component={Card} sx={{ display: { xs: "none", md: "block" } }}>
             <Table>
@@ -598,6 +647,24 @@ export function ThemeShowcase() {
           </ActionButton>
         </Stack>
       </AppDrawer>
+
+      <ConfirmationDialog
+        cancelLabel={feedbackTranslations("confirmation.cancel")}
+        closeLabel={feedbackTranslations("close")}
+        confirmLabel={feedbackTranslations("confirmation.confirm")}
+        danger
+        description={feedbackTranslations("confirmation.description")}
+        open={confirmationOpen}
+        title={feedbackTranslations("confirmation.title")}
+        onCancel={() => setConfirmationOpen(false)}
+        onConfirm={() => {
+          setConfirmationOpen(false);
+          notify({
+            message: feedbackTranslations("confirmation.confirmed"),
+            severity: "success",
+          });
+        }}
+      />
     </Box>
   );
 }

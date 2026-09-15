@@ -22,5 +22,52 @@
     "contact": "Contacto",
     "profile": "Perfil",
     "dashboard": "Painel"
+  },
+  "feedback": {
+    "close": "Fechar notificação",
+    "loading": "A carregar a página",
+    "offline": {
+      "title": "Está offline",
+      "message": "Verifique a ligação. Voltaremos a ligar automaticamente."
+    },
+    "online": {
+      "title": "Ligação restabelecida",
+      "message": "A sua ligação foi restabelecida."
+    },
+    "success": {
+      "title": "Encomenda atualizada",
+      "message": "As alterações foram guardadas com sucesso."
+    },
+    "validation": {
+      "title": "Verifique o formulário",
+      "message": "Alguns campos precisam da sua atenção antes de continuar."
+    },
+    "permission": {
+      "title": "Permissão necessária",
+      "message": "Não tem acesso para realizar esta ação."
+    },
+    "network": {
+      "title": "Erro de rede",
+      "message": "Não foi possível concluir o pedido. Verifique a ligação e tente novamente."
+    },
+    "unknown": {
+      "title": "Erro inesperado",
+      "message": "Ocorreu algo inesperado. Tente novamente."
+    },
+    "actions": {
+      "success": "Mostrar sucesso",
+      "validation": "Mostrar validação",
+      "permission": "Mostrar permissão",
+      "network": "Mostrar erro de rede",
+      "unknown": "Mostrar erro desconhecido",
+      "confirm": "Abrir confirmação"
+    },
+    "confirmation": {
+      "title": "Eliminar este rascunho?",
+      "description": "Esta ação não pode ser anulada.",
+      "confirm": "Eliminar rascunho",
+      "cancel": "Manter rascunho",
+      "confirmed": "O rascunho foi eliminado."
+    }
   }
 }

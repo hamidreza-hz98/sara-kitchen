@@ -17,3 +17,8 @@ only when introduced by their dedicated tasks.
 `LocaleProvider` owns the client-side `next-intl` error and fallback callbacks. The matching server
 callbacks live in the request configuration so missing-key behavior is consistent across rendering
 boundaries.
+
+`FeedbackProvider` owns the FIFO snackbar queue and browser connectivity status. Keep it inside the
+locale and theme providers so messages, direction, close labels, and component styling are correct.
+It carries presentation state only; mutation outcomes and authoritative error data remain owned by
+the calling feature or server module.

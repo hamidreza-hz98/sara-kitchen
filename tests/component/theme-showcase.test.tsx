@@ -1,9 +1,13 @@
 import { ThemeProvider } from "@mui/material/styles";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 
 import { ThemeShowcase } from "@/app/[locale]/theme-showcase/theme-showcase";
+import { PROJECT_TIME_ZONE } from "@/constants";
+import messages from "@/locales/messages/en";
+import { FeedbackProvider } from "@/providers/feedback-provider";
 import { appTheme } from "@/theme";
 
 describe("ThemeShowcase", () => {
@@ -11,9 +15,13 @@ describe("ThemeShowcase", () => {
     const user = userEvent.setup();
 
     render(
-      <ThemeProvider theme={appTheme} defaultMode="light">
-        <ThemeShowcase />
-      </ThemeProvider>,
+      <NextIntlClientProvider locale="en" messages={messages} timeZone={PROJECT_TIME_ZONE}>
+        <ThemeProvider theme={appTheme} defaultMode="light">
+          <FeedbackProvider>
+            <ThemeShowcase />
+          </FeedbackProvider>
+        </ThemeProvider>
+      </NextIntlClientProvider>,
     );
 
     expect(
@@ -28,6 +36,7 @@ describe("ThemeShowcase", () => {
     expect(screen.getByRole("navigation", { name: "Dish pages" })).toBeVisible();
     expect(screen.getByRole("article")).toBeVisible();
     expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Show success" })).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "Preview order" }));
 

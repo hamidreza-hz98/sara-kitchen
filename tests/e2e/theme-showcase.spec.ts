@@ -98,3 +98,46 @@ test("shared primitives support keyboard operation and restore overlay focus", a
   await page.keyboard.press("Enter");
   await expect(page.locator('[aria-current="page"]')).toHaveText("2");
 });
+
+test("feedback demo exposes each localized outcome and safe confirmation", async ({ page }) => {
+  await page.goto("/theme-showcase");
+
+  const outcomes = [
+    ["Show success", "Your changes were saved successfully."],
+    ["Show validation", "Some fields need your attention before continuing."],
+    ["Show permission", "You do not have access to perform this action."],
+    ["Show network error", "The request could not be completed."],
+    ["Show unknown error", "Something unexpected happened."],
+  ] as const;
+
+  for (const [action, message] of outcomes) {
+    await page.getByRole("button", { name: action }).click();
+    await expect(page.getByRole("alert").filter({ hasText: message })).toBeVisible();
+    await page.getByRole("button", { name: "Dismiss notification" }).click();
+    await expect(page.getByRole("alert").filter({ hasText: message })).toBeHidden();
+  }
+
+  await page.getByRole("button", { name: "Open confirmation" }).click();
+  const dialog = page.getByRole("dialog", { name: "Delete this draft?" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Keep draft" })).toBeFocused();
+  await dialog.getByRole("button", { name: "Delete draft" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "The draft was deleted." })).toBeVisible();
+});
+
+test("offline feedback remains visible and reports recovery", async ({ context, page }) => {
+  await page.goto("/theme-showcase");
+
+  await context.setOffline(true);
+  await expect(page.getByRole("alert").filter({ hasText: "You're offline" })).toBeVisible();
+
+  await context.setOffline(false);
+  await expect(page.getByRole("alert").filter({ hasText: "Back online" })).toBeVisible();
+});
+
+test("unknown application URLs use the localized not-found UI", async ({ page }) => {
+  await page.goto("/not-a-real-route");
+
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
+});

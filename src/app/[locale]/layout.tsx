@@ -6,7 +6,12 @@ import type { ReactNode } from "react";
 
 import { isRtlLocale, isSupportedLocale, PROJECT_TIME_ZONE } from "@/constants";
 import { routing } from "@/locales/routing";
-import { AppThemeProvider, DirectionAwareCacheProvider, LocaleProvider } from "@/providers";
+import {
+  AppThemeProvider,
+  DirectionAwareCacheProvider,
+  FeedbackProvider,
+  LocaleProvider,
+} from "@/providers";
 import { applicationFontVariables } from "@/theme/fonts.server";
 
 import "../globals.css";
@@ -60,7 +65,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         />
         <DirectionAwareCacheProvider direction={direction}>
           <LocaleProvider locale={locale} messages={messages} timeZone={PROJECT_TIME_ZONE}>
-            <AppThemeProvider direction={direction}>{children}</AppThemeProvider>
+            <AppThemeProvider direction={direction}>
+              <FeedbackProvider>{children}</FeedbackProvider>
+            </AppThemeProvider>
           </LocaleProvider>
         </DirectionAwareCacheProvider>
       </body>

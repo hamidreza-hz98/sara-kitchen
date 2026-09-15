@@ -9,3 +9,7 @@ Shared client-side React hooks belong here.
 - Tests should exercise observable hook behavior, cleanup, and failure states.
 
 Do not add pass-through hooks that merely rename a library API without adding a stable project-level contract.
+
+`useFeedback` is the stable application contract for queued notifications. It fails immediately
+outside `FeedbackProvider`, accepts already-localized safe messages, and deliberately hides the
+provider's queue implementation from callers.

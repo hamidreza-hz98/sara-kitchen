@@ -5,7 +5,11 @@ import { validateEnvironment } from "./src/server/environment-core";
 
 validateEnvironment();
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  experimental: {
+    globalNotFound: true,
+  },
+};
 
 const withNextIntl = createNextIntlPlugin("./src/locales/request.ts");
 

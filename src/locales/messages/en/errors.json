@@ -8,6 +8,11 @@
     "title": "Something went wrong",
     "description": "Please try again."
   },
+  "boundary": {
+    "title": "This page ran into a problem",
+    "description": "Your other data is safe. Try loading this page again.",
+    "retry": "Try again"
+  },
   "unauthorized": "You are not authorized to perform this action.",
   "network": "Check your connection and try again."
 }
