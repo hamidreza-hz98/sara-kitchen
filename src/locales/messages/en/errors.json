@@ -1,0 +1,13 @@
+{
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you requested does not exist.",
+    "home": "Return home"
+  },
+  "generic": {
+    "title": "Something went wrong",
+    "description": "Please try again."
+  },
+  "unauthorized": "You are not authorized to perform this action.",
+  "network": "Check your connection and try again."
+}

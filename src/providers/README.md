@@ -13,3 +13,7 @@ Application-level React context providers and their composition belong here.
 plugin functions across a Server Component boundary. `AppThemeProvider` selects a theme with the
 same direction and owns the baseline. Keep query and notification providers inside this boundary
 only when introduced by their dedicated tasks.
+
+`LocaleProvider` owns the client-side `next-intl` error and fallback callbacks. The matching server
+callbacks live in the request configuration so missing-key behavior is consistent across rendering
+boundaries.

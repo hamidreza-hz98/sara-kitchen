@@ -1,0 +1,13 @@
+{
+  "title": "O meu perfil",
+  "overview": "Resumo",
+  "information": "Informação pessoal",
+  "addresses": "Moradas",
+  "orders": "Encomendas",
+  "summary": {
+    "totalOrders": "Total de encomendas",
+    "totalSpent": "Total gasto",
+    "lastOrder": "Última encomenda",
+    "specialOffer": "Oferta especial"
+  }
+}

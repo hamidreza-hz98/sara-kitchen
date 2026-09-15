@@ -1,0 +1,13 @@
+{
+  "title": "My profile",
+  "overview": "Overview",
+  "information": "Personal information",
+  "addresses": "Addresses",
+  "orders": "Orders",
+  "summary": {
+    "totalOrders": "Total orders",
+    "totalSpent": "Total spent",
+    "lastOrder": "Last order",
+    "specialOffer": "Special offer"
+  }
+}

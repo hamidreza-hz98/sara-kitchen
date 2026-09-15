@@ -1,0 +1,13 @@
+{
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "A página que pediu não existe.",
+    "home": "Voltar ao início"
+  },
+  "generic": {
+    "title": "Ocorreu um erro",
+    "description": "Tente novamente."
+  },
+  "unauthorized": "Não tem autorização para realizar esta ação.",
+  "network": "Verifique a sua ligação e tente novamente."
+}

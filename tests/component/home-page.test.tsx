@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 
 import Home from "@/app/[locale]/page";
-import messages from "@/locales/messages/en.json";
+import messages from "@/locales/messages/en";
 
 describe("Home", () => {
   it("renders the current starter page with an accessible primary heading", () => {

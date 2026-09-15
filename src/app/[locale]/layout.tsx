@@ -1,13 +1,12 @@
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { isRtlLocale, isSupportedLocale } from "@/constants";
 import { routing } from "@/locales/routing";
-import { AppThemeProvider, DirectionAwareCacheProvider } from "@/providers";
+import { AppThemeProvider, DirectionAwareCacheProvider, LocaleProvider } from "@/providers";
 import { applicationFontVariables } from "@/theme/fonts.server";
 
 import "../globals.css";
@@ -28,7 +27,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     notFound();
   }
 
-  const translations = await getTranslations({ locale, namespace: "Metadata" });
+  const translations = await getTranslations({ locale, namespace: "storefront.metadata" });
 
   return {
     title: translations("title"),
@@ -60,9 +59,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           modeStorageKey="sara-kitchen-mode"
         />
         <DirectionAwareCacheProvider direction={direction}>
-          <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Lisbon">
+          <LocaleProvider locale={locale} messages={messages} timeZone="Europe/Lisbon">
             <AppThemeProvider direction={direction}>{children}</AppThemeProvider>
-          </NextIntlClientProvider>
+          </LocaleProvider>
         </DirectionAwareCacheProvider>
       </body>
     </html>

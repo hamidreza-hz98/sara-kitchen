@@ -1,0 +1,13 @@
+{
+  "admin": { "singular": "مدیر", "plural": "مدیران" },
+  "customer": { "singular": "مشتری", "plural": "مشتریان" },
+  "media": { "singular": "رسانه", "plural": "رسانه‌ها" },
+  "category": { "singular": "دسته‌بندی", "plural": "دسته‌بندی‌ها" },
+  "dish": { "singular": "غذا", "plural": "غذاها" },
+  "ingredient": { "singular": "ماده اولیه", "plural": "مواد اولیه" },
+  "address": { "singular": "نشانی", "plural": "نشانی‌ها" },
+  "order": { "singular": "سفارش", "plural": "سفارش‌ها" },
+  "transaction": { "singular": "تراکنش", "plural": "تراکنش‌ها" },
+  "contact": { "singular": "پیام تماس", "plural": "پیام‌های تماس" },
+  "blog": { "singular": "نوشته وبلاگ", "plural": "نوشته‌های وبلاگ" }
+}

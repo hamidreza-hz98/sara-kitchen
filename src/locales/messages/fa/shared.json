@@ -1,0 +1,26 @@
+{
+  "brandName": "آشپزخانه سارا",
+  "actions": {
+    "save": "ذخیره",
+    "cancel": "لغو",
+    "create": "ایجاد",
+    "update": "به‌روزرسانی",
+    "delete": "حذف",
+    "search": "جست‌وجو",
+    "continue": "ادامه",
+    "back": "بازگشت"
+  },
+  "status": {
+    "loading": "در حال بارگذاری…",
+    "saving": "در حال ذخیره…",
+    "empty": "نتیجه‌ای پیدا نشد"
+  },
+  "navigation": {
+    "home": "خانه",
+    "menu": "منو",
+    "about": "درباره ما",
+    "contact": "تماس",
+    "profile": "پروفایل",
+    "dashboard": "داشبورد"
+  }
+}

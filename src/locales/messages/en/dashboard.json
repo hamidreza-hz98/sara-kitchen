@@ -1,0 +1,23 @@
+{
+  "title": "Management dashboard",
+  "navigation": {
+    "overview": "Overview",
+    "media": "Media",
+    "categories": "Categories",
+    "dishes": "Dishes",
+    "customers": "Customers",
+    "admins": "Administrators",
+    "orders": "Orders",
+    "contacts": "Contact messages",
+    "activity": "Activity",
+    "settings": "Settings",
+    "blogs": "Blog",
+    "ingredients": "Ingredients"
+  },
+  "metrics": {
+    "sales": "Sales",
+    "orders": "Orders",
+    "customers": "Customers",
+    "dishes": "Dishes"
+  }
+}

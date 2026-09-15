@@ -1,0 +1,13 @@
+{
+  "title": "پروفایل من",
+  "overview": "نمای کلی",
+  "information": "اطلاعات شخصی",
+  "addresses": "نشانی‌ها",
+  "orders": "سفارش‌ها",
+  "summary": {
+    "totalOrders": "مجموع سفارش‌ها",
+    "totalSpent": "مجموع خرید",
+    "lastOrder": "آخرین سفارش",
+    "specialOffer": "پیشنهاد ویژه"
+  }
+}

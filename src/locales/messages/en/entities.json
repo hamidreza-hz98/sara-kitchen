@@ -1,0 +1,13 @@
+{
+  "admin": { "singular": "administrator", "plural": "administrators" },
+  "customer": { "singular": "customer", "plural": "customers" },
+  "media": { "singular": "media item", "plural": "media items" },
+  "category": { "singular": "category", "plural": "categories" },
+  "dish": { "singular": "dish", "plural": "dishes" },
+  "ingredient": { "singular": "ingredient", "plural": "ingredients" },
+  "address": { "singular": "address", "plural": "addresses" },
+  "order": { "singular": "order", "plural": "orders" },
+  "transaction": { "singular": "transaction", "plural": "transactions" },
+  "contact": { "singular": "contact message", "plural": "contact messages" },
+  "blog": { "singular": "blog post", "plural": "blog posts" }
+}

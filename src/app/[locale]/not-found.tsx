@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import { useTranslations } from "next-intl";
 
 export default function NotFound() {
-  const translations = useTranslations("NotFound");
+  const translations = useTranslations("errors.notFound");
 
   return (
     <Stack component="main" spacing={2} sx={{ alignItems: "flex-start", p: 4 }}>

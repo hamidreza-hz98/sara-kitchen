@@ -1,0 +1,23 @@
+{
+  "title": "Painel de gestão",
+  "navigation": {
+    "overview": "Resumo",
+    "media": "Multimédia",
+    "categories": "Categorias",
+    "dishes": "Pratos",
+    "customers": "Clientes",
+    "admins": "Administradores",
+    "orders": "Encomendas",
+    "contacts": "Mensagens de contacto",
+    "activity": "Atividade",
+    "settings": "Definições",
+    "blogs": "Blogue",
+    "ingredients": "Ingredientes"
+  },
+  "metrics": {
+    "sales": "Vendas",
+    "orders": "Encomendas",
+    "customers": "Clientes",
+    "dishes": "Pratos"
+  }
+}

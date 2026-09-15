@@ -1,0 +1,23 @@
+{
+  "title": "داشبورد مدیریت",
+  "navigation": {
+    "overview": "نمای کلی",
+    "media": "رسانه‌ها",
+    "categories": "دسته‌بندی‌ها",
+    "dishes": "غذاها",
+    "customers": "مشتریان",
+    "admins": "مدیران",
+    "orders": "سفارش‌ها",
+    "contacts": "پیام‌های تماس",
+    "activity": "فعالیت‌ها",
+    "settings": "تنظیمات",
+    "blogs": "وبلاگ",
+    "ingredients": "مواد اولیه"
+  },
+  "metrics": {
+    "sales": "فروش",
+    "orders": "سفارش‌ها",
+    "customers": "مشتریان",
+    "dishes": "غذاها"
+  }
+}

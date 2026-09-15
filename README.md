@@ -78,6 +78,7 @@ shutdown.
 | `pnpm lint`             | Run zero-warning, type-aware ESLint without fixes.            |
 | `pnpm lint:fix`         | Apply safe ESLint fixes and fail on remaining violations.     |
 | `pnpm typecheck`        | Run strict TypeScript checking without emitting files.        |
+| `pnpm check:locales`    | Validate locale namespaces, keys, values, and placeholders.   |
 | `pnpm check:boundaries` | Validate source-layer and domain-module import rules.         |
 | `pnpm security:audit`   | Fail on Critical production dependency advisories.            |
 

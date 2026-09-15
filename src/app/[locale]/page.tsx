@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const translations = useTranslations("Home");
+  const translations = useTranslations("storefront.home");
 
   return (
     <div className={styles.page}>

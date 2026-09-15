@@ -1,0 +1,13 @@
+{
+  "admin": { "singular": "administrador", "plural": "administradores" },
+  "customer": { "singular": "cliente", "plural": "clientes" },
+  "media": { "singular": "item multimédia", "plural": "itens multimédia" },
+  "category": { "singular": "categoria", "plural": "categorias" },
+  "dish": { "singular": "prato", "plural": "pratos" },
+  "ingredient": { "singular": "ingrediente", "plural": "ingredientes" },
+  "address": { "singular": "morada", "plural": "moradas" },
+  "order": { "singular": "encomenda", "plural": "encomendas" },
+  "transaction": { "singular": "transação", "plural": "transações" },
+  "contact": { "singular": "mensagem de contacto", "plural": "mensagens de contacto" },
+  "blog": { "singular": "artigo", "plural": "artigos" }
+}

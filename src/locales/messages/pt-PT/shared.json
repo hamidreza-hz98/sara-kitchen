@@ -1,0 +1,26 @@
+{
+  "brandName": "Sara Kitchen",
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "update": "Atualizar",
+    "delete": "Eliminar",
+    "search": "Pesquisar",
+    "continue": "Continuar",
+    "back": "Voltar"
+  },
+  "status": {
+    "loading": "A carregar…",
+    "saving": "A guardar…",
+    "empty": "Nenhum resultado encontrado"
+  },
+  "navigation": {
+    "home": "Início",
+    "menu": "Menu",
+    "about": "Sobre nós",
+    "contact": "Contacto",
+    "profile": "Perfil",
+    "dashboard": "Painel"
+  }
+}
