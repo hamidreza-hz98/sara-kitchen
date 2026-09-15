@@ -20,5 +20,27 @@
   },
   "blog": {
     "title": "داستان‌های آشپزخانه سارا"
+  },
+  "shell": {
+    "skipToContent": "رفتن به محتوای اصلی",
+    "primaryNavigation": "پیمایش اصلی",
+    "mobileNavigation": "پیمایش موبایل",
+    "openMenu": "باز کردن منوی پیمایش",
+    "closeMenu": "بستن منوی پیمایش",
+    "language": "زبان",
+    "languageChanged": "زبان تغییر کرد",
+    "cartItems": "سبد خرید، {count} آیتم",
+    "accountMenu": "باز کردن منوی حساب",
+    "accountNavigation": "پیمایش حساب",
+    "authenticFlavors": "طعم‌های اصیل",
+    "footerTagline": "روح اصیل مهمان‌نوازی ایرانی را به قلب پورتو می‌آوریم. هر غذا داستانی از سنت، زعفران و عشق است.",
+    "quickLinks": "پیوندهای سریع",
+    "categories": "دسته‌بندی‌ها",
+    "kebabs": "کباب‌ها",
+    "stews": "خورشت‌ها",
+    "sides": "مخلفات و سالادها",
+    "drinks": "نوشیدنی‌ها",
+    "terms": "قوانین و حریم خصوصی",
+    "copyright": "© {year} آشپزخانه سارا پورتو. همه حقوق محفوظ است."
   }
 }

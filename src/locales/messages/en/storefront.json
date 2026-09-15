@@ -20,5 +20,27 @@
   },
   "blog": {
     "title": "Stories from Sara Kitchen"
+  },
+  "shell": {
+    "skipToContent": "Skip to main content",
+    "primaryNavigation": "Primary navigation",
+    "mobileNavigation": "Mobile navigation",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu",
+    "language": "Language",
+    "languageChanged": "Language changed",
+    "cartItems": "Cart, {count} items",
+    "accountMenu": "Open account menu",
+    "accountNavigation": "Account navigation",
+    "authenticFlavors": "Authentic flavours",
+    "footerTagline": "Bringing the authentic soul of Persian hospitality to the heart of Porto. Every dish is a story of tradition, saffron, and love.",
+    "quickLinks": "Quick links",
+    "categories": "Categories",
+    "kebabs": "Kebabs",
+    "stews": "Stew dishes",
+    "sides": "Sides and salads",
+    "drinks": "Drinks",
+    "terms": "Terms and privacy",
+    "copyright": "© {year} Sara Kitchen Porto. All rights reserved."
   }
 }

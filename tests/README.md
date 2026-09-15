@@ -27,6 +27,9 @@ Focused unit and component tests may be colocated with the source they exercise.
   focus, offline/reconnected messaging, and route-loading announcements. Browser tests exercise all
   five demo outcomes and localized not-found routing; the production build validates the global
   fallback entry point.
+- Storefront-shell browser tests cover the 390, 768, 1024, and 1440px navigation modes, overflow,
+  screenshots, skip-link focus, account-menu and drawer keyboard behavior, cart labelling, clean-URL
+  locale switching, Persian drawer mirroring, and axe checks.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.

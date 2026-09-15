@@ -21,7 +21,11 @@
     "about": "درباره ما",
     "contact": "تماس",
     "profile": "پروفایل",
-    "dashboard": "داشبورد"
+    "dashboard": "داشبورد",
+    "blog": "وبلاگ",
+    "cart": "سبد خرید",
+    "orders": "سفارش‌ها",
+    "signIn": "ورود"
   },
   "feedback": {
     "close": "بستن اعلان",

@@ -21,7 +21,11 @@
     "about": "About",
     "contact": "Contact",
     "profile": "Profile",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "blog": "Blog",
+    "cart": "Cart",
+    "orders": "Orders",
+    "signIn": "Sign in"
   },
   "feedback": {
     "close": "Dismiss notification",

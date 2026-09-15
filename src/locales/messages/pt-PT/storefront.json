@@ -20,5 +20,27 @@
   },
   "blog": {
     "title": "Histórias da Sara Kitchen"
+  },
+  "shell": {
+    "skipToContent": "Saltar para o conteúdo principal",
+    "primaryNavigation": "Navegação principal",
+    "mobileNavigation": "Navegação móvel",
+    "openMenu": "Abrir menu de navegação",
+    "closeMenu": "Fechar menu de navegação",
+    "language": "Idioma",
+    "languageChanged": "Idioma alterado",
+    "cartItems": "Carrinho, {count} artigos",
+    "accountMenu": "Abrir menu da conta",
+    "accountNavigation": "Navegação da conta",
+    "authenticFlavors": "Sabores autênticos",
+    "footerTagline": "Levamos a alma autêntica da hospitalidade persa ao coração do Porto. Cada prato conta uma história de tradição, açafrão e carinho.",
+    "quickLinks": "Ligações rápidas",
+    "categories": "Categorias",
+    "kebabs": "Kebabs",
+    "stews": "Pratos de estufado",
+    "sides": "Acompanhamentos e saladas",
+    "drinks": "Bebidas",
+    "terms": "Termos e privacidade",
+    "copyright": "© {year} Sara Kitchen Porto. Todos os direitos reservados."
   }
 }

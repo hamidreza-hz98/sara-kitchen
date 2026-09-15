@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
 
-import Home from "@/app/[locale]/page";
+import Home from "@/app/[locale]/(storefront)/page";
 import { PROJECT_TIME_ZONE } from "@/constants";
 import messages from "@/locales/messages/en";
 

@@ -18,6 +18,14 @@ Browser `Accept-Language` is intentionally ignored: locale order is explicit coo
 Requests for unknown public paths return the localized not-found response. An invalid locale cookie
 does not break navigation and is repaired to English.
 
+Because this response is rendered through a streamed App Router boundary, development may expose it
+with HTTP 200; the not-found UI remains localized and the non-streamed production response can use
+404 as prescribed by Next.js.
+
+The storefront locale selector writes the same validated first-party cookie and reloads the current
+clean pathname. No visible URL gains a locale segment, and Persian direction takes effect from the
+next server response rather than being simulated only in client styles.
+
 ## Message namespaces
 
 Each locale has the same seven JSON files under `src/locales/messages/<locale>/`:

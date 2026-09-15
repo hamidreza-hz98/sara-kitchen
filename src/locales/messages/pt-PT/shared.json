@@ -21,7 +21,11 @@
     "about": "Sobre nós",
     "contact": "Contacto",
     "profile": "Perfil",
-    "dashboard": "Painel"
+    "dashboard": "Painel",
+    "blog": "Blogue",
+    "cart": "Carrinho",
+    "orders": "Encomendas",
+    "signIn": "Iniciar sessão"
   },
   "feedback": {
     "close": "Fechar notificação",

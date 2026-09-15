@@ -11,7 +11,6 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/material/styles";
 import type { DialogProps } from "@mui/material/Dialog";
 import type { DrawerProps } from "@mui/material/Drawer";
 import type { ReactElement, ReactNode } from "react";
@@ -90,22 +89,26 @@ export function AppDrawer({
   title,
   ...props
 }: AppDrawerProps) {
-  const theme = useTheme();
   const titleId = useId();
   const descriptionId = useId();
   const isStart = side === "start";
-  const anchor =
-    theme.direction === "rtl" ? (isStart ? "right" : "left") : isStart ? "left" : "right";
+  // MUI's Drawer resolves the physical side from the active theme direction. Keep the
+  // public API logical, then let MUI mirror the physical anchor once (not twice).
+  const anchor = isStart ? "left" : "right";
 
   return (
-    <Drawer anchor={anchor} onClose={onClose} {...props}>
-      <Box
-        aria-describedby={description ? descriptionId : undefined}
-        aria-labelledby={titleId}
-        aria-modal="true"
-        role="dialog"
-        sx={{ width: { xs: "min(88vw, 360px)", sm: 400 }, p: 6 }}
-      >
+    <Drawer
+      anchor={anchor}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          "aria-describedby": description ? descriptionId : undefined,
+          "aria-labelledby": titleId,
+        },
+      }}
+      {...props}
+    >
+      <Box sx={{ width: { xs: "min(88vw, 360px)", sm: 400 }, p: 6 }}>
         <Stack direction="row" spacing={3} sx={{ alignItems: "flex-start" }}>
           <Box sx={{ flexGrow: 1 }}>
             <Typography component="h2" id={titleId} variant="h3">

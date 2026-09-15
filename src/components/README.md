@@ -25,3 +25,7 @@ implementation files directly or adding a client directive to the global compone
 `feedback/` contains composed feedback behavior rather than low-level controls:
 `ConfirmationDialog` enforces safe focus and destructive-action styling, while `RouteLoading`
 provides the localized route-level loading contract. See `docs/feedback.md`.
+
+`layout/` contains shared visual shells. `StorefrontShell` owns the public skip link, responsive
+header/navigation, mobile drawer and bottom bar, cart/account access, and footer. Route content is
+passed through its named main-content landmark; domain data remains outside the shell.
