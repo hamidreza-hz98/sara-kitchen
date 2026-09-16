@@ -6,6 +6,7 @@ import HomeRounded from "@mui/icons-material/HomeRounded";
 import InfoRounded from "@mui/icons-material/InfoRounded";
 import LanguageRounded from "@mui/icons-material/LanguageRounded";
 import LoginRounded from "@mui/icons-material/LoginRounded";
+import LogoutRounded from "@mui/icons-material/LogoutRounded";
 import MenuRounded from "@mui/icons-material/MenuRounded";
 import PersonRounded from "@mui/icons-material/PersonRounded";
 import PhoneRounded from "@mui/icons-material/PhoneRounded";
@@ -28,8 +29,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, type MouseEvent, type ReactNode } from "react";
 
 import { AppDrawer, AppLink } from "@/components/ui";
+import { useCustomerAuth, useFeedback } from "@/hooks";
+import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import { LOCALE_COOKIE_MAX_AGE, LOCALE_COOKIE_NAME } from "@/locales";
-import { usePathname } from "@/locales/navigation";
+import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
 
@@ -162,11 +165,31 @@ function CartButton({ count, compact = false }: { compact?: boolean; count: numb
 function AccountMenu() {
   const navigation = useTranslations("shared.navigation");
   const shell = useTranslations("storefront.shell");
+  const auth = useCustomerAuth();
+  const feedback = useFeedback();
+  const router = useRouter();
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null);
   const open = anchorElement !== null;
 
   const handleOpen = (event: MouseEvent<HTMLElement>) => setAnchorElement(event.currentTarget);
   const handleClose = () => setAnchorElement(null);
+  const signOut = async () => {
+    try {
+      const response = await fetch("/api/auth/customer/logout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: "{}",
+      });
+      if (!response.ok) throw new Error("Logout failed.");
+      handleClose();
+      broadcastCustomerAuthChange();
+      router.replace("/");
+      router.refresh();
+    } catch {
+      feedback.notify({ message: shell("signOutFailed"), severity: "error" });
+    }
+  };
 
   return (
     <>
@@ -194,14 +217,27 @@ function AccountMenu() {
           <ReceiptLongRounded fontSize="small" sx={{ me: 2 }} />
           {navigation("orders")}
         </MenuItem>
-        <MenuItem component={NextLink} href="/profile" onClick={handleClose}>
-          <LoginRounded fontSize="small" sx={{ me: 2 }} />
-          {navigation("signIn")}
-        </MenuItem>
-        <MenuItem component={NextLink} href="/signup" onClick={handleClose}>
-          <PersonRounded fontSize="small" sx={{ me: 2 }} />
-          {shell("createAccount")}
-        </MenuItem>
+        {auth.authenticated ? (
+          <MenuItem
+            onClick={() => {
+              signOut().catch(() => undefined);
+            }}
+          >
+            <LogoutRounded fontSize="small" sx={{ me: 2 }} />
+            {shell("signOut")}
+          </MenuItem>
+        ) : (
+          [
+            <MenuItem component={NextLink} href="/login" onClick={handleClose} key="login">
+              <LoginRounded fontSize="small" sx={{ me: 2 }} />
+              {navigation("signIn")}
+            </MenuItem>,
+            <MenuItem component={NextLink} href="/signup" onClick={handleClose} key="signup">
+              <PersonRounded fontSize="small" sx={{ me: 2 }} />
+              {shell("createAccount")}
+            </MenuItem>,
+          ]
+        )}
       </Menu>
     </>
   );

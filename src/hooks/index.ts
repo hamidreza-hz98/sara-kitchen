@@ -1,4 +1,5 @@
 export { useFeedback } from "./use-feedback";
+export { useCustomerAuth } from "./use-customer-auth";
 export type {
   FeedbackContextValue,
   FeedbackNotification,

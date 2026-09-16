@@ -39,6 +39,17 @@
     "rateLimited": "Too many attempts. Please try again later.",
     "networkError": "We couldn't complete your request. Please try again."
   },
+  "login": {
+    "title": "Sign in",
+    "description": "Access your Sara Kitchen profile and orders.",
+    "identifier": "Mobile number or email",
+    "password": "Password",
+    "persistent": "Keep me signed in on this device",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "invalid": "Invalid mobile, email, or password.",
+    "network": "We couldn't sign you in. Please try again."
+  },
   "shell": {
     "skipToContent": "Skip to main content",
     "primaryNavigation": "Primary navigation",
@@ -50,6 +61,8 @@
     "cartItems": "Cart, {count} items",
     "accountMenu": "Open account menu",
     "createAccount": "Create account",
+    "signOut": "Sign out",
+    "signOutFailed": "We couldn't sign you out. Please try again.",
     "accountNavigation": "Account navigation",
     "authenticFlavors": "Authentic flavours",
     "footerTagline": "Bringing the authentic soul of Persian hospitality to the heart of Porto. Every dish is a story of tradition, saffron, and love.",

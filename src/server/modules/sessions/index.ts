@@ -6,5 +6,6 @@ export {
   resolveSession,
   revokeSession,
   SESSION_IDLE_TIMEOUT_MS,
+  PERSISTENT_SESSION_IDLE_TIMEOUT_MS,
   type ResolvedSession,
 } from "./service/session-lifecycle";

@@ -39,6 +39,17 @@
     "rateLimited": "Demasiadas tentativas. Tente novamente mais tarde.",
     "networkError": "Não foi possível concluir o pedido. Tente novamente."
   },
+  "login": {
+    "title": "Iniciar sessão",
+    "description": "Aceda ao seu perfil e às suas encomendas Sara Kitchen.",
+    "identifier": "Telemóvel ou email",
+    "password": "Palavra-passe",
+    "persistent": "Manter sessão iniciada neste dispositivo",
+    "submit": "Iniciar sessão",
+    "submitting": "A iniciar sessão…",
+    "invalid": "Telemóvel, email ou palavra-passe inválidos.",
+    "network": "Não foi possível iniciar sessão. Tente novamente."
+  },
   "shell": {
     "skipToContent": "Saltar para o conteúdo principal",
     "primaryNavigation": "Navegação principal",
@@ -50,6 +61,8 @@
     "cartItems": "Carrinho, {count} artigos",
     "accountMenu": "Abrir menu da conta",
     "createAccount": "Criar conta",
+    "signOut": "Terminar sessão",
+    "signOutFailed": "Não foi possível terminar sessão. Tente novamente.",
     "accountNavigation": "Navegação da conta",
     "authenticFlavors": "Sabores autênticos",
     "footerTagline": "Levamos a alma autêntica da hospitalidade persa ao coração do Porto. Cada prato conta uma história de tradição, açafrão e carinho.",

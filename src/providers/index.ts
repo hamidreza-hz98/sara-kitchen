@@ -1,6 +1,7 @@
 export { AppThemeProvider } from "./app-theme-provider";
 export { DirectionAwareCacheProvider } from "./direction-aware-cache-provider";
 export { FeedbackProvider } from "./feedback-provider";
+export { CustomerAuthProvider } from "./customer-auth-provider";
 export { LocaleProvider } from "./locale-provider";
 export type {
   FeedbackContextValue,

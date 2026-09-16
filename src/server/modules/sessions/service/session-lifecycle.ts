@@ -10,6 +10,7 @@ import {
 import { hashSessionToken } from "./session-token";
 
 export const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1_000;
+export const PERSISTENT_SESSION_IDLE_TIMEOUT_MS = 7 * 24 * 60 * 60 * 1_000;
 const LAST_SEEN_WRITE_INTERVAL_MS = 5 * 60 * 1_000;
 
 export type ResolvedSession = {
@@ -18,6 +19,7 @@ export type ResolvedSession = {
   actorKind: SessionActorKind;
   audience: SessionActorKind;
   passwordVersion: number;
+  persistent: boolean;
   expiresAt: Date;
 };
 
@@ -47,7 +49,11 @@ export async function resolveSession(
   })
     .lean()
     .exec();
-  if (!session || now.getTime() - session.lastSeenAt.getTime() >= SESSION_IDLE_TIMEOUT_MS) {
+  if (
+    !session ||
+    now.getTime() - session.lastSeenAt.getTime() >=
+      (session.persistent ? PERSISTENT_SESSION_IDLE_TIMEOUT_MS : SESSION_IDLE_TIMEOUT_MS)
+  ) {
     return null;
   }
   if (now.getTime() - session.lastSeenAt.getTime() >= LAST_SEEN_WRITE_INTERVAL_MS) {
@@ -63,6 +69,7 @@ export async function resolveSession(
     actorKind: session.actorKind,
     audience: session.audience,
     passwordVersion: session.passwordVersion,
+    persistent: session.persistent,
     expiresAt: session.expiresAt,
   };
 }

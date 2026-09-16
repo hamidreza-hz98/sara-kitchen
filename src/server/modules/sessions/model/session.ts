@@ -28,6 +28,7 @@ export type SessionRecord = BaseDocumentFields & {
   actorId: Types.ObjectId;
   audience: SessionActorKind;
   passwordVersion: number;
+  persistent: boolean;
   lastSeenAt: Date;
   expiresAt: Date;
   revokedAt: Date | null;
@@ -65,6 +66,7 @@ const sessionSchema = createBaseSchema<SessionRecord>(
         validator: (value: number) => Number.isSafeInteger(value) && value >= 1,
       },
     },
+    persistent: { type: Boolean, required: true, default: false },
     lastSeenAt: { type: Date, required: true, default: Date.now },
     expiresAt: { type: Date, required: true, immutable: true },
     revokedAt: { type: Date, default: null },
