@@ -1,20 +1,8 @@
-export const dashboardPermissions = [
-  "dashboard:view",
-  "media:read",
-  "categories:read",
-  "dishes:read",
-  "ingredients:read",
-  "blogs:read",
-  "customers:read",
-  "admins:read",
-  "orders:read",
-  "transactions:read",
-  "contacts:read",
-  "logs:read",
-  "settings:read",
-] as const;
+import { ADMIN_PERMISSIONS, type AdminPermission } from "@/constants/admin-access";
 
-export type DashboardPermission = (typeof dashboardPermissions)[number];
+export const dashboardPermissions = ADMIN_PERMISSIONS;
+
+export type DashboardPermission = AdminPermission;
 
 export type DashboardActor = {
   displayName: string;
