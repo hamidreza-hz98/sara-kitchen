@@ -35,6 +35,7 @@ Focused unit and component tests may be colocated with the source they exercise.
   breakpoints, persistent collapse, keyboard operation, RTL mirroring, and axe checks.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
+- `pnpm test:api-contract` proves Route Handlers cannot bypass the shared request-ID, response, and safe-error envelope.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.
 - `pnpm test:watch` starts the Vitest development watcher.
 - `pnpm test:coverage` writes V8 text, HTML, and LCOV coverage reports.

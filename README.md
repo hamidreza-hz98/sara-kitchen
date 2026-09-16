@@ -71,16 +71,17 @@ shutdown.
 
 ## Code-quality commands
 
-| Command                 | Purpose                                                       |
-| ----------------------- | ------------------------------------------------------------- |
-| `pnpm format`           | Format supported repository files with pinned Prettier rules. |
-| `pnpm format:check`     | Verify formatting without writing files.                      |
-| `pnpm lint`             | Run zero-warning, type-aware ESLint without fixes.            |
-| `pnpm lint:fix`         | Apply safe ESLint fixes and fail on remaining violations.     |
-| `pnpm typecheck`        | Run strict TypeScript checking without emitting files.        |
-| `pnpm check:locales`    | Validate locale namespaces, keys, values, and placeholders.   |
-| `pnpm check:boundaries` | Validate source-layer and domain-module import rules.         |
-| `pnpm security:audit`   | Fail on Critical production dependency advisories.            |
+| Command                   | Purpose                                                       |
+| ------------------------- | ------------------------------------------------------------- |
+| `pnpm format`             | Format supported repository files with pinned Prettier rules. |
+| `pnpm format:check`       | Verify formatting without writing files.                      |
+| `pnpm lint`               | Run zero-warning, type-aware ESLint without fixes.            |
+| `pnpm lint:fix`           | Apply safe ESLint fixes and fail on remaining violations.     |
+| `pnpm typecheck`          | Run strict TypeScript checking without emitting files.        |
+| `pnpm check:locales`      | Validate locale namespaces, keys, values, and placeholders.   |
+| `pnpm check:boundaries`   | Validate source-layer and domain-module import rules.         |
+| `pnpm check:api-contract` | Require every JSON Route Handler to use the shared envelope.  |
+| `pnpm security:audit`     | Fail on Critical production dependency advisories.            |
 
 Formatting, staged-file behavior, and architectural restrictions are documented in
 [`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md) and
@@ -92,26 +93,27 @@ production release.
 
 ## Test commands
 
-| Command                 | Purpose                                                                   |
-| ----------------------- | ------------------------------------------------------------------------- |
-| `pnpm test`             | Run all deterministic non-browser suites once.                            |
-| `pnpm unit`             | Alias for the unit/component Vitest suite.                                |
-| `pnpm test:unit`        | Run unit and component tests once.                                        |
-| `pnpm integration`      | Alias for integration and contract tests.                                 |
-| `pnpm test:integration` | Run Node-based integration and contract tests once.                       |
-| `pnpm test:watch`       | Start Vitest in watch mode.                                               |
-| `pnpm test:coverage`    | Generate V8 text, HTML, and LCOV coverage.                                |
-| `pnpm e2e`              | Alias for the Playwright browser suite.                                   |
-| `pnpm test:e2e`         | Start the app and run Playwright/axe checks.                              |
-| `pnpm test:e2e:ui`      | Open Playwright's interactive test UI.                                    |
-| `pnpm test:e2e:install` | Install the pinned Chromium runtime for CI or machines without a browser. |
-| `pnpm test:boundaries`  | Unit-test the architecture checker.                                       |
-| `pnpm test:quality`     | Prove deliberate type, lint, and import violations fail.                  |
-| `pnpm test:hooks`       | Exercise malformed and valid commits in a disposable Git repository.      |
-| `pnpm test:scripts`     | Verify this common command contract and database-operation safety.        |
-| `pnpm test:infra`       | Verify the local infrastructure definition without starting Docker.       |
-| `pnpm test:adr`         | Verify the accepted ADR inventory, structure, and index links.            |
-| `pnpm test:dod`         | Verify the pull-request template retains every delivery gate.             |
+| Command                  | Purpose                                                                   |
+| ------------------------ | ------------------------------------------------------------------------- |
+| `pnpm test`              | Run all deterministic non-browser suites once.                            |
+| `pnpm unit`              | Alias for the unit/component Vitest suite.                                |
+| `pnpm test:unit`         | Run unit and component tests once.                                        |
+| `pnpm integration`       | Alias for integration and contract tests.                                 |
+| `pnpm test:integration`  | Run Node-based integration and contract tests once.                       |
+| `pnpm test:watch`        | Start Vitest in watch mode.                                               |
+| `pnpm test:coverage`     | Generate V8 text, HTML, and LCOV coverage.                                |
+| `pnpm e2e`               | Alias for the Playwright browser suite.                                   |
+| `pnpm test:e2e`          | Start the app and run Playwright/axe checks.                              |
+| `pnpm test:e2e:ui`       | Open Playwright's interactive test UI.                                    |
+| `pnpm test:e2e:install`  | Install the pinned Chromium runtime for CI or machines without a browser. |
+| `pnpm test:boundaries`   | Unit-test the architecture checker.                                       |
+| `pnpm test:api-contract` | Test and run the Route Handler API-contract checker.                      |
+| `pnpm test:quality`      | Prove deliberate type, lint, and import violations fail.                  |
+| `pnpm test:hooks`        | Exercise malformed and valid commits in a disposable Git repository.      |
+| `pnpm test:scripts`      | Verify this common command contract and database-operation safety.        |
+| `pnpm test:infra`        | Verify the local infrastructure definition without starting Docker.       |
+| `pnpm test:adr`          | Verify the accepted ADR inventory, structure, and index links.            |
+| `pnpm test:dod`          | Verify the pull-request template retains every delivery gate.             |
 
 See [`tests/README.md`](./tests/README.md) for suite boundaries and external-service safety rules.
 

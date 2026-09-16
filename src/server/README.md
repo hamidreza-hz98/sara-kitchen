@@ -9,6 +9,8 @@ The Sara Kitchen modular-monolith backend belongs here.
   call `disconnectFromDatabase()`.
 - `slugs/` owns canonical normalization, reserved paths, deterministic collision resolution, and the
   shared unique schema field; modules provide collection-specific existence checks and retries.
+- `http/` owns JSON response envelopes, public error taxonomy, request IDs, and the Route Handler
+  boundary that prevents internal error details from reaching clients.
 - Server Components call module services directly instead of making HTTP requests back into this Next.js process.
 - Route Handlers adapt HTTP requests to the same services for browser calls, uploads, webhooks, and external clients.
 - Enforce authentication, authorization, validation, ownership, idempotency, and audit logging in server code rather than relying on hidden UI controls.
