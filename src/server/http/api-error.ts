@@ -87,6 +87,17 @@ export class ApiError extends Error {
     });
   }
 
+  static unavailable(dependencies: NonNullable<ApiErrorDetails["dependencies"]>): ApiError {
+    return new ApiError("unavailable", {
+      details: {
+        dependencies: {
+          mongodb: dependencies.mongodb,
+          objectStorage: dependencies.objectStorage,
+        },
+      },
+    });
+  }
+
   static internal(cause?: unknown, internalMessage = "Unhandled internal API error."): ApiError {
     return new ApiError("internal", { cause, internalMessage });
   }

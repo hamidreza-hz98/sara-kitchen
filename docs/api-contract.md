@@ -49,10 +49,11 @@ unless a future explicitly reviewed public-cache contract replaces it.
 | `notFound`       | `NOT_FOUND`               |    404 | Authorized lookup cannot find the resource       |
 | `conflict`       | `CONFLICT`                |    409 | Uniqueness, stale state, or business conflict    |
 | `rateLimit`      | `RATE_LIMITED`            |    429 | Bounded retry delay; also emits `Retry-After`    |
+| `unavailable`    | `SERVICE_UNAVAILABLE`     |    503 | Required dependency is unavailable               |
 | `internal`       | `INTERNAL_ERROR`          |    500 | Fixed opaque response; diagnostic is server-only |
 
 Use `ApiError` factories rather than status literals. Details are deliberately allowlisted to field,
-resource, retry delay, and validation issues. Authentication and authorization are separate: a known
+resource, retry delay, validation issues, and fixed dependency readiness states. Authentication and authorization are separate: a known
 principal without permission receives `403`; missing/invalid credentials receive `401`. Services
 must avoid disclosing whether a resource exists when that fact itself is unauthorized.
 
@@ -82,6 +83,7 @@ domain-specific failures and let the Route Handler map them.
 
 `pnpm check:api-contract` scans every `src/app/**/route.ts(x)` file. It requires the public HTTP import
 and `handleApiRoute()` and rejects ad hoc `Response.json`, `NextResponse.json`, or `new Response`
-construction. The initial `/api/health` handler is the executable reference. Streaming/binary routes
+construction. `/api/health` and `/api/ready` are executable references for liveness and sanitized
+dependency failures; see [`health-readiness.md`](./health-readiness.md). Streaming/binary routes
 will require an explicit reviewed extension of this contract; they must still preserve request IDs
 and safe error serialization.

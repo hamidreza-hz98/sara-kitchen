@@ -24,6 +24,7 @@ const requiredScripts = [
   "migrate",
   "indexes",
   "verify",
+  "readiness:check",
 ];
 
 function runOperation(operation, mode) {

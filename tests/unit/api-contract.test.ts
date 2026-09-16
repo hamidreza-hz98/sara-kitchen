@@ -60,6 +60,12 @@ describe("HTTP API contract", () => {
     [ApiError.notFound("dish"), 404, "notFound", "NOT_FOUND"],
     [ApiError.conflict({ field: "slug", resource: "dish" }), 409, "conflict", "CONFLICT"],
     [ApiError.rateLimit(30), 429, "rateLimit", "RATE_LIMITED"],
+    [
+      ApiError.unavailable({ mongodb: "ready", objectStorage: "unavailable" }),
+      503,
+      "unavailable",
+      "SERVICE_UNAVAILABLE",
+    ],
   ] as const)(
     "serializes %s as the stable public failure shape",
     async (error, status, type, code) => {

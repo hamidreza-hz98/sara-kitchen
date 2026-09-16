@@ -54,13 +54,14 @@ pnpm verify
 
 ## Local infrastructure commands
 
-| Command             | Purpose                                                                |
-| ------------------- | ---------------------------------------------------------------------- |
-| `pnpm infra:up`     | Build/start MongoDB and MinIO, wait for health, and create the bucket. |
-| `pnpm infra:down`   | Stop containers without deleting named-volume data.                    |
-| `pnpm infra:status` | Show current service and health state.                                 |
-| `pnpm infra:logs`   | Print the latest 100 MongoDB and MinIO log lines.                      |
-| `pnpm infra:config` | Render and validate the resolved Compose model.                        |
+| Command                           | Purpose                                                                  |
+| --------------------------------- | ------------------------------------------------------------------------ |
+| `pnpm infra:up`                   | Build/start MongoDB and MinIO, wait for health, and create the bucket.   |
+| `pnpm infra:down`                 | Stop containers without deleting named-volume data.                      |
+| `pnpm infra:status`               | Show current service and health state.                                   |
+| `pnpm infra:logs`                 | Print the latest 100 MongoDB and MinIO log lines.                        |
+| `pnpm infra:config`               | Render and validate the resolved Compose model.                          |
+| `pnpm readiness:check <base-url>` | Fail deployment validation unless MongoDB and MinIO readiness are green. |
 
 Use the local application credentials and endpoints documented in
 [`docs/local-infrastructure.md`](./docs/local-infrastructure.md). The stack is loopback-only and its
@@ -111,6 +112,7 @@ production release.
 | `pnpm test:quality`      | Prove deliberate type, lint, and import violations fail.                  |
 | `pnpm test:hooks`        | Exercise malformed and valid commits in a disposable Git repository.      |
 | `pnpm test:scripts`      | Verify this common command contract and database-operation safety.        |
+| `pnpm test:readiness`    | Check readiness parsing and deployment success/failure exit codes.        |
 | `pnpm test:infra`        | Verify the local infrastructure definition without starting Docker.       |
 | `pnpm test:adr`          | Verify the accepted ADR inventory, structure, and index links.            |
 | `pnpm test:dod`          | Verify the pull-request template retains every delivery gate.             |

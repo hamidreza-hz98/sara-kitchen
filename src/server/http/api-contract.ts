@@ -29,6 +29,11 @@ export const API_ERROR_DEFINITIONS = Object.freeze({
     message: "Too many requests. Try again later.",
     status: 429,
   },
+  unavailable: {
+    code: "SERVICE_UNAVAILABLE",
+    message: "A required service is unavailable.",
+    status: 503,
+  },
   internal: {
     code: "INTERNAL_ERROR",
     message: "An unexpected error occurred.",
@@ -47,6 +52,10 @@ export type ApiValidationIssue = {
 };
 
 export type ApiErrorDetails = {
+  dependencies?: Readonly<{
+    mongodb: "ready" | "unavailable";
+    objectStorage: "ready" | "unavailable";
+  }>;
   field?: string;
   issues?: readonly ApiValidationIssue[];
   resource?: string;
