@@ -1,3 +1,7 @@
 # Sessions
 
 Owns hashed opaque session tokens, actor kind/identifier, expiry, last-seen metadata, revocation, and active-session queries. It deliberately stores polymorphic actor references without importing Admin or Customer models, preventing an authentication persistence cycle.
+
+SK-0050 uses 32 random bytes encoded as a 43-character base64url bearer token. `issueSession()` returns that token only for the caller to place in the correct HttpOnly cookie; its `token` property is deliberately non-enumerable to prevent accidental object serialization/logging. MongoDB stores only its SHA-256 digest in a unique, default-unselected `tokenHash` field. Never pass raw tokens to audit events, errors, URLs, or persistence APIs. Token lookup must validate encoding before hashing.
+
+The private model stores actor kind (`admin` or `customer`), opaque actor ObjectId, matching audience, shared creation/update timestamps, last-seen, absolute expiry, optional revocation timestamp/reason, and optional IP/user-agent metadata. Token hash and IP are hidden from ordinary queries and JSON. A compound index supports active-session lists and a TTL index removes expired rows eventually; authentication must check expiry and revocation on every request because TTL cleanup is asynchronous. The model enforces actor/audience agreement and coherent revocation state. Cookie handling, idle expiry, lookup, rotation, revocation commands, and activity logging follow in later authentication tasks.
