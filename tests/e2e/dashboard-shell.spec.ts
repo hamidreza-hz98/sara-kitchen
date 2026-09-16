@@ -7,9 +7,7 @@ test("actual dashboard routes fail closed without an admin session", async ({ pa
   for (const path of ["/dashboard", "/dashboard/orders/SK-1234"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/authentication$/);
-    await expect(
-      page.getByText("Administrator sign-in is not available yet.", { exact: false }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Administrator sign in" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Dashboard navigation" })).toHaveCount(0);
   }
 });

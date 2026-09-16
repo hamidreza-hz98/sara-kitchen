@@ -12,6 +12,7 @@ export type IssueSessionInput = {
   actorKind: SessionActorKind;
   actorId: string | Types.ObjectId;
   expiresAt: Date;
+  passwordVersion?: number;
   ipAddress?: string | null;
   userAgent?: string | null;
 };
@@ -41,6 +42,7 @@ export async function issueSession(
     actorKind: input.actorKind,
     actorId: input.actorId,
     audience: input.actorKind,
+    passwordVersion: input.passwordVersion ?? 1,
     expiresAt: input.expiresAt,
     ipAddress: input.ipAddress ?? null,
     userAgent: input.userAgent ?? null,

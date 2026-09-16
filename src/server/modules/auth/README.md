@@ -1,3 +1,7 @@
 # Auth
 
 Owns credential verification orchestration, login, logout, signup coordination, password reset/change flows, and actor resolution. It may consume the public APIs of Admins, Customers, and Sessions. Password hashes remain owned by the relevant identity module; session persistence remains owned by Sessions.
+
+SK-0052 implements administrator login/logout. The identifier is normalized by Admins, password verification remains in Admins, and Sessions issues a fresh 256-bit opaque bearer on every successful login. An incoming admin bearer is revoked before the new one is issued (fixation defense). The login result never includes the raw token in JSON; only the Route Handler sets it in an HttpOnly, SameSite=Strict, host-only cookie. Production uses `__Host-sara_admin` with Secure; local HTTP uses `sara_admin_dev`. The login endpoint requires a same-origin `Origin` header and gives the same generic credential error for wrong/unknown/disabled accounts. Logout revokes the current bearer and clears the cookie. The dashboard resolves an active admin only after checking session audience, absolute/idle expiry, revocation and password version. No default admin is created by this flow.
+
+This is not the final security boundary for all admin actions. SK-0058 will add per-route/action permission guards, SK-0059 expands CSRF protections, and SK-0060 adds distributed rate limits. Do not expose this login endpoint publicly before those controls and initial admin provisioning are complete.

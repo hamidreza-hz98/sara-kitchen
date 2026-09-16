@@ -18,6 +18,7 @@ export const SESSION_REVOCATION_REASONS = [
   "role-change",
   "account-disabled",
   "security",
+  "login-rotation",
 ] as const;
 export type SessionRevocationReason = (typeof SESSION_REVOCATION_REASONS)[number];
 
@@ -26,6 +27,7 @@ export type SessionRecord = BaseDocumentFields & {
   actorKind: SessionActorKind;
   actorId: Types.ObjectId;
   audience: SessionActorKind;
+  passwordVersion: number;
   lastSeenAt: Date;
   expiresAt: Date;
   revokedAt: Date | null;
@@ -54,6 +56,15 @@ const sessionSchema = createBaseSchema<SessionRecord>(
       validate: { validator: isValidObjectId, message: "A valid actor ID is required." },
     },
     audience: { type: String, enum: SESSION_ACTOR_KINDS, required: true, immutable: true },
+    passwordVersion: {
+      type: Number,
+      required: true,
+      default: 1,
+      immutable: true,
+      validate: {
+        validator: (value: number) => Number.isSafeInteger(value) && value >= 1,
+      },
+    },
     lastSeenAt: { type: Date, required: true, default: Date.now },
     expiresAt: { type: Date, required: true, immutable: true },
     revokedAt: { type: Date, default: null },

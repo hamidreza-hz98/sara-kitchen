@@ -26,6 +26,7 @@ export type AdminRecord = BaseDocumentFields & {
   passwordHash: string;
   passwordVersion: number;
   active: boolean;
+  lastLoginAt: Date | null;
 };
 
 const adminSchema = createBaseSchema<AdminRecord>(
@@ -65,6 +66,7 @@ const adminSchema = createBaseSchema<AdminRecord>(
       },
     },
     active: { type: Boolean, required: true, default: true },
+    lastLoginAt: { type: Date, default: null },
   },
   { collection: "admins", searchSourcePaths: ["firstName", "lastName", "identifier"] },
 );

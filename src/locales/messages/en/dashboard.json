@@ -29,11 +29,23 @@
     "breadcrumbs": "Breadcrumbs",
     "accountMenu": "Administrator account",
     "signOutPending": "Sign-out available after authentication setup",
+    "signOut": "Sign out",
+    "signOutError": "Sign-out failed. Please try again.",
     "unknownSection": "Dashboard section",
     "permissionDenied": "You do not have permission to view this section.",
     "previewTitle": "Dashboard shell preview",
     "previewDescription": "Navigation and layout preview. Live dashboard data will be added in later tasks.",
     "authPending": "Administrator sign-in is not available yet. The dashboard remains protected while authentication is being implemented."
+  },
+  "auth": {
+    "title": "Administrator sign in",
+    "description": "Sign in to manage Sara Kitchen.",
+    "identifier": "Username or email",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "invalid": "Invalid credentials.",
+    "network": "Unable to sign in right now. Please try again."
   },
   "metrics": {
     "sales": "Sales",

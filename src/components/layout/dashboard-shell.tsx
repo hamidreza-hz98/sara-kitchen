@@ -35,7 +35,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { AppDrawer } from "@/components/ui";
-import { usePathname } from "@/locales/navigation";
+import { useFeedback } from "@/hooks";
+import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
 import {
@@ -93,6 +94,7 @@ export type DashboardShellProps = {
   actor: DashboardActor;
   basePath?: string;
   children: ReactNode;
+  enableSignOut?: boolean;
 };
 
 function NavigationList({
@@ -201,14 +203,22 @@ function NavigationList({
   );
 }
 
-export function DashboardShell({ actor, basePath = "/dashboard", children }: DashboardShellProps) {
+export function DashboardShell({
+  actor,
+  basePath = "/dashboard",
+  children,
+  enableSignOut = false,
+}: DashboardShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const locale = useLocale();
   const navigation = useTranslations("dashboard.navigation");
   const shell = useTranslations("dashboard.shell");
+  const feedback = useFeedback();
   const [mobileOpen, setMobileOpen] = useState(false);
   const collapsed = useSyncExternalStore(subscribeCollapsed, getCollapsed, () => false);
   const [accountAnchor, setAccountAnchor] = useState<HTMLElement | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   const activeItem = dashboardItemForPath(pathname, basePath);
   const accessibleItems = visibleDashboardItems(actor);
   const isAuthorizedPath = accessibleItems.some((item) => item.key === activeItem?.key);
@@ -216,6 +226,25 @@ export function DashboardShell({ actor, basePath = "/dashboard", children }: Das
   const toggleCollapsed = () => {
     window.localStorage.setItem(collapseStorageKey, String(!collapsed));
     window.dispatchEvent(new Event(collapseChangeEvent));
+  };
+
+  const signOut = async () => {
+    setSigningOut(true);
+    try {
+      const response = await fetch("/api/auth/admin/logout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+        credentials: "same-origin",
+      });
+      if (!response.ok) throw new Error("Sign-out failed");
+      router.replace("/authentication");
+      router.refresh();
+    } catch {
+      setSigningOut(false);
+      setAccountAnchor(null);
+      feedback.notify({ message: shell("signOutError"), severity: "error" });
+    }
   };
 
   const relativePath = pathname.startsWith(`${basePath}/`)
@@ -352,7 +381,20 @@ export function DashboardShell({ actor, basePath = "/dashboard", children }: Das
               <MenuItem disabled>
                 {actor.displayName} — {actor.roleLabel}
               </MenuItem>
-              <MenuItem disabled>{shell("signOutPending")}</MenuItem>
+              {enableSignOut ? (
+                <MenuItem
+                  disabled={signingOut}
+                  onClick={() => {
+                    signOut().catch(() =>
+                      feedback.notify({ message: shell("signOutError"), severity: "error" }),
+                    );
+                  }}
+                >
+                  {shell("signOut")}
+                </MenuItem>
+              ) : (
+                <MenuItem disabled>{shell("signOutPending")}</MenuItem>
+              )}
             </Menu>
           </Box>
         </AppBar>
