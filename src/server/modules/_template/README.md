@@ -35,3 +35,9 @@ This is documentation, not a runnable domain module. Copy the structure selectiv
 7. Tests may reach private layers inside their own module but never another module’s internals.
 
 The public `index.ts` exports use-case functions and public DTO/input types only. It must not export Mongoose models, schemas, repository implementations, provider secrets, or test helpers.
+
+Every entity schema starts with `createBaseSchema()` from `@/server/database`; do not duplicate `_id`,
+timestamps, schema version, actor metadata, normalized-search, soft-delete, or JSON rules. Opt into
+soft deletion and search only when the module's lifecycle/query requirements call for them. Ordinary
+repository operations on a soft-deleted entity apply `ACTIVE_DOCUMENT_FILTER` explicitly. See
+`docs/schema-conventions.md`.

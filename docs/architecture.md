@@ -66,6 +66,12 @@ The canonical blueprint is `src/server/modules/_template/README.md`.
 
 Layers materialize when real behavior is implemented. Empty directories, placeholder classes, and fake CRUD abstractions are not architecture. A new layer file must contain a real contract, invariant, query, mapping, or test.
 
+Every entity model uses the shared `createBaseSchema()` factory documented in
+[`schema-conventions.md`](./schema-conventions.md). Modules choose soft deletion and normalized
+search explicitly, but do not redefine identity, timestamps, actor provenance, schema version, or
+JSON serialization. Repository queries apply the shared active-record filter where soft deletion is
+enabled; models never add hidden global query middleware.
+
 ## Module ownership and allowed dependencies
 
 Dependencies point from consumer to provider. “None” means the module accepts opaque identifiers/context and has no domain-module import.

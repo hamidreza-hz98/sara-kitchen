@@ -35,3 +35,4 @@ export const connectToDatabase = manager.connect;
 export const disconnectFromDatabase = manager.disconnect;
 
 export { MongoDatabaseConnectionError } from "./connection-manager";
+export * from "./schema";
