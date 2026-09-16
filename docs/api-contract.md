@@ -73,7 +73,8 @@ export function POST(request: Request) {
 }
 ```
 
-Validation adapters in SK-0041 will convert Zod issues to localized `ApiValidationIssue` values.
+Validation adapters convert Zod issues to localized `ApiValidationIssue` values. See
+[`request-validation.md`](./request-validation.md) for transport parsing and field-safety rules.
 Module services may throw `ApiError` only at an HTTP-aware adapter boundary; domain code should retain
 domain-specific failures and let the Route Handler map them.
 

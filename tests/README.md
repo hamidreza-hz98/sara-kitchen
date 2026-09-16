@@ -34,6 +34,8 @@ Focused unit and component tests may be colocated with the source they exercise.
   browser tests cover fail-closed real routes and the data-free development fixture at four
   breakpoints, persistent collapse, keyboard operation, RTL mirroring, and axe checks.
 - `pnpm test:integration` (or `pnpm integration`) runs integration and contract tests in Node.
+- Request-validation tests exercise JSON/form/query/route/file parsing, localized safe issue mapping,
+  and Portuguese/Farsi HTTP 400 responses through the actual health Route Handler.
 - `pnpm test:quality` proves the real TypeScript, ESLint, and import-boundary commands reject deliberate violations.
 - `pnpm test:api-contract` proves Route Handlers cannot bypass the shared request-ID, response, and safe-error envelope.
 - `pnpm test:hooks` proves malformed staged source is rejected, valid source commits, and unrelated work is preserved.

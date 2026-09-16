@@ -1,8 +1,21 @@
 {
   "required": "Este campo é obrigatório.",
+  "invalidRequest": "Reveja os campos assinalados e tente novamente.",
+  "invalidJson": "O corpo do pedido deve conter JSON válido.",
+  "invalidFormData": "Não foi possível ler os dados do formulário enviado.",
+  "unsupportedContentType": "O pedido utiliza um tipo de conteúdo não suportado.",
+  "invalidType": "Introduza um valor do tipo esperado.",
+  "invalidFormat": "Introduza um valor no formato exigido.",
   "invalidEmail": "Introduza um endereço de e-mail válido.",
   "invalidMobile": "Introduza um número de telemóvel válido.",
+  "invalidChoice": "Selecione uma das opções disponíveis.",
+  "unknownFields": "O pedido contém campos não suportados.",
   "minLength": "Introduza pelo menos {min} caracteres.",
   "maxLength": "Introduza no máximo {max} caracteres.",
+  "minValue": "Introduza um valor igual ou superior a {min}.",
+  "maxValue": "Introduza um valor não superior a {max}.",
+  "invalidFileName": "Introduza um nome de ficheiro válido.",
+  "fileTooLarge": "O ficheiro não pode exceder {max} bytes.",
+  "unsupportedFileType": "Selecione um tipo de ficheiro suportado.",
   "passwordMismatch": "As palavras-passe não coincidem."
 }

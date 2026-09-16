@@ -13,3 +13,5 @@ Feature-specific schemas may live in their server module and be re-exported only
 Implemented contracts:
 
 - [`env`](./env/README.md) — fail-fast server/client environment parsing and exposure controls.
+- [`request`](./request/README.md) — localized Zod issue mapping plus pagination, sorting, filtering,
+  and file-metadata schemas shared by HTTP adapters and forms.

@@ -1,8 +1,21 @@
 {
   "required": "This field is required.",
+  "invalidRequest": "Review the highlighted fields and try again.",
+  "invalidJson": "The request body must contain valid JSON.",
+  "invalidFormData": "The submitted form data could not be read.",
+  "unsupportedContentType": "The request uses an unsupported content type.",
+  "invalidType": "Enter a value of the expected type.",
+  "invalidFormat": "Enter a value in the required format.",
   "invalidEmail": "Enter a valid email address.",
   "invalidMobile": "Enter a valid mobile number.",
+  "invalidChoice": "Select one of the available options.",
+  "unknownFields": "The request contains unsupported fields.",
   "minLength": "Enter at least {min} characters.",
   "maxLength": "Enter no more than {max} characters.",
+  "minValue": "Enter a value of at least {min}.",
+  "maxValue": "Enter a value no greater than {max}.",
+  "invalidFileName": "Enter a valid file name.",
+  "fileTooLarge": "The file must not exceed {max} bytes.",
+  "unsupportedFileType": "Select a supported file type.",
   "passwordMismatch": "The passwords do not match."
 }
