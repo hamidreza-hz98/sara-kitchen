@@ -14,5 +14,9 @@
     "retry": "Try again"
   },
   "unauthorized": "You are not authorized to perform this action.",
-  "network": "Check your connection and try again."
+  "network": "Check your connection and try again.",
+  "idempotency": {
+    "conflict": "This request key was already used for different details.",
+    "processing": "This request is still processing. Please retry shortly."
+  }
 }

@@ -14,5 +14,9 @@
     "retry": "Tentar novamente"
   },
   "unauthorized": "Não tem autorização para realizar esta ação.",
-  "network": "Verifique a sua ligação e tente novamente."
+  "network": "Verifique a sua ligação e tente novamente.",
+  "idempotency": {
+    "conflict": "Esta chave de pedido já foi usada com dados diferentes.",
+    "processing": "Este pedido ainda está a ser processado. Tente novamente em breve."
+  }
 }
