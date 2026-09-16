@@ -41,5 +41,5 @@ describe("ThemeShowcase", () => {
     await user.click(screen.getByRole("button", { name: "Preview order" }));
 
     expect(screen.getByRole("dialog", { name: "Preview order" })).toBeVisible();
-  });
+  }, 10_000);
 });

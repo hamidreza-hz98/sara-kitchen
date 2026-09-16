@@ -42,6 +42,14 @@ Document `validate()`/`save()` refreshes the search field. Query updates such as
 
 The normalized field supports deterministic equality and prefix-oriented repository strategies. More advanced language-aware full-text ranking requires a separate indexed search design rather than regex scans over user-facing fields.
 
+## Translated values
+
+Multilingual entities define their required embedded array with `createTranslationsField()`. The
+helper enforces one entry per supported locale and non-empty canonical English identity text while
+keeping locale-independent data on the aggregate root. See
+[`translation-values.md`](./translation-values.md) for the complete placement, validation, draft,
+publication, and repository-update contract.
+
 ## Example
 
 ```ts

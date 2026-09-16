@@ -12,3 +12,15 @@ export {
   type SoftDeleteFields,
 } from "./base-schema";
 export { buildNormalizedSearchText, normalizeSearchText } from "./search-normalization";
+export {
+  CANONICAL_CONTENT_LOCALE,
+  TRANSLATION_VALIDATION_CODES,
+  createTranslationsField,
+  validateTranslationValues,
+  type TranslationTextField,
+  type TranslationValidationCode,
+  type TranslationValidationIssue,
+  type TranslationValue,
+  type TranslationValueOptions,
+  type WithTranslations,
+} from "./translation-values";
