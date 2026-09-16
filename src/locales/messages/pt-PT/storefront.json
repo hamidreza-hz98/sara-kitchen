@@ -21,6 +21,24 @@
   "blog": {
     "title": "Histórias da Sara Kitchen"
   },
+  "signup": {
+    "title": "Criar conta",
+    "description": "Junte-se à Sara Kitchen para preparar as suas encomendas. Não revelamos se um contacto já está registado.",
+    "firstName": "Nome",
+    "lastName": "Apelido",
+    "mobile": "Número de telemóvel",
+    "email": "Email (opcional)",
+    "password": "Palavra-passe",
+    "passwordHint": "Use uma frase-passe com pelo menos 15 caracteres.",
+    "terms": "Aceito os termos e a política de privacidade",
+    "marketing": "Quero receber ofertas ocasionais (opcional)",
+    "submit": "Criar conta",
+    "submitting": "A criar conta…",
+    "accepted": "Se estes dados forem elegíveis, a sua conta está pronta. Poderá iniciar sessão quando essa função estiver disponível.",
+    "validationError": "Verifique os seus dados e tente novamente.",
+    "rateLimited": "Demasiadas tentativas. Tente novamente mais tarde.",
+    "networkError": "Não foi possível concluir o pedido. Tente novamente."
+  },
   "shell": {
     "skipToContent": "Saltar para o conteúdo principal",
     "primaryNavigation": "Navegação principal",
@@ -31,6 +49,7 @@
     "languageChanged": "Idioma alterado",
     "cartItems": "Carrinho, {count} artigos",
     "accountMenu": "Abrir menu da conta",
+    "createAccount": "Criar conta",
     "accountNavigation": "Navegação da conta",
     "authenticFlavors": "Sabores autênticos",
     "footerTagline": "Levamos a alma autêntica da hospitalidade persa ao coração do Porto. Cada prato conta uma história de tradição, açafrão e carinho.",

@@ -198,6 +198,10 @@ function AccountMenu() {
           <LoginRounded fontSize="small" sx={{ me: 2 }} />
           {navigation("signIn")}
         </MenuItem>
+        <MenuItem component={NextLink} href="/signup" onClick={handleClose}>
+          <PersonRounded fontSize="small" sx={{ me: 2 }} />
+          {shell("createAccount")}
+        </MenuItem>
       </Menu>
     </>
   );

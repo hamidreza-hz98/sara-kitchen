@@ -21,6 +21,24 @@
   "blog": {
     "title": "Stories from Sara Kitchen"
   },
+  "signup": {
+    "title": "Create your account",
+    "description": "Join Sara Kitchen to get ready for ordering. We won't reveal whether a contact is already registered.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "mobile": "Mobile number",
+    "email": "Email (optional)",
+    "password": "Password",
+    "passwordHint": "Use a passphrase of at least 15 characters.",
+    "terms": "I agree to the terms and privacy policy",
+    "marketing": "Send me occasional offers (optional)",
+    "submit": "Create account",
+    "submitting": "Creating account…",
+    "accepted": "If these details are eligible, your account is ready. You can sign in when customer sign-in is available.",
+    "validationError": "Please check your details and try again.",
+    "rateLimited": "Too many attempts. Please try again later.",
+    "networkError": "We couldn't complete your request. Please try again."
+  },
   "shell": {
     "skipToContent": "Skip to main content",
     "primaryNavigation": "Primary navigation",
@@ -31,6 +49,7 @@
     "languageChanged": "Language changed",
     "cartItems": "Cart, {count} items",
     "accountMenu": "Open account menu",
+    "createAccount": "Create account",
     "accountNavigation": "Account navigation",
     "authenticFlavors": "Authentic flavours",
     "footerTagline": "Bringing the authentic soul of Persian hospitality to the heart of Porto. Every dish is a story of tradition, saffron, and love.",

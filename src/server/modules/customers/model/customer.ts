@@ -28,6 +28,7 @@ export type CustomerRecord = BaseDocumentFields & {
   passwordVersion: number;
   marketingConsent: boolean;
   marketingConsentAt: Date | null;
+  termsAcceptedAt: Date | null;
   status: CustomerStatus;
 };
 
@@ -76,6 +77,7 @@ const customerSchema = createBaseSchema<CustomerRecord>(
     },
     marketingConsent: { type: Boolean, required: true, default: false },
     marketingConsentAt: { type: Date, default: null },
+    termsAcceptedAt: { type: Date, default: null },
     status: { type: String, enum: CUSTOMER_STATUSES, required: true, default: "active" },
   },
   { collection: "customers", searchSourcePaths: ["firstName", "lastName", "mobile", "email"] },
