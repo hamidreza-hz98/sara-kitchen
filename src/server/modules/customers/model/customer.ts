@@ -3,8 +3,8 @@ import "server-only";
 import type { Connection, Model } from "mongoose";
 
 import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
+import { isPasswordHash } from "@/server/security/password";
 
-import { isCustomerPasswordHash } from "../service/password";
 import {
   isValidCustomerEmail,
   isValidCustomerMobile,
@@ -61,7 +61,7 @@ const customerSchema = createBaseSchema<CustomerRecord>(
       type: String,
       required: true,
       select: false,
-      validate: { validator: isCustomerPasswordHash, message: "An Argon2id hash is required." },
+      validate: { validator: isPasswordHash, message: "An Argon2id hash is required." },
     },
     mobileVerifiedAt: { type: Date, default: null },
     emailVerifiedAt: { type: Date, default: null },

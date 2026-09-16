@@ -9,8 +9,8 @@ import {
   type AdminRole,
 } from "@/constants/admin-access";
 import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
+import { isPasswordHash } from "@/server/security/password";
 
-import { isAdminPasswordHash } from "../service/password";
 import {
   isValidAdminIdentifier,
   isValidAdminName,
@@ -53,7 +53,7 @@ const adminSchema = createBaseSchema<AdminRecord>(
       type: String,
       required: true,
       select: false,
-      validate: { validator: isAdminPasswordHash, message: "An Argon2id hash is required." },
+      validate: { validator: isPasswordHash, message: "An Argon2id hash is required." },
     },
     passwordVersion: {
       type: Number,

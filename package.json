@@ -12,6 +12,7 @@
     "lint:fix": "eslint --fix --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "security:audit": "pnpm audit --prod --audit-level critical",
+    "password:benchmark": "node scripts/benchmark-password-hashing.mjs",
     "test": "pnpm test:unit && pnpm test:integration && pnpm test:locales && pnpm test:boundaries && pnpm check:boundaries && pnpm test:api-contract && pnpm test:quality && pnpm test:hooks && pnpm test:scripts && pnpm test:readiness && pnpm test:infra && pnpm test:adr && pnpm test:dod",
     "test:unit": "vitest run --config vitest.config.mts",
     "unit": "pnpm test:unit",

@@ -1,7 +1,7 @@
 /** Public entry point for administrator identity management. */
 export const MODULE_NAME = "admins" as const;
 export { AdminPermissionDeniedError, requireAdminPermission } from "./policy/authorization";
-export { hashAdminPassword } from "./service/password";
+export { hashAdminPassword, verifyAdminPasswordForLogin } from "./service/password";
 export { normalizeAdminIdentifier } from "./validation/admin-identity";
 export {
   ADMIN_PERMISSIONS,

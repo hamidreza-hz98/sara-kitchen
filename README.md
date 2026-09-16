@@ -72,17 +72,18 @@ shutdown.
 
 ## Code-quality commands
 
-| Command                   | Purpose                                                       |
-| ------------------------- | ------------------------------------------------------------- |
-| `pnpm format`             | Format supported repository files with pinned Prettier rules. |
-| `pnpm format:check`       | Verify formatting without writing files.                      |
-| `pnpm lint`               | Run zero-warning, type-aware ESLint without fixes.            |
-| `pnpm lint:fix`           | Apply safe ESLint fixes and fail on remaining violations.     |
-| `pnpm typecheck`          | Run strict TypeScript checking without emitting files.        |
-| `pnpm check:locales`      | Validate locale namespaces, keys, values, and placeholders.   |
-| `pnpm check:boundaries`   | Validate source-layer and domain-module import rules.         |
-| `pnpm check:api-contract` | Require every JSON Route Handler to use the shared envelope.  |
-| `pnpm security:audit`     | Fail on Critical production dependency advisories.            |
+| Command                   | Purpose                                                        |
+| ------------------------- | -------------------------------------------------------------- |
+| `pnpm format`             | Format supported repository files with pinned Prettier rules.  |
+| `pnpm format:check`       | Verify formatting without writing files.                       |
+| `pnpm lint`               | Run zero-warning, type-aware ESLint without fixes.             |
+| `pnpm lint:fix`           | Apply safe ESLint fixes and fail on remaining violations.      |
+| `pnpm typecheck`          | Run strict TypeScript checking without emitting files.         |
+| `pnpm check:locales`      | Validate locale namespaces, keys, values, and placeholders.    |
+| `pnpm check:boundaries`   | Validate source-layer and domain-module import rules.          |
+| `pnpm check:api-contract` | Require every JSON Route Handler to use the shared envelope.   |
+| `pnpm security:audit`     | Fail on Critical production dependency advisories.             |
+| `pnpm password:benchmark` | Measure Argon2id hash/verify latency on the current Node host. |
 
 Formatting, staged-file behavior, and architectural restrictions are documented in
 [`docs/formatting-and-hooks.md`](./docs/formatting-and-hooks.md) and
