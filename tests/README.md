@@ -65,5 +65,6 @@ Focused unit and component tests may be colocated with the source they exercise.
   real third-party sandbox from the default unit-test command.
 - `startTestMongoDatabase` provisions an isolated MongoDB process on demand. It uses
   `mongodb-memory-server-core`, so package installation does not download a MongoDB binary; CI must
-  cache the runtime binary or provide `MONGOMS_SYSTEM_BINARY`.
+  cache the runtime binary or provide `MONGOMS_SYSTEM_BINARY`. On Windows, the helper also discovers
+  the standard MongoDB 8.0 installation path before attempting its pinned archive fallback.
 - Tests must never use production MongoDB, MinIO, payment, messaging, or email credentials.
