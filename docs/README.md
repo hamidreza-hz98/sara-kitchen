@@ -18,6 +18,7 @@ Current records:
 - [`adr/`](./adr/README.md) — accepted architecture decisions, alternatives, consequences, and revisit triggers;
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`api-contract.md`](./api-contract.md) — typed JSON envelopes, public error taxonomy, request IDs, and internal-error safety;
+- [`cache-revalidation.md`](./cache-revalidation.md) — public content tags, dependency-aware reads, targeted mutation expiry, and visibility timing;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`dashboard-shell.md`](./dashboard-shell.md) — protected management route, responsive shell, permission-filtered navigation, and admin-session handoff;
 - [`database-connection.md`](./database-connection.md) — cached Mongoose lifecycle, pool/timeouts, retry behavior, and secret-safe errors;
