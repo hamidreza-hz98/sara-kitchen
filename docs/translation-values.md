@@ -1,4 +1,4 @@
-# Translation value conventions (SK-0037)
+# Translation value conventions and selection (SK-0037–SK-0038)
 
 Authored multilingual aggregates store one typed, embedded `translations` array. English (`en`) is
 the canonical authoring locale; Portuguese (`pt-PT`) and Farsi (`fa`) entries may be absent while a
@@ -75,5 +75,31 @@ locale values inside one document with a multikey unique index.
 | `canonical_locale_missing` | The English entry is absent.                        |
 | `canonical_text_missing`   | Configured canonical English text is blank/missing. |
 
-The shared helper validates draft shape, not locale selection. Response mapping and fallback are
-handled by the localized-value selection contract in SK-0038.
+## Localized selection
+
+Use `resolveTranslation()` when a mapper needs a complete entity-specific translation entry. Use
+`resolveLocalizedValue()` when fields can be authored independently; a present translation with a
+blank requested field does not block that field from falling back. Both helpers follow exactly:
+
+1. the requested locale;
+2. the configured fallback locale, when supplied;
+3. canonical English.
+
+Repeated candidates are removed without changing precedence. Missing, null, and whitespace-only
+strings continue through the chain, while structured rich text, `0`, and `false` are treated as
+present values. If no candidate exists, the helpers return `null`; callers must deliberately render
+an unavailable state rather than inventing text or leaking an arbitrary locale.
+
+Every successful selection includes the requested and resolved locale, `source`, `isFallback`, and
+the direction of the resolved content. Direction follows the resolved value—not merely the page—so
+English fallback content inside a Farsi page can receive `ltr` treatment. The page shell itself
+continues to follow the user's selected locale.
+
+```ts
+const selection = resolveLocalizedValue(dish.translations, "name", requestedLocale, {
+  fallbackLocale: settings.contentFallbackLocale,
+});
+
+if (!selection) return unavailableDishName;
+return { name: selection.value, direction: selection.direction };
+```

@@ -24,6 +24,8 @@ or placeholder-incompatible messages.
   instead of their Next.js equivalents when navigation changes or depends on locale.
 - `formatters.ts` centralizes cached `Intl` formatters for integer-cent EUR, decimal numbers, units,
   relative time, and Porto-zone dates/times. It validates inputs before formatting.
+- `translation-selection.ts` resolves database-authored entries and individual localized fields in
+  requested, configured-fallback, then canonical-English order and reports resolved text direction.
 - `messages.ts` uses an exhaustive loader map and merges localized copy over English defensively.
 - `global.d.ts` derives valid translation namespaces and keys from the English source catalog.
 - `messages/<locale>/*.json` contains UI copy only. Every locale must preserve the English shape.

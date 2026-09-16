@@ -18,3 +18,14 @@ export {
   resolveLocalePreference,
   routing,
 } from "./routing";
+export {
+  buildLocaleResolutionOrder,
+  resolveLocalizedValue,
+  resolveTranslation,
+  type LocalizedEntry,
+  type LocalizedField,
+  type LocalizedSelection,
+  type LocaleResolutionCandidate,
+  type LocaleResolutionOptions,
+  type LocaleResolutionSource,
+} from "./translation-selection";
