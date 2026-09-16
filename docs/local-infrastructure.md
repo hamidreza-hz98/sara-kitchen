@@ -4,6 +4,8 @@ Sara Kitchen runs MongoDB and MinIO locally through Docker Compose. The stack bi
 `127.0.0.1`, uses development-only credentials, waits for service health, creates the private media
 bucket idempotently, and stores state in named volumes.
 
+The local Compose MongoDB is **standalone**, so it cannot run the multi-collection checkout/payment transactions defined in [ADR-0008](./adr/0008-transaction-boundaries.md). Those workflows fail before writing; they never fall back to unsafe partial writes. Automated transaction integration tests start an isolated single-node replica set. A separate local replica-set setup is required for interactive end-to-end checkout development.
+
 ## Prerequisite
 
 Install Docker Desktop with Docker Compose v2 and start its Linux container engine. Verify it with:

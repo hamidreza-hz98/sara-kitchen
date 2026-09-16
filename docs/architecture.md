@@ -111,6 +111,7 @@ Dependencies point from consumer to provider. “None” means the module accept
 - Multi-module workflows are coordinated by the module named as owner in the table or by a future application orchestration service documented in an ADR.
 - MongoDB transactions are opened at the workflow boundary and passed through explicit infrastructure contracts; repositories do not silently create nested transactions.
 - Side effects such as WhatsApp/email notifications occur after durable state is recorded and use idempotent event/outbox processing where consistency matters.
+- Checkout, payment results, and refund-recording boundaries follow [ADR-0008](./adr/0008-transaction-boundaries.md). The current local standalone MongoDB cannot execute those workflows; they fail closed until a replica set is available.
 
 ## Evolution rule
 

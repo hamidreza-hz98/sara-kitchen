@@ -35,6 +35,7 @@ export const connectToDatabase = manager.connect;
 export const disconnectFromDatabase = manager.disconnect;
 
 export { MongoDatabaseConnectionError } from "./connection-manager";
+export { MongoTransactionUnavailableError, withMongoTransaction } from "./transaction-boundary";
 export {
   createListQueryControls,
   escapeSearchPattern,

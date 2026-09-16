@@ -16,6 +16,7 @@ const expectedFiles = [
   "0005-integer-money.md",
   "0006-minio-object-storage.md",
   "0007-production-deployment-target.md",
+  "0008-transaction-boundaries.md",
 ];
 const requiredSections = ["Context", "Decision", "Alternatives considered", "Consequences"];
 

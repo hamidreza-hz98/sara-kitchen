@@ -25,5 +25,6 @@ in the same change when it reveals that a recorded decision is inaccurate.
 | [0005](./0005-integer-money.md)                | Represent money as integer EUR cents                     | Accepted |
 | [0006](./0006-minio-object-storage.md)         | Store media in private MinIO object storage              | Accepted |
 | [0007](./0007-production-deployment-target.md) | Deploy serverless compute with external EU data services | Accepted |
+| [0008](./0008-transaction-boundaries.md)       | Keep checkout and payment state atomic in MongoDB        | Accepted |
 
 Run `pnpm test:adr` to verify the inventory, metadata, required sections, and index links.
