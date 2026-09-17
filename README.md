@@ -83,6 +83,7 @@ shutdown.
 | `pnpm check:boundaries`   | Validate source-layer and domain-module import rules.          |
 | `pnpm check:api-contract` | Require every JSON Route Handler to use the shared envelope.   |
 | `pnpm security:audit`     | Fail on Critical production dependency advisories.             |
+| `pnpm secrets:scan`       | Scan all Git history, current source, and production output.   |
 | `pnpm password:benchmark` | Measure Argon2id hash/verify latency on the current Node host. |
 
 Formatting, staged-file behavior, and architectural restrictions are documented in
@@ -92,6 +93,13 @@ Formatting, staged-file behavior, and architectural restrictions are documented 
 `pnpm security:audit` queries the package registry and therefore stays outside the deterministic
 `pnpm verify` command. Run it whenever production dependencies or the lockfile change and before a
 production release.
+
+`pnpm secrets:scan` requires an existing production build, downloads the pinned Gitleaks release to
+the operating-system temporary tools directory, verifies its SHA-256 checksum, and scans all Git
+refs, tracked/unignored source, and deployable `.next` output with full redaction. Use
+`pnpm secrets:scan:repository` before a build or `pnpm secrets:scan:build` after one. The full scan
+runs in GitHub Actions and is required before production. See
+[`docs/secret-management.md`](./docs/secret-management.md).
 
 ## Test commands
 

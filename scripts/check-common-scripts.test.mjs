@@ -25,6 +25,7 @@ const requiredScripts = [
   "indexes",
   "verify",
   "readiness:check",
+  "secrets:scan",
 ];
 
 function runOperation(operation, mode) {

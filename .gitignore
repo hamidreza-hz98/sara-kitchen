@@ -16,6 +16,8 @@
 /test-results
 /quality-fixture-*
 /hook-fixture-*
+/secret-scan-fixture-*
+gitleaks-report.*
 
 # next.js
 /.next/

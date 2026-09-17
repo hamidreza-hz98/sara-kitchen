@@ -60,7 +60,7 @@ Before committing:
 1. Confirm the change belongs to the active task.
 2. Preserve unrelated user work and avoid broad mechanical changes without a reason.
 3. Review `git diff` for accidental files, secrets, debug output, and generated artifacts.
-4. Run the checks relevant to the change.
+4. Run `pnpm secrets:scan:repository` and the other checks relevant to the change.
 5. Update documentation, translations, tests, and the master task list when the task requires them.
 
 The complete local verification command is:
@@ -99,6 +99,10 @@ Before production deployment:
 - the released commit must be identified by an immutable Git tag or deployment revision.
 
 Production credentials must stay in the deployment provider’s secret store. They must never be placed in commits, issue text, logs, screenshots, AI prompts, or chat messages.
+
+Before a production release, run `pnpm build && pnpm secrets:scan`; this verifies complete Git history,
+the current working tree, and deployable build output. A finding is an incident until a human proves it
+is a non-operational test value. Never suppress a finding by path alone or add a broad allowlist.
 
 ## Temporary nature of this policy
 

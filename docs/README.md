@@ -33,6 +33,7 @@ Current records:
 - [`idempotency.md`](./idempotency.md) — checkout/payment/webhook keys, fingerprints, replay, conflicts, retention, and concurrent delivery.
 - [`request-security.md`](./request-security.md) — browser CSRF/origin policy, Server Action checks, and signed payment webhook boundary.
 - [`security-headers.md`](./security-headers.md) — production response headers, narrowly allowed browser origins, secure cookies, and CSP tradeoffs.
+- [`secret-management.md`](./secret-management.md) — secret ownership, deployment storage, rotation, incident response, and repository/build scanning.
 - [`authentication-rate-limits.md`](./authentication-rate-limits.md) — independent IP/identity/actor buckets, thresholds, privacy, and retry contract.
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.
 - [`localization.md`](./localization.md) — locale routing, cookie persistence, catalogs, authoring rules, and acceptance coverage.

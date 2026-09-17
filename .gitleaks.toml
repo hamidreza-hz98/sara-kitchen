@@ -1,0 +1,37 @@
+title = "Sara Kitchen secret scanning"
+minVersion = "8.30.1"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Non-operational signup test fixture"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)tests/integration/customer-signup-routes\.test\.ts$''']
+regexes = ['''AUTH_SESSION_SECRET: "test-signup-secret-at-least-32-characters-long"''']
+
+[[allowlists]]
+description = "Architecture prose misclassified as a slash-delimited key"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)docs/architecture\.md$''']
+regexes = ['''credentials, consent/privacy''']
+
+[[allowlists]]
+description = "Next.js build-generated preview keys in the server-only prerender manifest"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)prerender-manifest\.json$''']
+regexes = ['''"previewMode(Signing|Encryption)Key": "[a-f0-9]{64}"''']
+
+[[allowlists]]
+description = "Next.js build-generated Server Action key in the server-only reference manifest"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)server/server-reference-manifest\.json$''']
+regexes = ['''"encryptionKey": "[A-Za-z0-9+/_=-]{44}"''']

@@ -72,3 +72,7 @@ before launch. Reset URLs must use the public HTTPS `NEXT_PUBLIC_SITE_URL` origi
 
 Errors list invalid variable names and remediation, but never include received values. Add new
 variables to the schema and this inventory in the same change.
+
+Storage, access, rotation, and leak-response requirements for every sensitive value are defined in
+[`secret-management.md`](./secret-management.md). Environment validation prevents malformed values;
+it does not replace the deployment secret store or repository/build secret scanning.
