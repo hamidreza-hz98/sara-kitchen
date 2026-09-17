@@ -10,6 +10,7 @@ import type {
 import { ApiError } from "./api-error";
 import { createApplicationLogger } from "../observability/logger";
 import { captureServerException } from "../monitoring";
+import { recordOperationalMetric } from "../metrics";
 
 export const REQUEST_ID_HEADER = "x-request-id";
 export const REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
@@ -109,11 +110,20 @@ export async function handleApiRoute<Data, Meta = never>(
 
   try {
     const response = successResponse(requestId, await handler({ requestId }));
+    const durationMs = performance.now() - startedAt;
     logger.info({
       action: "request.completed",
       context: { ...requestContext, statusCode: response.status },
-      durationMs: performance.now() - startedAt,
+      durationMs,
       message: "API request completed.",
+    });
+    recordOperationalMetric({
+      name: "http.request",
+      method: request.method,
+      statusClass: `${Math.floor(response.status / 100)}xx`,
+      unit: "ms",
+      value: durationMs,
+      requestId,
     });
     return response;
   } catch (caughtError) {
@@ -154,6 +164,14 @@ export async function handleApiRoute<Data, Meta = never>(
         message: "API request was rejected.",
       });
     }
+    recordOperationalMetric({
+      name: "http.request",
+      method: request.method,
+      statusClass: `${Math.floor(apiError.status / 100)}xx`,
+      unit: "ms",
+      value: durationMs,
+      requestId,
+    });
     return errorResponse(requestId, apiError);
   }
 }

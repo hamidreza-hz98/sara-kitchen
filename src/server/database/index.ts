@@ -3,6 +3,7 @@ import "server-only";
 import mongoose from "mongoose";
 
 import { getServerEnvironment } from "@/server/environment";
+import { observeMongoCommands } from "@/server/metrics/mongo-command-observer";
 
 import {
   createMongoConnectionCache,
@@ -26,7 +27,11 @@ const manager = createMongoConnectionManager({
 });
 
 /** Reuse this process's healthy connection or in-flight connection attempt. */
-export const connectToDatabase = manager.connect;
+export async function connectToDatabase() {
+  const connection = await manager.connect();
+  observeMongoCommands(connection.getClient());
+  return connection;
+}
 
 /**
  * Close the process connection during graceful shutdown and isolated tests only.

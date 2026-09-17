@@ -10,6 +10,7 @@ export const DEFAULT_MONGODB_CONNECT_OPTIONS = Object.freeze({
   maxIdleTimeMS: 30_000,
   maxPoolSize: 10,
   minPoolSize: 0,
+  monitorCommands: true,
 }) satisfies Readonly<ConnectOptions>;
 
 export type MongoConnectionCache = {
