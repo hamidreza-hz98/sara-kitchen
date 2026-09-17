@@ -8,6 +8,7 @@ import {
   AUDIT_LOG_RETENTION_MS,
   getAuditLogModel,
 } from "@/server/modules/logs/model/audit-log";
+import { recordAuditEvent } from "@/server/modules/logs";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
 
@@ -87,6 +88,90 @@ describe("persisted audit log", () => {
         expect.objectContaining({ key: { "actor.kind": 1, "actor.ref": 1, occurredAt: -1 } }),
       ]),
     );
+  });
+
+  it("creates canonical successful CRUD and failed payment events through one public command", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const AuditLog = getAuditLogModel(client.connection);
+    const actorId = new Types.ObjectId();
+    const dishId = new Types.ObjectId().toHexString();
+
+    const createdReceipt = await recordAuditEvent(client.connection, {
+      action: "crud.resource.create",
+      actor: {
+        kind: "admin",
+        ref: actorId.toHexString(),
+        snapshot: { displayName: "Sara Kazemi", role: "owner" },
+      },
+      context: { statusCode: 201 },
+      network: { ipAddress: null, ipHash: "d".repeat(64), policy: "hashed" },
+      occurredAt: new Date("2026-09-17T18:00:00.000Z"),
+      outcome: "success",
+      requestId: "request.crud:0001",
+      resource: {
+        kind: "dish",
+        ref: dishId,
+        snapshot: { code: null, label: "Fesenjan", status: "active" },
+      },
+      userAgent: "Integration test browser",
+    });
+    const failedReceipt = await recordAuditEvent(client.connection, {
+      action: "payment.transaction.process",
+      actor: {
+        kind: "customer",
+        ref: new Types.ObjectId().toHexString(),
+        snapshot: { displayName: "Customer", role: null },
+      },
+      context: { provider: "mbway", statusCode: 502 },
+      network: { ipAddress: null, ipHash: null, policy: "omitted" },
+      occurredAt: new Date("2026-09-17T18:01:00.000Z"),
+      outcome: "failure",
+      requestId: "request.payment:0002",
+      resource: {
+        kind: "transaction",
+        ref: new Types.ObjectId().toHexString(),
+        snapshot: { code: "TX-1002", label: "MB Way payment", status: "failed" },
+      },
+      userAgent: null,
+    });
+
+    expect(Object.isFrozen(createdReceipt)).toBe(true);
+    expect(createdReceipt).toMatchObject({
+      actionCode: "crud.resource.create",
+      message: "Resource was created successfully.",
+      occurredAt: "2026-09-17T18:00:00.000Z",
+      outcome: "success",
+      severity: "info",
+      type: "data",
+    });
+    expect(failedReceipt).toMatchObject({
+      actionCode: "payment.transaction.process",
+      message: "Payment processing failed.",
+      outcome: "failure",
+      severity: "error",
+      type: "business",
+    });
+
+    const storedSuccess = await AuditLog.findById(createdReceipt.id).exec();
+    const storedFailure = await AuditLog.findById(failedReceipt.id).exec();
+    expect(storedSuccess).toMatchObject({
+      actionCode: createdReceipt.actionCode,
+      message: createdReceipt.message,
+      outcome: "success",
+      severity: "info",
+      type: "data",
+    });
+    expect(storedFailure).toMatchObject({
+      actionCode: failedReceipt.actionCode,
+      message: failedReceipt.message,
+      outcome: "failure",
+      severity: "error",
+      type: "business",
+    });
+
+    if (!storedSuccess) throw new Error("Created audit record was not found.");
+    storedSuccess.message = "Attempted mutation.";
+    await expect(storedSuccess.save()).rejects.toThrow(AUDIT_LOG_APPEND_ONLY_ERROR);
   });
 
   it("rejects document, query, delete, and bulk mutation paths", async () => {

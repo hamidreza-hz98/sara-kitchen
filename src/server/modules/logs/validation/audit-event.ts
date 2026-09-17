@@ -12,7 +12,7 @@ import type {
 
 export const AUDIT_ACTION_CODE_PATTERN = /^[a-z][a-z0-9]*(?:\.[a-z][a-z0-9-]*){1,7}$/u;
 export const AUDIT_ENTITY_KIND_PATTERN = /^[a-z][a-z0-9-]{1,63}$/u;
-export const AUDIT_REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,128}$/u;
+export const AUDIT_REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 export const AUDIT_IP_HASH_PATTERN = /^[a-f0-9]{64}$/u;
 export const AUDIT_CONTEXT_KEY_PATTERN = /^[a-z][A-Za-z0-9]{0,63}$/u;
 

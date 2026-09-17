@@ -5,6 +5,25 @@ a copy of business data. Events use bounded English action codes and messages so
 one stable vocabulary regardless of the actor's selected locale. Display snapshots may preserve a
 Unicode name or label when needed to understand a historical event.
 
+## Creation service and action catalog
+
+`recordAuditEvent()` is the only public write command. Every domain module may depend on the Logs
+public API, while Logs remains dependency-free. Callers select a compile-time `AuditActionCode`, an
+outcome, actor/resource snapshots, request correlation, privacy-classified network data, and optional
+bounded context. The service derives the English message, event type, and default severity from the
+immutable action catalog; user input can never become audit prose.
+
+The initial catalog covers administrator/customer authentication, password reset, authorization,
+generic create/update/delete operations, order creation/status changes, payment processing, and
+settings updates. Add new stable actions to the catalog rather than accepting arbitrary strings. A
+successful outcome maps to `info`, failure to `error`, and denial to `warning` unless a reviewed
+action definition deliberately specifies another severity.
+
+The service validates context before persistence, accepts an optional caller-owned MongoDB
+`ClientSession` for transactional workflows, and returns a frozen serializable receipt rather than a
+Mongoose document. Persistence errors are emitted through the redacted operational logger and then
+re-thrown; the service never reports a successful audit write when insertion failed.
+
 ## Record contract
 
 Each `audit_logs` document contains:
@@ -40,11 +59,12 @@ MongoDB URIs, private-key blocks, and payment-card-like digit sequences. Nested 
 request/response bodies, contact messages, rich-text content, dish descriptions, addresses, and
 transaction payloads belong in their owning system—not in the log.
 
-The default network policy is `hashed`. `hashAuditIpAddress()` uses HMAC-SHA256 with an explicit domain
+The preferred network policy is `hashed`. `hashAuditIpAddress()` uses HMAC-SHA256 with an explicit domain
 separator and at least 32 bytes of secret material, preventing simple rainbow-table recovery while
-allowing short-term abuse correlation. The creation service will use the server-only session secret
-unless a dedicated audit key is introduced; rotating that key intentionally breaks correlation across
-the boundary. Raw IP retention is supported only when a documented security/legal need selects
+allowing short-term abuse correlation. The authenticated request boundary supplies the resulting hash;
+the creation service never accepts an unclassified raw request object or chooses a privacy policy.
+Rotating the hashing key intentionally breaks correlation across the boundary. Raw IP retention is
+supported only when a documented security/legal need selects
 `retained`; ordinary model queries and JSON hide both raw IP and hashes. `omitted` stores neither.
 
 Snapshot fields are historical evidence and may contain limited personal data such as a display name.
@@ -54,9 +74,9 @@ full contact text, and payment details are not snapshot fields.
 ## Append-only enforcement
 
 All event fields are immutable. Document re-save plus Mongoose update, replace, delete, find-and-modify,
-and bulk-write paths throw `Audit records are append-only.` The future repository may expose insert and
-authorized read methods only. Other modules consume the Logs public service and may not import its
-model or collection.
+and bulk-write paths throw `Audit records are append-only.` The private repository exposes insertion
+inside Logs only. Other modules consume the public creation service and may not import its model,
+repository, or collection.
 
 Mongoose middleware cannot constrain a database administrator or code that deliberately calls the raw
 MongoDB collection. Production operational access must therefore restrict direct writes, and raw
@@ -78,10 +98,12 @@ must be reviewed after real traffic because audit collections are write-heavy.
 
 ## Verification
 
-Unit tests cover admin/customer/system-compatible structure, English message constraints, actor/network
-coherence, bounded context, forbidden keys and secret-like values, keyed IP hashing, hidden fields, and
-indexes. MongoDB integration tests persist both admin and customer events and prove document, query,
-delete, and bulk mutations fail while the retention index remains present.
+Unit tests cover the complete action vocabulary, English message constraints, derived type/severity,
+admin/customer/system-compatible structure, actor/network coherence, bounded context, forbidden keys
+and secret-like values, keyed IP hashing, hidden fields, and indexes. MongoDB integration tests use the
+public service for representative successful CRUD and failed payment events, verify the persisted
+derived fields and frozen DTO, and prove document, query, delete, and bulk mutations fail while the
+retention index remains present.
 
 This design follows OWASP's direction to remove, mask, sanitize, hash, or encrypt session identifiers,
 tokens, passwords, connection strings, encryption keys, and sensitive personal data rather than logging
