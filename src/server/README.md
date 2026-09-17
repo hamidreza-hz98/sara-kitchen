@@ -12,6 +12,8 @@ The Sara Kitchen modular-monolith backend belongs here.
 - `http/` owns JSON response envelopes, public error taxonomy, request IDs, and the Route Handler
   boundary that prevents internal error details from reaching clients.
 - `cache/` owns public content tags and post-commit invalidation adapters; personalized data is not cached there.
+- `observability/` owns typed, redacted operational logs and renders the same normalized fields as
+  readable local text or production JSON; it is separate from the append-only audit-log module.
 - Server Components call module services directly instead of making HTTP requests back into this Next.js process.
 - Route Handlers adapt HTTP requests to the same services for browser calls, uploads, webhooks, and external clients.
 - Enforce authentication, authorization, validation, ownership, idempotency, and audit logging in server code rather than relying on hidden UI controls.

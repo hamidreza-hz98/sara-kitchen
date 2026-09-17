@@ -8,6 +8,7 @@ import type {
   ApiSuccessResult,
 } from "./api-contract";
 import { ApiError } from "./api-error";
+import { createApplicationLogger } from "../observability/logger";
 
 export const REQUEST_ID_HEADER = "x-request-id";
 export const REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
@@ -71,19 +72,21 @@ function errorResponse(requestId: string, error: ApiError): Response {
   return Response.json(body, { headers, status: error.status });
 }
 
-function defaultInternalErrorReporter(error: unknown, context: ApiErrorReporterContext): void {
-  console.error("Unhandled API route error", { ...context, error });
-}
-
 async function reportInternalError(
   error: unknown,
   context: ApiErrorReporterContext,
-  reporter: NonNullable<HandleApiRouteOptions["onInternalError"]>,
+  reporter: NonNullable<HandleApiRouteOptions["onInternalError"]> | undefined,
 ): Promise<void> {
+  if (!reporter) return;
   try {
     await reporter(error, context);
   } catch (reportingError) {
-    defaultInternalErrorReporter(reportingError, context);
+    createApplicationLogger({ module: "http", requestId: context.requestId }).error({
+      action: "internal-error-reporter.failed",
+      context: { method: context.method, pathname: context.pathname },
+      error: reportingError,
+      message: "The configured internal error reporter failed.",
+    });
   }
 }
 
@@ -96,18 +99,54 @@ export async function handleApiRoute<Data, Meta = never>(
   options: HandleApiRouteOptions = {},
 ): Promise<Response> {
   const requestId = resolveRequestId(request);
+  const startedAt = performance.now();
+  const requestContext = {
+    method: request.method,
+    pathname: new URL(request.url).pathname,
+  };
+  const logger = createApplicationLogger({ module: "http", requestId });
 
   try {
-    return successResponse(requestId, await handler({ requestId }));
+    const response = successResponse(requestId, await handler({ requestId }));
+    logger.info({
+      action: "request.completed",
+      context: { ...requestContext, statusCode: response.status },
+      durationMs: performance.now() - startedAt,
+      message: "API request completed.",
+    });
+    return response;
   } catch (caughtError) {
     const apiError = caughtError instanceof ApiError ? caughtError : ApiError.internal(caughtError);
+    const durationMs = performance.now() - startedAt;
     if (apiError.type === "internal") {
       const reportedError = apiError.cause ?? caughtError;
+      logger.error({
+        action: "request.failed",
+        context: {
+          ...requestContext,
+          errorCode: API_ERROR_DEFINITIONS[apiError.type].code,
+          statusCode: apiError.status,
+        },
+        durationMs,
+        error: reportedError,
+        message: "API request failed unexpectedly.",
+      });
       await reportInternalError(
         reportedError,
-        { method: request.method, pathname: new URL(request.url).pathname, requestId },
-        options.onInternalError ?? defaultInternalErrorReporter,
+        { ...requestContext, requestId },
+        options.onInternalError,
       );
+    } else {
+      logger.warn({
+        action: "request.rejected",
+        context: {
+          ...requestContext,
+          errorCode: API_ERROR_DEFINITIONS[apiError.type].code,
+          statusCode: apiError.status,
+        },
+        durationMs,
+        message: "API request was rejected.",
+      });
     }
     return errorResponse(requestId, apiError);
   }

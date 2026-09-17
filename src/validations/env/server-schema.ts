@@ -55,6 +55,8 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "MONGODB_URI",
   "AUTH_SESSION_SECRET",
   "AUTH_PASSWORD_RESET_SECRET",
+  "LOG_LEVEL",
+  "DEPLOYMENT_VERSION",
   "RESET_SMS_ENABLED",
   "TWILIO_RESET_ACCOUNT_SID",
   "TWILIO_RESET_AUTH_TOKEN",
@@ -88,6 +90,8 @@ export const serverEnvironmentSchema = z
     ),
     AUTH_SESSION_SECRET: requiredSecret("AUTH_SESSION_SECRET"),
     AUTH_PASSWORD_RESET_SECRET: requiredSecret("AUTH_PASSWORD_RESET_SECRET"),
+    LOG_LEVEL: z.enum(["debug", "info", "warn", "error", "fatal"]).optional(),
+    DEPLOYMENT_VERSION: optionalText("DEPLOYMENT_VERSION"),
     RESET_SMS_ENABLED: booleanString("RESET_SMS_ENABLED").default(false),
     TWILIO_RESET_ACCOUNT_SID: optionalText("TWILIO_RESET_ACCOUNT_SID"),
     TWILIO_RESET_AUTH_TOKEN: z.preprocess(

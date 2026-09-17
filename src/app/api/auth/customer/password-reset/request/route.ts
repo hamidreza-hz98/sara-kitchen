@@ -18,6 +18,7 @@ import {
   resetSmsEnabled,
   sendResetSms,
 } from "@/server/modules/auth";
+import { createApplicationLogger } from "@/server/observability";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -48,9 +49,13 @@ export async function POST(request: NextRequest): Promise<Response> {
           { identifier: input.identifier, locale, siteUrl },
           sendResetSms,
         );
-      } catch {
+      } catch (error) {
         // Never log the bearer, mobile, identifier, or provider response.
-        console.error("Customer password-reset delivery failed", { requestId });
+        createApplicationLogger({ module: "auth.password-reset", requestId }).error({
+          action: "delivery.failed",
+          error,
+          message: "Customer password-reset delivery failed.",
+        });
       }
     });
     return apiSuccess({ accepted: true as const }, { status: 202 });
