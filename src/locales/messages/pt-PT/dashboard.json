@@ -28,6 +28,7 @@
     "expandSidebar": "Expandir barra lateral",
     "breadcrumbs": "Navegação estrutural",
     "accountMenu": "Conta do administrador",
+    "sessions": "Sessões ativas",
     "signOutPending": "Terminar sessão disponível após configurar a autenticação",
     "signOut": "Terminar sessão",
     "signOutError": "Não foi possível terminar a sessão. Tente novamente.",

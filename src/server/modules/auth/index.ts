@@ -8,6 +8,13 @@ export {
 } from "./policy/customer-cookie";
 export { isSameOriginMutation } from "./policy/same-origin";
 export {
+  ActorSessionRejectedError,
+  getActorActiveSessions,
+  revokeActorSessionById,
+  revokeAllOtherActorSessions,
+  type SessionPrincipal,
+} from "./service/actor-sessions";
+export {
   requestCustomerPasswordReset,
   resetCustomerPassword,
   PasswordResetRejectedError,

@@ -27,6 +27,48 @@
     "orders": "Orders",
     "signIn": "Sign in"
   },
+  "sessions": {
+    "title": "Active sessions",
+    "description": "Review devices signed in to your account. Ending a session takes effect on its next request.",
+    "current": "This device",
+    "started": "Signed in: {date}",
+    "lastSeen": "Last active: {date}",
+    "expires": "Expires: {date}",
+    "persistent": "Remembered session",
+    "browserSession": "Browser session",
+    "revokeOne": "Sign out this device",
+    "revokeOthers": "Sign out all other devices",
+    "revoking": "Signing out…",
+    "revoked": "Selected sessions have been signed out.",
+    "error": "Could not update your sessions. Please try again.",
+    "expired": "Your session has expired. Sign in again.",
+    "signIn": "Sign in",
+    "loading": "Loading sessions",
+    "empty": "No active sessions found.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page}",
+    "confirmTitle": "Sign out other devices?",
+    "confirmDescription": "Every other active session will be closed. This device will stay signed in.",
+    "confirmOthers": "Sign out others",
+    "cancel": "Cancel",
+    "close": "Close",
+    "browser": {
+      "chrome": "Chrome",
+      "edge": "Edge",
+      "firefox": "Firefox",
+      "safari": "Safari",
+      "other": "Unknown browser"
+    },
+    "platform": {
+      "android": "Android",
+      "ios": "iOS",
+      "linux": "Linux",
+      "macos": "macOS",
+      "windows": "Windows",
+      "other": "Unknown device"
+    }
+  },
   "feedback": {
     "close": "Dismiss notification",
     "loading": "Loading page",

@@ -27,6 +27,48 @@
     "orders": "Encomendas",
     "signIn": "Iniciar sessão"
   },
+  "sessions": {
+    "title": "Sessões ativas",
+    "description": "Veja os dispositivos com sessão iniciada. Terminar uma sessão tem efeito no próximo pedido.",
+    "current": "Este dispositivo",
+    "started": "Início de sessão: {date}",
+    "lastSeen": "Última atividade: {date}",
+    "expires": "Expira: {date}",
+    "persistent": "Sessão memorizada",
+    "browserSession": "Sessão do navegador",
+    "revokeOne": "Terminar sessão neste dispositivo",
+    "revokeOthers": "Terminar sessão em todos os outros dispositivos",
+    "revoking": "A terminar sessão…",
+    "revoked": "As sessões selecionadas foram terminadas.",
+    "error": "Não foi possível atualizar as sessões. Tente novamente.",
+    "expired": "A sua sessão expirou. Inicie sessão novamente.",
+    "signIn": "Iniciar sessão",
+    "loading": "A carregar sessões",
+    "empty": "Não foram encontradas sessões ativas.",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "page": "Página {page}",
+    "confirmTitle": "Terminar sessão noutros dispositivos?",
+    "confirmDescription": "Todas as outras sessões ativas serão terminadas. Este dispositivo continuará ligado.",
+    "confirmOthers": "Terminar outras sessões",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "browser": {
+      "chrome": "Chrome",
+      "edge": "Edge",
+      "firefox": "Firefox",
+      "safari": "Safari",
+      "other": "Navegador desconhecido"
+    },
+    "platform": {
+      "android": "Android",
+      "ios": "iOS",
+      "linux": "Linux",
+      "macos": "macOS",
+      "windows": "Windows",
+      "other": "Dispositivo desconhecido"
+    }
+  },
   "feedback": {
     "close": "Fechar notificação",
     "loading": "A carregar a página",

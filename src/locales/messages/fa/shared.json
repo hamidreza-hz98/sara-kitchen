@@ -27,6 +27,48 @@
     "orders": "سفارش‌ها",
     "signIn": "ورود"
   },
+  "sessions": {
+    "title": "نشست‌های فعال",
+    "description": "دستگاه‌های واردشده به حساب خود را بررسی کنید. پایان نشست در درخواست بعدی اعمال می‌شود.",
+    "current": "این دستگاه",
+    "started": "زمان ورود: {date}",
+    "lastSeen": "آخرین فعالیت: {date}",
+    "expires": "انقضا: {date}",
+    "persistent": "نشست ماندگار",
+    "browserSession": "نشست مرورگر",
+    "revokeOne": "خروج این دستگاه",
+    "revokeOthers": "خروج از همهٔ دستگاه‌های دیگر",
+    "revoking": "در حال خروج…",
+    "revoked": "نشست‌های انتخاب‌شده پایان یافتند.",
+    "error": "به‌روزرسانی نشست‌ها ممکن نشد. دوباره تلاش کنید.",
+    "expired": "نشست شما منقضی شده است. دوباره وارد شوید.",
+    "signIn": "ورود",
+    "loading": "در حال بارگذاری نشست‌ها",
+    "empty": "نشست فعالی یافت نشد.",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "page": "صفحهٔ {page}",
+    "confirmTitle": "از دستگاه‌های دیگر خارج شوید؟",
+    "confirmDescription": "همهٔ نشست‌های فعال دیگر پایان می‌یابند. این دستگاه وارد می‌ماند.",
+    "confirmOthers": "خروج از دستگاه‌های دیگر",
+    "cancel": "لغو",
+    "close": "بستن",
+    "browser": {
+      "chrome": "Chrome",
+      "edge": "Edge",
+      "firefox": "Firefox",
+      "safari": "Safari",
+      "other": "مرورگر ناشناخته"
+    },
+    "platform": {
+      "android": "Android",
+      "ios": "iOS",
+      "linux": "Linux",
+      "macos": "macOS",
+      "windows": "Windows",
+      "other": "دستگاه ناشناخته"
+    }
+  },
   "feedback": {
     "close": "بستن اعلان",
     "loading": "در حال بارگذاری صفحه",

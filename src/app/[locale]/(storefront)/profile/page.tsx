@@ -14,6 +14,11 @@ export default async function CustomerProfilePage() {
       <Link component={NextLink} href="/profile/change-password">
         {t("changePassword.title")}
       </Link>
+      <Typography sx={{ mt: 2 }}>
+        <Link component={NextLink} href="/profile/sessions">
+          {t("sessionsLink")}
+        </Link>
+      </Typography>
     </Container>
   );
 }

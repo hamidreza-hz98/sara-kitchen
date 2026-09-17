@@ -4,6 +4,7 @@
   "information": "Informação pessoal",
   "addresses": "Moradas",
   "orders": "Encomendas",
+  "sessionsLink": "Gerir sessões ativas",
   "changePassword": {
     "title": "Alterar palavra-passe",
     "description": "Confirme a palavra-passe atual e escolha uma nova. Este dispositivo mantém a sessão iniciada com uma nova sessão.",

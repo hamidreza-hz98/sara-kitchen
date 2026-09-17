@@ -4,6 +4,7 @@
   "information": "Personal information",
   "addresses": "Addresses",
   "orders": "Orders",
+  "sessionsLink": "Manage active sessions",
   "changePassword": {
     "title": "Change password",
     "description": "Confirm your current password, then choose a new one. Your current device stays signed in with a fresh session.",

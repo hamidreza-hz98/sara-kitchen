@@ -28,6 +28,7 @@
     "expandSidebar": "Expand sidebar",
     "breadcrumbs": "Breadcrumbs",
     "accountMenu": "Administrator account",
+    "sessions": "Active sessions",
     "signOutPending": "Sign-out available after authentication setup",
     "signOut": "Sign out",
     "signOutError": "Sign-out failed. Please try again.",

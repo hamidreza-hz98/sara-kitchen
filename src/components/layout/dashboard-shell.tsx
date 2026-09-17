@@ -221,7 +221,9 @@ export function DashboardShell({
   const [signingOut, setSigningOut] = useState(false);
   const activeItem = dashboardItemForPath(pathname, basePath);
   const accessibleItems = visibleDashboardItems(actor);
-  const isAuthorizedPath = accessibleItems.some((item) => item.key === activeItem?.key);
+  const isSessionPath = pathname === `${basePath}/sessions`;
+  const isAuthorizedPath =
+    isSessionPath || accessibleItems.some((item) => item.key === activeItem?.key);
 
   const toggleCollapsed = () => {
     window.localStorage.setItem(collapseStorageKey, String(!collapsed));
@@ -360,7 +362,11 @@ export function DashboardShell({
               {shell("brand")}
             </Typography>
             <Typography sx={{ display: { xs: "none", lg: "block" }, flexGrow: 1, fontWeight: 700 }}>
-              {activeItem ? navigation(activeItem.key) : shell("unknownSection")}
+              {isSessionPath
+                ? shell("sessions")
+                : activeItem
+                  ? navigation(activeItem.key)
+                  : shell("unknownSection")}
             </Typography>
             <IconButton
               aria-label={shell("accountMenu")}
@@ -381,6 +387,15 @@ export function DashboardShell({
               <MenuItem disabled>
                 {actor.displayName} — {actor.roleLabel}
               </MenuItem>
+              {enableSignOut && (
+                <MenuItem
+                  component={NextLink}
+                  href={`${basePath}/sessions`}
+                  onClick={() => setAccountAnchor(null)}
+                >
+                  {shell("sessions")}
+                </MenuItem>
+              )}
               {enableSignOut ? (
                 <MenuItem
                   disabled={signingOut}
@@ -423,7 +438,9 @@ export function DashboardShell({
             >
               {navigation("overview")}
             </Typography>
-            {activeItem && activeItem.key !== "overview" ? (
+            {isSessionPath ? (
+              <Typography color="text.primary">{shell("sessions")}</Typography>
+            ) : activeItem && activeItem.key !== "overview" ? (
               <Typography
                 component={detailParts.length ? NextLink : "span"}
                 href={detailParts.length ? `${basePath}${activeItem.path}` : undefined}
