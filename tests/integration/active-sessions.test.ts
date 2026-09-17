@@ -36,6 +36,7 @@ vi.mock("@/server/environment", () => ({
 }));
 
 import { GET as adminGet, POST as adminPost } from "@/app/api/auth/admin/sessions/route";
+import { GET as csrfGet } from "@/app/api/auth/csrf/route";
 import { GET as customerGet, POST as customerPost } from "@/app/api/auth/customer/sessions/route";
 import { revokeOtherSessionsAction } from "@/app/actions/revoke-other-sessions";
 import DashboardDeepLinkPage from "@/app/[locale]/(dashboard)/dashboard/[...rest]/page";
@@ -44,6 +45,7 @@ import { requireCustomerPage } from "@/server/auth/page-guards";
 import { getAdminModel } from "@/server/modules/admins/model/admin";
 import { hashAdminPassword } from "@/server/modules/admins/service/password";
 import { resolveAdminActor } from "@/server/modules/auth/service/admin-session";
+import { createCsrfToken } from "@/server/modules/auth/policy/csrf";
 import { resolveCustomerActor } from "@/server/modules/auth/service/customer-session";
 import {
   AuthorizationGuardError,
@@ -69,6 +71,7 @@ function request(
     method: body === undefined ? "GET" : "POST",
     headers: {
       ...(body === undefined ? {} : { origin, "content-type": "application/json" }),
+      ...(body !== undefined && token ? { "x-csrf-token": createCsrfToken(principal, token) } : {}),
       ...(token
         ? { cookie: `${principal === "admin" ? "sara_admin_dev" : "sara_customer_dev"}=${token}` }
         : {}),
@@ -191,7 +194,29 @@ describe("owner-scoped active session management", () => {
     expect((await customerGet(request("customer", admin.current.token))).status).toBe(401);
   });
 
+  it("issues a no-store CSRF token only for the matching active principal", async () => {
+    const valid = await csrfGet(
+      new NextRequest(`${baseUrl}/csrf?principal=admin`, {
+        headers: { cookie: `sara_admin_dev=${admin.current.token}` },
+      }),
+    );
+    expect(valid.status).toBe(200);
+    expect(valid.headers.get("cache-control")).toBe("no-store");
+    const value = (await valid.json()).data.csrfToken as string;
+    expect(value).toHaveLength(64);
+    expect(value).not.toContain(admin.current.token);
+    const crossed = await csrfGet(
+      new NextRequest(`${baseUrl}/csrf?principal=admin`, {
+        headers: { cookie: `sara_admin_dev=${customer.current.token}` },
+      }),
+    );
+    expect(crossed.status).toBe(401);
+  });
+
   it("rejects foreign targets and foreign origins without revoking another actor", async () => {
+    const missingCsrf = request("admin", admin.current.token, { action: "others" });
+    missingCsrf.headers.delete("x-csrf-token");
+    expect((await adminPost(missingCsrf)).status).toBe(403);
     expect(
       (
         await adminPost(

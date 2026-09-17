@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { useRouter } from "@/locales/navigation";
 
 type Result =
@@ -47,7 +48,7 @@ export function ChangePasswordForm() {
     try {
       const response = await fetch("/api/auth/customer/change-password", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: await csrfJsonHeaders("customer"),
         credentials: "same-origin",
         body: JSON.stringify({ currentPassword, newPassword, revokeOtherSessions }),
       });

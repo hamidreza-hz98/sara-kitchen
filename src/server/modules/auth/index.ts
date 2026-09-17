@@ -7,6 +7,7 @@ export {
   serializeCustomerCookie,
 } from "./policy/customer-cookie";
 export { isSameOriginMutation } from "./policy/same-origin";
+export { createCsrfToken, isProtectedMutation, verifyCsrfToken } from "./policy/csrf";
 export {
   AuthorizationGuardError,
   dashboardPermissionForPath,

@@ -5,6 +5,11 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const databaseState = vi.hoisted(() => ({ connection: null as Connection | null }));
 vi.mock("server-only", () => ({}));
+vi.mock("@/server/environment", () => ({
+  getServerEnvironment: () => ({
+    AUTH_SESSION_SECRET: "test-session-secret-with-at-least-32-characters",
+  }),
+}));
 vi.mock("@/server/database", () => ({
   connectToDatabase: async () => {
     if (!databaseState.connection) throw new Error("Test connection not ready.");
@@ -17,6 +22,7 @@ import { POST as logout } from "@/app/api/auth/customer/logout/route";
 import { GET as sessionStatus } from "@/app/api/auth/customer/session/route";
 import { getCustomerModel } from "@/server/modules/customers/model/customer";
 import { hashCustomerPassword } from "@/server/modules/customers/service/password";
+import { createCsrfToken } from "@/server/modules/auth/policy/csrf";
 import { getSessionModel } from "@/server/modules/sessions/model/session";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
@@ -30,6 +36,9 @@ function request(path: string, body: unknown, cookie?: string, origin = "http://
     headers: {
       origin,
       "content-type": "application/json",
+      ...(path === "logout" && cookie
+        ? { "x-csrf-token": createCsrfToken("customer", cookie) }
+        : {}),
       ...(cookie ? { cookie: `sara_customer_dev=${cookie}` } : {}),
     },
     body: JSON.stringify(body),

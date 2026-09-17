@@ -36,6 +36,7 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { AppDrawer } from "@/components/ui";
 import { useFeedback } from "@/hooks";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
@@ -235,7 +236,7 @@ export function DashboardShell({
     try {
       const response = await fetch("/api/auth/admin/logout", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: await csrfJsonHeaders("admin"),
         body: "{}",
         credentials: "same-origin",
       });

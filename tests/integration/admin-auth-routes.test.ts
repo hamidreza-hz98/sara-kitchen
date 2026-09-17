@@ -5,6 +5,11 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const databaseState = vi.hoisted(() => ({ connection: null as Connection | null }));
 vi.mock("server-only", () => ({}));
+vi.mock("@/server/environment", () => ({
+  getServerEnvironment: () => ({
+    AUTH_SESSION_SECRET: "test-session-secret-with-at-least-32-characters",
+  }),
+}));
 vi.mock("@/server/database", () => ({
   connectToDatabase: async () => {
     if (!databaseState.connection) throw new Error("Test connection not ready.");
@@ -16,6 +21,7 @@ import { POST as login } from "@/app/api/auth/admin/login/route";
 import { POST as logout } from "@/app/api/auth/admin/logout/route";
 import { getAdminModel } from "@/server/modules/admins/model/admin";
 import { hashAdminPassword } from "@/server/modules/admins/service/password";
+import { createCsrfToken } from "@/server/modules/auth/policy/csrf";
 import { resolveAdminActor } from "@/server/modules/auth/service/admin-session";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
@@ -29,6 +35,7 @@ function request(path: string, body: unknown, cookie?: string, origin = "http://
     headers: {
       origin,
       "content-type": "application/json",
+      ...(path === "logout" && cookie ? { "x-csrf-token": createCsrfToken("admin", cookie) } : {}),
       ...(cookie ? { cookie: `sara_admin_dev=${cookie}` } : {}),
     },
     body: JSON.stringify(body),

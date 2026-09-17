@@ -21,6 +21,7 @@ vi.mock("@/server/environment", () => ({
 import { POST } from "@/app/api/auth/customer/change-password/route";
 import { getCustomerModel } from "@/server/modules/customers/model/customer";
 import { hashCustomerPassword } from "@/server/modules/customers/service/password";
+import { createCsrfToken } from "@/server/modules/auth/policy/csrf";
 import { issueSession } from "@/server/modules/sessions/service/issue-session";
 import { resolveSession } from "@/server/modules/sessions/service/session-lifecycle";
 
@@ -75,6 +76,7 @@ describe("customer change-password Route Handler", () => {
       headers: {
         origin: options.origin ?? "http://localhost:3000",
         "content-type": "application/json",
+        ...(options.bearer ? { "x-csrf-token": createCsrfToken("customer", options.bearer) } : {}),
         ...(options.bearer ? { cookie: `sara_customer_dev=${options.bearer}` } : {}),
       },
       body: JSON.stringify(body),

@@ -56,6 +56,8 @@ describe("active-session controls", () => {
       "fetch",
       vi.fn(async (url: string, options?: RequestInit) => {
         calls.push({ url, body: options?.body?.toString() });
+        if (url.startsWith("/api/auth/csrf"))
+          return new Response(JSON.stringify({ data: { csrfToken: "a".repeat(64) } }));
         if (options?.method === "POST")
           return new Response(JSON.stringify({ ok: true, data: { revoked: 1 } }), { status: 200 });
         return new Response(
@@ -89,6 +91,8 @@ describe("active-session controls", () => {
       "fetch",
       vi.fn(async (url: string, options?: RequestInit) => {
         calls.push({ url, body: options?.body?.toString() });
+        if (url.startsWith("/api/auth/csrf"))
+          return new Response(JSON.stringify({ data: { csrfToken: "a".repeat(64) } }));
         if (options?.method === "POST")
           return new Response(JSON.stringify({ ok: true, data: { revoked: 1 } }), { status: 200 });
         return new Response(JSON.stringify({ ok: true, data: page }), { status: 200 });

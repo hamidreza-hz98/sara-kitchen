@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { ConfirmationDialog } from "@/components/feedback";
 import { formatDateTime } from "@/locales/formatters";
 import { resolveLocalePreference } from "@/locales/routing";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import type { ActiveSessionPage, ActiveSessionSummary } from "@/types/session";
 
 type Principal = "admin" | "customer";
@@ -73,7 +74,7 @@ export function ActiveSessions({
         } else {
           const response = await fetch(endpoint, {
             method: "POST",
-            headers: { "content-type": "application/json" },
+            headers: await csrfJsonHeaders(principal),
             credentials: "same-origin",
             body: JSON.stringify({ action: "others" }),
           });
@@ -93,7 +94,7 @@ export function ActiveSessions({
       }
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: await csrfJsonHeaders(principal),
         credentials: "same-origin",
         body: JSON.stringify(action === "one" ? { action, sessionId } : { action }),
       });

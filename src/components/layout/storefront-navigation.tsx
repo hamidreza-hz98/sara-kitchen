@@ -31,6 +31,7 @@ import { useState, type MouseEvent, type ReactNode } from "react";
 import { AppDrawer, AppLink } from "@/components/ui";
 import { useCustomerAuth, useFeedback } from "@/hooks";
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { LOCALE_COOKIE_MAX_AGE, LOCALE_COOKIE_NAME } from "@/locales";
 import { usePathname, useRouter } from "@/locales/navigation";
 
@@ -177,7 +178,7 @@ function AccountMenu() {
     try {
       const response = await fetch("/api/auth/customer/logout", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: await csrfJsonHeaders("customer"),
         credentials: "same-origin",
         body: "{}",
       });

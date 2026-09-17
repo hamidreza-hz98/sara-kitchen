@@ -15,7 +15,7 @@ import {
   adminCookieName,
   customerCookieName,
   getActorActiveSessions,
-  isSameOriginMutation,
+  isProtectedMutation,
   revokeActorSessionById,
   revokeAllOtherActorSessions,
   type SessionPrincipal,
@@ -63,7 +63,8 @@ export async function readActorSessions(request: NextRequest, principal: Session
 }
 
 export async function mutateActorSessions(request: NextRequest, principal: SessionPrincipal) {
-  if (!isSameOriginMutation(request)) throw ApiError.authorization();
+  const token = bearer(request, principal);
+  if (!isProtectedMutation(request, principal, token)) throw ApiError.authorization();
   const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
   const input = await parseJsonRequest(
     request,
@@ -72,7 +73,6 @@ export async function mutateActorSessions(request: NextRequest, principal: Sessi
   );
   try {
     const connection = await connectToDatabase();
-    const token = bearer(request, principal);
     if (input.action === "one") {
       await revokeActorSessionById(connection, principal, token, input.sessionId);
       return apiSuccess({ revoked: 1 });

@@ -13,7 +13,7 @@ import {
 import {
   clearCustomerCookie,
   customerCookieName,
-  isSameOriginMutation,
+  isProtectedMutation,
   logoutCustomer,
 } from "@/server/modules/auth";
 
@@ -22,10 +22,10 @@ const emptyBodySchema = z.strictObject({});
 
 export async function POST(request: NextRequest): Promise<Response> {
   const response = await handleApiRoute(request, async () => {
-    if (!isSameOriginMutation(request)) throw ApiError.authorization();
+    const token = request.cookies.get(customerCookieName())?.value;
+    if (!isProtectedMutation(request, "customer", token)) throw ApiError.authorization();
     const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
     await parseJsonRequest(request, emptyBodySchema, await getRequestValidationOptions(locale));
-    const token = request.cookies.get(customerCookieName())?.value;
     if (token) await logoutCustomer(await connectToDatabase(), token);
     return apiSuccess({ authenticated: false as const });
   });

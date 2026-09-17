@@ -8,6 +8,8 @@ validateEnvironment();
 const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
+    // Keep Next's same-origin Server Action check; no proxy origins bypass it.
+    serverActions: { bodySizeLimit: "64kb" },
   },
 };
 

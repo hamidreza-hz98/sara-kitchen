@@ -15,7 +15,7 @@ import {
   changeCurrentCustomerPassword,
   CustomerPasswordChangeRejectedError,
   customerCookieName,
-  isSameOriginMutation,
+  isProtectedMutation,
   serializeCustomerCookie,
 } from "@/server/modules/auth";
 import { isStrongSignupPassword } from "@/server/modules/customers";
@@ -31,9 +31,9 @@ const schema = z.strictObject({
 export async function POST(request: NextRequest): Promise<Response> {
   let cookie: string | undefined;
   const response = await handleApiRoute(request, async () => {
-    if (!isSameOriginMutation(request)) throw ApiError.authorization();
     const token = request.cookies.get(customerCookieName())?.value;
     if (!token) throw ApiError.authentication();
+    if (!isProtectedMutation(request, "customer", token)) throw ApiError.authorization();
     const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
     const input = await parseJsonRequest(
       request,

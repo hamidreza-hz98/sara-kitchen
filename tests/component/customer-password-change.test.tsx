@@ -23,6 +23,8 @@ describe("customer change-password form", () => {
   it("defaults to revoking other sessions and shows the rotated-session result", async () => {
     const user = userEvent.setup();
     const submit = vi.fn(async (url: string, options: RequestInit) => {
+      if (url.startsWith("/api/auth/csrf"))
+        return new Response(JSON.stringify({ data: { csrfToken: "a".repeat(64) } }));
       expect(url).toBe("/api/auth/customer/change-password");
       expect(options.method).toBe("POST");
       return new Response(JSON.stringify({ ok: true, data: { changed: true } }), { status: 200 });
@@ -40,8 +42,8 @@ describe("customer change-password form", () => {
       "A different secure passphrase 2026",
     );
     await user.click(screen.getByRole("button", { name: "Change password" }));
-    await waitFor(() => expect(submit).toHaveBeenCalledOnce());
-    expect(JSON.parse(submit.mock.calls[0]![1]!.body as string)).toMatchObject({
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(submit.mock.calls[1]![1]!.body as string)).toMatchObject({
       revokeOtherSessions: true,
       currentPassword: "A strong customer passphrase 2026",
     });
@@ -53,6 +55,8 @@ describe("customer change-password form", () => {
   it("lets the customer retain other sessions and blocks mismatched confirmation", async () => {
     const user = userEvent.setup();
     const submit = vi.fn(async (url: string, options: RequestInit) => {
+      if (url.startsWith("/api/auth/csrf"))
+        return new Response(JSON.stringify({ data: { csrfToken: "a".repeat(64) } }));
       expect(url).toBe("/api/auth/customer/change-password");
       expect(options.method).toBe("POST");
       return new Response("{}", { status: 200 });
@@ -78,8 +82,8 @@ describe("customer change-password form", () => {
       "A different secure passphrase 2026",
     );
     await user.click(screen.getByRole("button", { name: "Change password" }));
-    await waitFor(() => expect(submit).toHaveBeenCalledOnce());
-    expect(JSON.parse(submit.mock.calls[0]![1]!.body as string).revokeOtherSessions).toBe(false);
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(submit.mock.calls[1]![1]!.body as string).revokeOtherSessions).toBe(false);
     expect(await screen.findByRole("status")).toHaveTextContent("other devices remain signed in");
   });
 });
