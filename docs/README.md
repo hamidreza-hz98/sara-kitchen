@@ -35,6 +35,7 @@ Current records:
 - [`security-headers.md`](./security-headers.md) — production response headers, narrowly allowed browser origins, secure cookies, and CSP tradeoffs.
 - [`secret-management.md`](./secret-management.md) — secret ownership, deployment storage, rotation, incident response, and repository/build scanning.
 - [`authentication-rate-limits.md`](./authentication-rate-limits.md) — independent IP/identity/actor buckets, thresholds, privacy, and retry contract.
+- [`audit-logging.md`](./audit-logging.md) — immutable event schema, privacy constraints, indexes, retention, and tamper boundaries.
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.
 - [`localization.md`](./localization.md) — locale routing, cookie persistence, catalogs, authoring rules, and acceptance coverage.
 - [`localized-formatting.md`](./localized-formatting.md) — EUR, numeric, unit, relative-time, date/time defaults, input contracts, and locale examples.
