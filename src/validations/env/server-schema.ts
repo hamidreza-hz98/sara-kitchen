@@ -55,6 +55,10 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "MONGODB_URI",
   "AUTH_SESSION_SECRET",
   "AUTH_PASSWORD_RESET_SECRET",
+  "RESET_SMS_ENABLED",
+  "TWILIO_RESET_ACCOUNT_SID",
+  "TWILIO_RESET_AUTH_TOKEN",
+  "TWILIO_RESET_FROM_NUMBER",
   "MINIO_ENDPOINT",
   "MINIO_PORT",
   "MINIO_USE_SSL",
@@ -84,6 +88,20 @@ export const serverEnvironmentSchema = z
     ),
     AUTH_SESSION_SECRET: requiredSecret("AUTH_SESSION_SECRET"),
     AUTH_PASSWORD_RESET_SECRET: requiredSecret("AUTH_PASSWORD_RESET_SECRET"),
+    RESET_SMS_ENABLED: booleanString("RESET_SMS_ENABLED").default(false),
+    TWILIO_RESET_ACCOUNT_SID: optionalText("TWILIO_RESET_ACCOUNT_SID"),
+    TWILIO_RESET_AUTH_TOKEN: z.preprocess(
+      emptyStringToUndefined,
+      requiredSecret("TWILIO_RESET_AUTH_TOKEN").optional(),
+    ),
+    TWILIO_RESET_FROM_NUMBER: z.preprocess(
+      emptyStringToUndefined,
+      z
+        .string()
+        .trim()
+        .regex(/^\+[1-9]\d{7,14}$/, "TWILIO_RESET_FROM_NUMBER must use E.164 format.")
+        .optional(),
+    ),
     MINIO_ENDPOINT: requiredText("MINIO_ENDPOINT").refine(
       (value) => !value.includes("://"),
       "MINIO_ENDPOINT must be a hostname without http:// or https://.",
@@ -138,6 +156,26 @@ export const serverEnvironmentSchema = z
         path: ["AUTH_PASSWORD_RESET_SECRET"],
         message: "AUTH_PASSWORD_RESET_SECRET must differ from AUTH_SESSION_SECRET.",
       });
+    }
+
+    if (environment.RESET_SMS_ENABLED) {
+      for (const field of [
+        "TWILIO_RESET_ACCOUNT_SID",
+        "TWILIO_RESET_AUTH_TOKEN",
+        "TWILIO_RESET_FROM_NUMBER",
+      ] as const) {
+        if (!environment[field]) addRequiredIssue(context, field, field);
+      }
+      if (
+        environment.TWILIO_RESET_ACCOUNT_SID &&
+        !/^AC[0-9a-fA-F]{32}$/u.test(environment.TWILIO_RESET_ACCOUNT_SID)
+      ) {
+        context.addIssue({
+          code: "custom",
+          path: ["TWILIO_RESET_ACCOUNT_SID"],
+          message: "TWILIO_RESET_ACCOUNT_SID must be a Twilio account SID.",
+        });
+      }
     }
 
     if (environment.MBWAY_ENABLED) {

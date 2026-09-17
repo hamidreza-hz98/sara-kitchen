@@ -48,7 +48,33 @@
     "submit": "Iniciar sessão",
     "submitting": "A iniciar sessão…",
     "invalid": "Telemóvel, email ou palavra-passe inválidos.",
-    "network": "Não foi possível iniciar sessão. Tente novamente."
+    "network": "Não foi possível iniciar sessão. Tente novamente.",
+    "forgotPassword": "Esqueceu-se da palavra-passe?"
+  },
+  "forgotPassword": {
+    "title": "Esqueceu-se da palavra-passe?",
+    "description": "Introduza o telemóvel ou email. Se existir uma conta elegível, enviaremos uma ligação por SMS para o telemóvel registado.",
+    "identifier": "Telemóvel ou email",
+    "submit": "Enviar ligação",
+    "submitting": "A enviar…",
+    "accepted": "Se existir uma conta elegível, será enviada uma ligação por SMS.",
+    "rateLimited": "Demasiados pedidos. Tente novamente mais tarde.",
+    "error": "Não foi possível processar o pedido. Tente novamente."
+  },
+  "resetPassword": {
+    "title": "Redefinir palavra-passe",
+    "description": "Escolha uma nova frase-passe. A ligação expira em 15 minutos e só pode ser usada uma vez.",
+    "newPassword": "Nova palavra-passe",
+    "confirmPassword": "Confirmar nova palavra-passe",
+    "passwordHint": "Use pelo menos 15 caracteres.",
+    "submit": "Redefinir palavra-passe",
+    "submitting": "A redefinir…",
+    "success": "Palavra-passe alterada. Todas as sessões anteriores foram terminadas.",
+    "invalid": "Esta ligação é inválida, expirou ou já foi utilizada.",
+    "mismatch": "As palavras-passe não coincidem.",
+    "error": "Não foi possível redefinir a palavra-passe. Tente novamente.",
+    "requestNew": "Pedir nova ligação",
+    "signIn": "Iniciar sessão"
   },
   "shell": {
     "skipToContent": "Saltar para o conteúdo principal",

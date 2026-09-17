@@ -8,6 +8,8 @@ import Stack from "@mui/material/Stack";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import NextLink from "next/link";
 
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import { useRouter } from "@/locales/navigation";
@@ -65,6 +67,9 @@ export function CustomerLoginForm() {
         type="password"
       />
       <FormControlLabel control={<Checkbox name="persistent" />} label={t("persistent")} />
+      <Link component={NextLink} href="/forgot-password">
+        {t("forgotPassword")}
+      </Link>
       {error && (
         <Alert role="alert" severity="error">
           {t(error)}

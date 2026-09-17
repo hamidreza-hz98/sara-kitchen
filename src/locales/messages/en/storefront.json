@@ -48,7 +48,33 @@
     "submit": "Sign in",
     "submitting": "Signing in…",
     "invalid": "Invalid mobile, email, or password.",
-    "network": "We couldn't sign you in. Please try again."
+    "network": "We couldn't sign you in. Please try again.",
+    "forgotPassword": "Forgot your password?"
+  },
+  "forgotPassword": {
+    "title": "Forgot your password?",
+    "description": "Enter your mobile number or email. If an eligible account exists, we'll text a reset link to its mobile number.",
+    "identifier": "Mobile number or email",
+    "submit": "Send reset link",
+    "submitting": "Submitting…",
+    "accepted": "If an eligible account exists, a reset link will be sent by SMS.",
+    "rateLimited": "Too many requests. Please try again later.",
+    "error": "We couldn't process your request. Please try again."
+  },
+  "resetPassword": {
+    "title": "Reset your password",
+    "description": "Choose a new passphrase. Your reset link expires after 15 minutes and can be used once.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "passwordHint": "Use at least 15 characters.",
+    "submit": "Reset password",
+    "submitting": "Resetting…",
+    "success": "Password changed. All previous sessions have been signed out.",
+    "invalid": "This reset link is invalid, expired, or already used.",
+    "mismatch": "The passwords don't match.",
+    "error": "We couldn't reset your password. Please try again.",
+    "requestNew": "Request a new link",
+    "signIn": "Sign in"
   },
   "shell": {
     "skipToContent": "Skip to main content",

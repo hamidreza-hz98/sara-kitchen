@@ -80,3 +80,7 @@ export function validateEnvironment(
 export function getServerEnvironment(): ServerEnvironment {
   return validateEnvironment().server;
 }
+
+export function getApplicationSiteUrl(): string {
+  return validateEnvironment().client.NEXT_PUBLIC_SITE_URL;
+}

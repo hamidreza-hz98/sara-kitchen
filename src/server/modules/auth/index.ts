@@ -7,6 +7,17 @@ export {
   serializeCustomerCookie,
 } from "./policy/customer-cookie";
 export { isSameOriginMutation } from "./policy/same-origin";
+export {
+  requestCustomerPasswordReset,
+  resetCustomerPassword,
+  PasswordResetRejectedError,
+  PASSWORD_RESET_LIFETIME_MS,
+} from "./service/customer-password-reset";
+export { resetSmsEnabled, sendResetSms } from "./service/reset-sms";
+export {
+  limitPasswordResetRequest,
+  limitPasswordResetSubmission,
+} from "./service/password-reset-limit";
 export { limitSignupIdentity, limitSignupIp } from "./service/signup-limit";
 export {
   CustomerLoginRejectedError,

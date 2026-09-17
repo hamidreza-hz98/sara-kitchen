@@ -10,6 +10,12 @@ export {
 } from "./service/customer-login";
 export { customerSignupSchema } from "./validation/signup";
 export {
+  findCustomerForReset,
+  replaceCustomerPasswordAfterReset,
+  type ResetCustomerIdentity,
+} from "./service/customer-reset";
+export { isStrongSignupPassword } from "./validation/signup";
+export {
   normalizeCustomerEmail,
   normalizeCustomerMobile,
   normalizeCustomerName,

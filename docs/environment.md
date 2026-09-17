@@ -62,5 +62,13 @@ requires every value in its group:
 - WhatsApp: `WHATSAPP_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, and
   `WHATSAPP_EMPLOYER_NUMBER` in E.164 format.
 
+`RESET_SMS_ENABLED` defaults to `false`. Customer password recovery is intentionally unavailable
+until it is enabled with `TWILIO_RESET_ACCOUNT_SID`, `TWILIO_RESET_AUTH_TOKEN`, and
+`TWILIO_RESET_FROM_NUMBER` (E.164). Set these only in the deployment secret manager. The reset
+request endpoint returns a generic response in local development while SMS is disabled; in
+production it fails closed with a server error if the provider is disabled. Use a Twilio test
+account or approved sender in staging, then verify delivery to real Portuguese mobile numbers
+before launch. Reset URLs must use the public HTTPS `NEXT_PUBLIC_SITE_URL` origin.
+
 Errors list invalid variable names and remediation, but never include received values. Add new
 variables to the schema and this inventory in the same change.

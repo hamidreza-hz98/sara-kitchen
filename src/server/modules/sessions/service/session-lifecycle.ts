@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isValidObjectId } from "mongoose";
 import type { Connection } from "mongoose";
 
 import {
@@ -88,4 +89,19 @@ export async function revokeSession(
     { $set: { revokedAt: now, revocationReason: reason } },
   );
   return result.matchedCount === 1;
+}
+
+export async function revokeActorSessions(
+  connection: Connection,
+  actorKind: SessionActorKind,
+  actorId: string,
+  reason: SessionRevocationReason,
+  now = new Date(),
+): Promise<number> {
+  if (!isValidObjectId(actorId)) throw new TypeError("Invalid session actor ID.");
+  const result = await getSessionModel(connection).updateMany(
+    { actorKind, audience: actorKind, actorId, revokedAt: null },
+    { $set: { revokedAt: now, revocationReason: reason } },
+  );
+  return result.modifiedCount;
 }

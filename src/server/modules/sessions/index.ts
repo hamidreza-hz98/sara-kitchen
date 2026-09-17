@@ -5,6 +5,7 @@ export { hashSessionToken } from "./service/session-token";
 export {
   resolveSession,
   revokeSession,
+  revokeActorSessions,
   SESSION_IDLE_TIMEOUT_MS,
   PERSISTENT_SESSION_IDLE_TIMEOUT_MS,
   type ResolvedSession,
