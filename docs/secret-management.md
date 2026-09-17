@@ -19,7 +19,7 @@ and must never be accepted by a public or production service.
 | Payment                  | `MBWAY_API_KEY`, `MBWAY_WEBHOOK_SECRET`, and any future private merchant credential     | Vercel encrypted environment variables; source credential managed by the acquirer | Payment owner               |
 | Messaging                | `TWILIO_RESET_AUTH_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, and future provider signing secrets | Vercel encrypted environment variables; source credential managed by the provider | Messaging owner             |
 | SMTP/email               | Future SMTP password or email-provider API/webhook keys                                 | Vercel encrypted environment variables; source credential managed by the provider | Messaging owner             |
-| Deployment automation    | Tokens needed by Vercel or GitHub Actions                                               | The owning platform's encrypted secret store, never application variables         | Repository/deployment owner |
+| Deployment automation    | `SENTRY_AUTH_TOKEN` and tokens needed by Vercel or GitHub Actions                       | The owning platform's encrypted secret store, never application variables         | Repository/deployment owner |
 
 Endpoints, bucket names, sender numbers, merchant IDs, account SIDs, and access-key identifiers may
 not authenticate by themselves, but remain server configuration unless explicitly classified as
@@ -110,9 +110,10 @@ requests, and manual dispatch. Scanner output is always fully redacted. Scanner 
 because reports can themselves contain sensitive metadata.
 
 The small `.gitleaks.toml` allowlist contains exact reviewed exceptions: a signup-test fixture,
-architecture prose, and Next.js-generated preview/Server Action cryptographic fields that must reside
-in their exact server-only deployment manifests. The build exceptions constrain the filename, field
-name, encoding, and length; they do not allow any Sara Kitchen or provider environment variable.
-Changes to that file require security review. A clean scan is evidence, not proof that no secret
-exists; provider access review, log hygiene, runtime configuration validation, and prompt/screenshot
-discipline remain mandatory.
+architecture prose, Next.js-generated preview/Server Action cryptographic fields that must reside in
+their exact server-only deployment manifests, and one exact pair of adjacent public OpenTelemetry
+Cloudflare constant names in Sentry's generated Edge source map. Build exceptions constrain the path,
+rule, exact match, field/signature, encoding, and length; they do not allow any Sara Kitchen or
+provider environment variable. Changes to that file require security review. A clean scan is
+evidence, not proof that no secret exists; provider access review, log hygiene, runtime configuration
+validation, and prompt/screenshot discipline remain mandatory.

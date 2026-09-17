@@ -43,6 +43,7 @@ test("checks every configured authentication and provider secret in build output
     "MONGODB_URI",
     "AUTH_SESSION_SECRET",
     "AUTH_PASSWORD_RESET_SECRET",
+    "SENTRY_AUTH_TOKEN",
     "TWILIO_RESET_AUTH_TOKEN",
     "MINIO_ACCESS_KEY",
     "MINIO_SECRET_KEY",

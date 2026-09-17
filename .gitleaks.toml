@@ -35,3 +35,11 @@ condition = "AND"
 regexTarget = "line"
 paths = ['''(^|/)server/server-reference-manifest\.json$''']
 regexes = ['''"encryptionKey": "[A-Za-z0-9+/_=-]{44}"''']
+
+[[allowlists]]
+description = "Sentry SDK Edge source-map telemetry label misclassified as a Cloudflare API key"
+targetRules = ["cloudflare-api-key"]
+condition = "AND"
+regexTarget = "match"
+paths = ['''(^|/)server/edge/chunks/[^/]+\.js\.map$''']
+regexes = ['''CLOUDFLARE_D1_ROWS_WRITTEN","CLOUDFLARE_DURABLE_OBJECT_QUERY_BINDINGS''']

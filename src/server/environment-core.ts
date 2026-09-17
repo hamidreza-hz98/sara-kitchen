@@ -68,6 +68,24 @@ export function validateEnvironment(
     throw new EnvironmentValidationError("environment", issues);
   }
 
+  if (server.SENTRY_ENABLED && !client.NEXT_PUBLIC_SENTRY_DSN) {
+    issues.push({
+      path: ["NEXT_PUBLIC_SENTRY_DSN"],
+      message: "NEXT_PUBLIC_SENTRY_DSN is required when SENTRY_ENABLED is true.",
+    });
+  }
+
+  if (server.SENTRY_ENABLED !== client.NEXT_PUBLIC_SENTRY_ENABLED) {
+    issues.push({
+      path: ["NEXT_PUBLIC_SENTRY_ENABLED"],
+      message: "NEXT_PUBLIC_SENTRY_ENABLED must match SENTRY_ENABLED.",
+    });
+  }
+
+  if (issues.length > 0) {
+    throw new EnvironmentValidationError("environment", issues);
+  }
+
   const environment = Object.freeze({ client, server });
 
   if (source === process.env) {

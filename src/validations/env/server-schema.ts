@@ -43,6 +43,16 @@ const booleanString = (label: string) =>
 const requiredNumber = (label: string) =>
   z.coerce.number({ error: `${label} must be a number.` }).finite(`${label} must be finite.`);
 
+const optionalSampleRate = (label: string) =>
+  z.preprocess(
+    emptyStringToUndefined,
+    z.coerce
+      .number({ error: `${label} must be a number.` })
+      .min(0, `${label} must be between 0 and 1.`)
+      .max(1, `${label} must be between 0 and 1.`)
+      .optional(),
+  );
+
 const addRequiredIssue = (context: z.RefinementCtx, path: string, label: string) => {
   context.addIssue({
     code: "custom",
@@ -57,6 +67,15 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "AUTH_PASSWORD_RESET_SECRET",
   "LOG_LEVEL",
   "DEPLOYMENT_VERSION",
+  "SENTRY_ENABLED",
+  "SENTRY_DSN",
+  "SENTRY_ENVIRONMENT",
+  "SENTRY_RELEASE",
+  "SENTRY_TRACES_SAMPLE_RATE",
+  "SENTRY_SOURCE_MAPS_ENABLED",
+  "SENTRY_AUTH_TOKEN",
+  "SENTRY_ORG",
+  "SENTRY_PROJECT",
   "RESET_SMS_ENABLED",
   "TWILIO_RESET_ACCOUNT_SID",
   "TWILIO_RESET_AUTH_TOKEN",
@@ -92,6 +111,15 @@ export const serverEnvironmentSchema = z
     AUTH_PASSWORD_RESET_SECRET: requiredSecret("AUTH_PASSWORD_RESET_SECRET"),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error", "fatal"]).optional(),
     DEPLOYMENT_VERSION: optionalText("DEPLOYMENT_VERSION"),
+    SENTRY_ENABLED: booleanString("SENTRY_ENABLED").default(false),
+    SENTRY_DSN: optionalUrl("SENTRY_DSN"),
+    SENTRY_ENVIRONMENT: optionalText("SENTRY_ENVIRONMENT"),
+    SENTRY_RELEASE: optionalText("SENTRY_RELEASE"),
+    SENTRY_TRACES_SAMPLE_RATE: optionalSampleRate("SENTRY_TRACES_SAMPLE_RATE"),
+    SENTRY_SOURCE_MAPS_ENABLED: booleanString("SENTRY_SOURCE_MAPS_ENABLED").default(false),
+    SENTRY_AUTH_TOKEN: optionalText("SENTRY_AUTH_TOKEN"),
+    SENTRY_ORG: optionalText("SENTRY_ORG"),
+    SENTRY_PROJECT: optionalText("SENTRY_PROJECT"),
     RESET_SMS_ENABLED: booleanString("RESET_SMS_ENABLED").default(false),
     TWILIO_RESET_ACCOUNT_SID: optionalText("TWILIO_RESET_ACCOUNT_SID"),
     TWILIO_RESET_AUTH_TOKEN: z.preprocess(
@@ -160,6 +188,16 @@ export const serverEnvironmentSchema = z
         path: ["AUTH_PASSWORD_RESET_SECRET"],
         message: "AUTH_PASSWORD_RESET_SECRET must differ from AUTH_SESSION_SECRET.",
       });
+    }
+
+    if (environment.SENTRY_ENABLED && !environment.SENTRY_DSN) {
+      addRequiredIssue(context, "SENTRY_DSN", "SENTRY_DSN");
+    }
+
+    if (environment.SENTRY_SOURCE_MAPS_ENABLED) {
+      for (const field of ["SENTRY_AUTH_TOKEN", "SENTRY_ORG", "SENTRY_PROJECT"] as const) {
+        if (!environment[field]) addRequiredIssue(context, field, field);
+      }
     }
 
     if (environment.RESET_SMS_ENABLED) {

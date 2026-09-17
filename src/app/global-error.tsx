@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { captureClientException } from "@/lib/monitoring/client";
+
 import styles from "./fallback.module.css";
 
 type GlobalErrorProps = {
@@ -11,7 +13,7 @@ type GlobalErrorProps = {
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
-    console.error(error);
+    captureClientException(error);
   }, [error]);
 
   return (

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
 import { ActionButton, ErrorState } from "@/components/ui";
+import { captureClientException } from "@/lib/monitoring/client";
 
 type ErrorPageProps = {
   error: Error & { digest?: string };
@@ -15,7 +16,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   const translations = useTranslations("errors.boundary");
 
   useEffect(() => {
-    console.error(error);
+    captureClientException(error);
   }, [error]);
 
   return (

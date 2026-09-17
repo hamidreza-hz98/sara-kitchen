@@ -28,6 +28,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
 | `next`                    |       `16.3.5` | App Router framework, route handlers, Server Components, and serverless application runtime.                                     |
 | `react`                   |       `19.3.0` | Component and rendering model used by Next.js.                                                                                   |
 | `react-dom`               |       `19.3.0` | Browser and server DOM renderer required by Next.js.                                                                             |
+| `@sentry/nextjs`          |      `10.75.0` | Official App Router exception/performance monitoring, request instrumentation, and private source-map upload.                    |
 | `@mui/material`           |        `9.4.0` | Accessible UI component foundation for the dashboard and storefront.                                                             |
 | `@mui/icons-material`     |        `9.4.0` | MUI-aligned application icons; import icons individually to preserve tree shaking.                                               |
 | `@mui/material-nextjs`    |        `9.4.0` | Official MUI App Router cache/streaming integration.                                                                             |

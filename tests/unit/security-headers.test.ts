@@ -36,12 +36,17 @@ describe("production response security", () => {
   });
 
   it("allows only the exact browser media and map origins", () => {
-    const policy = createContentSecurityPolicy({ production: true, mediaOrigin });
+    const monitoringOrigin = "https://o1.ingest.sentry.io";
+    const policy = createContentSecurityPolicy({
+      production: true,
+      mediaOrigin,
+      monitoringOrigin,
+    });
     expect(policy).toContain(
       `img-src 'self' data: blob: https://tile.openstreetmap.org ${mediaOrigin}`,
     );
     expect(policy).toContain(`media-src 'self' blob: ${mediaOrigin}`);
-    expect(policy).toContain(`connect-src 'self' ${mediaOrigin}`);
+    expect(policy).toContain(`connect-src 'self' ${mediaOrigin} ${monitoringOrigin}`);
     expect(policy).toContain("frame-src https://www.openstreetmap.org");
     expect(policy).toContain("frame-ancestors 'none'");
     expect(policy).toContain("object-src 'none'");

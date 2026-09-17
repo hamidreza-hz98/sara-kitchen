@@ -22,9 +22,14 @@ its secret and kitchen-coordinate placeholders are replaced.
 
 ## Public browser configuration
 
-| Variable               | Required | Purpose                                               |
-| ---------------------- | -------- | ----------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Yes      | Canonical public origin, inlined at application build |
+| Variable                                | Required    | Purpose                                               |
+| --------------------------------------- | ----------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                  | Yes         | Canonical public origin, inlined at application build |
+| `NEXT_PUBLIC_SENTRY_ENABLED`            | Yes         | Browser monitoring flag; must match server flag       |
+| `NEXT_PUBLIC_SENTRY_DSN`                | Conditional | Browser event ingestion identifier                    |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT`        | No          | Browser environment tag                               |
+| `NEXT_PUBLIC_SENTRY_RELEASE`            | No          | Browser release tag; must match the server release    |
+| `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE` | No          | Browser trace sample rate from 0 through 1            |
 
 Only allowlisted client variables may use `NEXT_PUBLIC_`. Startup rejects an unknown public key so
 a mistyped or accidentally public secret cannot silently enter the browser bundle. Public values are
@@ -69,6 +74,12 @@ request endpoint returns a generic response in local development while SMS is di
 production it fails closed with a server error if the provider is disabled. Use a Twilio test
 account or approved sender in staging, then verify delivery to real Portuguese mobile numbers
 before launch. Reset URLs must use the public HTTPS `NEXT_PUBLIC_SITE_URL` origin.
+
+`SENTRY_ENABLED` defaults to `false`. Enabling it requires both `SENTRY_DSN` and
+`NEXT_PUBLIC_SENTRY_DSN`. `SENTRY_SOURCE_MAPS_ENABLED=true` additionally requires the build-only
+`SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT`; none may use a public prefix. Environment,
+release, and trace sample-rate values are configured independently for the server and browser but
+must describe the same deployment. See [`error-monitoring.md`](./error-monitoring.md).
 
 Errors list invalid variable names and remediation, but never include received values. Add new
 variables to the schema and this inventory in the same change.

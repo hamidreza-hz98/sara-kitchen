@@ -108,6 +108,7 @@ runs in GitHub Actions and is required before production. See
 | `pnpm test`              | Run all deterministic non-browser suites once.                            |
 | `pnpm unit`              | Alias for the unit/component Vitest suite.                                |
 | `pnpm test:unit`         | Run unit and component tests once.                                        |
+| `pnpm monitoring:verify` | Verify monitoring redaction and readable stack-frame preservation.        |
 | `pnpm integration`       | Alias for integration and contract tests.                                 |
 | `pnpm test:integration`  | Run Node-based integration and contract tests once.                       |
 | `pnpm test:watch`        | Start Vitest in watch mode.                                               |

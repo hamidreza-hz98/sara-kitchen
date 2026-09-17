@@ -9,6 +9,7 @@ import type {
 } from "./api-contract";
 import { ApiError } from "./api-error";
 import { createApplicationLogger } from "../observability/logger";
+import { captureServerException } from "../monitoring";
 
 export const REQUEST_ID_HEADER = "x-request-id";
 export const REQUEST_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
@@ -130,6 +131,11 @@ export async function handleApiRoute<Data, Meta = never>(
         durationMs,
         error: reportedError,
         message: "API request failed unexpectedly.",
+      });
+      captureServerException(reportedError, {
+        action: "request.failed",
+        module: "http",
+        requestId,
       });
       await reportInternalError(
         reportedError,

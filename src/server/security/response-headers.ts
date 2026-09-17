@@ -3,6 +3,7 @@ export type SecurityHeaderOptions = {
   mediaOrigin?: string;
   mapTileOrigin?: string;
   mapFrameOrigin?: string;
+  monitoringOrigin?: string;
 };
 
 export type SecurityHeader = { key: string; value: string };
@@ -38,7 +39,8 @@ export function createContentSecurityPolicy(options: SecurityHeaderOptions): str
   const mediaOrigin = validatedOrigin(options.mediaOrigin);
   const mapTileOrigin = validatedOrigin(options.mapTileOrigin ?? DEFAULT_MAP_TILE_ORIGIN);
   const mapFrameOrigin = validatedOrigin(options.mapFrameOrigin ?? DEFAULT_MAP_FRAME_ORIGIN);
-  for (const origin of [mediaOrigin, mapTileOrigin, mapFrameOrigin]) {
+  const monitoringOrigin = validatedOrigin(options.monitoringOrigin);
+  for (const origin of [mediaOrigin, mapTileOrigin, mapFrameOrigin, monitoringOrigin]) {
     if (options.production && origin?.startsWith("http:") && !isLoopback(origin)) {
       throw new TypeError(
         "Production CSP sources must use HTTPS unless they are loopback origins.",
@@ -53,7 +55,7 @@ export function createContentSecurityPolicy(options: SecurityHeaderOptions): str
     "font-src 'self'",
     `img-src ${sources("'self'", "data:", "blob:", mapTileOrigin, mediaOrigin)}`,
     `media-src ${sources("'self'", "blob:", mediaOrigin)}`,
-    `connect-src ${sources("'self'", options.production ? undefined : "ws:", mediaOrigin)}`,
+    `connect-src ${sources("'self'", options.production ? undefined : "ws:", mediaOrigin, monitoringOrigin)}`,
     `frame-src ${sources(mapFrameOrigin)}`,
     "worker-src 'self' blob:",
     "manifest-src 'self'",

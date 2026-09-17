@@ -45,6 +45,7 @@ describe("environment validation", () => {
     expect(environment.server.MINIO_USE_SSL).toBe(false);
     expect(environment.server.KITCHEN_LATITUDE).toBe(41.1579);
     expect(environment.client.NEXT_PUBLIC_SITE_URL).toBe("http://localhost:3000");
+    expect(environment.client.NEXT_PUBLIC_SENTRY_ENABLED).toBe(false);
   });
 
   it("reports every missing field without printing supplied secret values", () => {
@@ -69,6 +70,20 @@ describe("environment validation", () => {
         MBWAY_ENABLED: "true",
       }),
     ).toThrowError(/MBWAY_API_URL is required when the integration is enabled/);
+
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        SENTRY_ENABLED: "true",
+      }),
+    ).toThrowError(/SENTRY_DSN is required when the integration is enabled/);
+
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        SENTRY_SOURCE_MAPS_ENABLED: "true",
+      }),
+    ).toThrowError(/SENTRY_AUTH_TOKEN is required when the integration is enabled/);
   });
 
   it("rejects unknown browser-exposed variables", () => {
@@ -88,6 +103,7 @@ describe("environment validation", () => {
 
     expect(clientEnvironment).toEqual({
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+      NEXT_PUBLIC_SENTRY_ENABLED: false,
     });
     expect(clientEnvironment).not.toHaveProperty("AUTH_SESSION_SECRET");
     expect(SERVER_ENVIRONMENT_KEYS.every((key) => !key.startsWith("NEXT_PUBLIC_"))).toBe(true);
