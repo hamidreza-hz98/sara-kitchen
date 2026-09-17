@@ -9,6 +9,13 @@ import {
   getAuditLogModel,
 } from "@/server/modules/logs/model/audit-log";
 import { recordAuditEvent } from "@/server/modules/logs";
+import { readAuditLogs, AuditLogReadForbiddenError } from "@/server/modules/logs";
+import { permissionsForRole } from "@/constants/admin-access";
+import {
+  buildAuditLogReadFilter,
+  selectAuditLogReadIndex,
+} from "@/server/modules/logs/repository/audit-log-read-repository";
+import { parseAuditLogReadQuery } from "@/server/modules/logs/validation/audit-log-read";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
 
@@ -85,7 +92,9 @@ describe("persisted audit log", () => {
     expect(await AuditLog.collection.indexes()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ key: { expiresAt: 1 }, expireAfterSeconds: 0 }),
-        expect.objectContaining({ key: { "actor.kind": 1, "actor.ref": 1, occurredAt: -1 } }),
+        expect.objectContaining({
+          key: { "actor.kind": 1, "actor.ref": 1, occurredAt: -1, _id: -1 },
+        }),
       ]),
     );
   });
@@ -172,6 +181,107 @@ describe("persisted audit log", () => {
     if (!storedSuccess) throw new Error("Created audit record was not found.");
     storedSuccess.message = "Attempted mutation.";
     await expect(storedSuccess.save()).rejects.toThrow(AUDIT_LOG_APPEND_ONLY_ERROR);
+  });
+
+  it("authorizes, filters, paginates, safely projects, audits, and uses named indexes", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const AuditLog = getAuditLogModel(client.connection);
+    const actorId = new Types.ObjectId();
+    const resourceRef = new Types.ObjectId().toHexString();
+    const principal = {
+      active: true as const,
+      displayName: "Sara Kazemi",
+      id: actorId.toHexString(),
+      kind: "admin" as const,
+      permissions: permissionsForRole("owner"),
+      role: "owner",
+    };
+    const request = {
+      network: { ipAddress: null, ipHash: null, policy: "omitted" as const },
+      requestId: "request.audit-read:01",
+      userAgent: "Integration test browser",
+    };
+
+    for (const [minute, outcome] of [
+      [10, "success"],
+      [11, "failure"],
+    ] as const) {
+      await recordAuditEvent(client.connection, {
+        action: "crud.resource.update",
+        actor: {
+          kind: "admin",
+          ref: actorId.toHexString(),
+          snapshot: { displayName: "Sara Kazemi", role: "owner" },
+        },
+        context: { statusCode: outcome === "success" ? 200 : 500 },
+        network: { ipAddress: null, ipHash: "e".repeat(64), policy: "hashed" },
+        occurredAt: new Date(`2026-09-17T18:${minute}:00.000Z`),
+        outcome,
+        requestId: `request.audit-filter:${minute}`,
+        resource: {
+          kind: "dish",
+          ref: resourceRef,
+          snapshot: { code: null, label: "Fesenjan", status: "active" },
+        },
+        userAgent: "Seed browser",
+      });
+    }
+
+    await expect(
+      readAuditLogs(
+        client.connection,
+        { ...principal, permissions: permissionsForRole("viewer"), role: "viewer" },
+        request,
+        {},
+      ),
+    ).rejects.toThrow(AuditLogReadForbiddenError);
+
+    const result = await readAuditLogs(client.connection, principal, request, {
+      action: "crud.resource.update",
+      actorKind: "admin",
+      actorRef: actorId.toHexString(),
+      dateFrom: "2026-09-17T18:00:00.000Z",
+      dateTo: "2026-09-17T18:30:00.000Z",
+      outcome: "success",
+      page: 1,
+      pageSize: 1,
+      requestId: "request.audit-filter:10",
+      resourceKind: "dish",
+      resourceRef,
+    });
+
+    expect(result.meta.pagination).toMatchObject({ page: 1, pageSize: 1, totalItems: 1 });
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]).toMatchObject({
+      actionCode: "crud.resource.update",
+      networkPolicy: "hashed",
+      outcome: "success",
+      requestId: "request.audit-filter:10",
+    });
+    expect(JSON.stringify(result.data[0])).not.toMatch(/ipHash|ipAddress|expiresAt/iu);
+    expect(
+      await AuditLog.countDocuments({ actionCode: "security.audit-log.read", outcome: "success" }),
+    ).toBeGreaterThanOrEqual(1);
+
+    const explainInputs = [
+      { dateFrom: "2026-09-17T18:00:00.000Z" },
+      { actorKind: "admin", actorRef: actorId.toHexString() },
+      { action: "crud.resource.update", outcome: "success" },
+      { resourceKind: "dish", resourceRef },
+      { requestId: "request.audit-filter:10" },
+    ] as const;
+    for (const input of explainInputs) {
+      const query = parseAuditLogReadQuery(input);
+      const indexName = selectAuditLogReadIndex(query);
+      const explanation = await AuditLog.find(buildAuditLogReadFilter(query))
+        .sort({ occurredAt: -1, _id: -1 })
+        .hint(indexName)
+        .explain("queryPlanner");
+      const serialized = JSON.stringify(explanation);
+      expect(serialized).toContain(`\"indexName\":\"${indexName}\"`);
+      expect(serialized).toContain("IXSCAN");
+      expect(serialized).not.toContain("COLLSCAN");
+    }
   });
 
   it("rejects document, query, delete, and bulk mutation paths", async () => {

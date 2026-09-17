@@ -34,6 +34,13 @@ import {
 export const AUDIT_LOG_RETENTION_DAYS = 365;
 export const AUDIT_LOG_RETENTION_MS = AUDIT_LOG_RETENTION_DAYS * 24 * 60 * 60 * 1_000;
 export const AUDIT_LOG_APPEND_ONLY_ERROR = "Audit records are append-only.";
+export const AUDIT_LOG_INDEX_NAMES = Object.freeze({
+  action: "audit_logs_action_outcome",
+  actor: "audit_logs_actor_timeline",
+  request: "audit_logs_request",
+  resource: "audit_logs_resource_timeline",
+  timeline: "audit_logs_timeline",
+} as const);
 
 type AuditActor = {
   kind: AuditActorKind;
@@ -205,20 +212,23 @@ const auditLogSchema = createBaseSchema<AuditLogRecord>(
   { collection: "audit_logs", schemaVersion: 1 },
 );
 
-auditLogSchema.index({ occurredAt: -1 }, { name: "audit_logs_timeline" });
+auditLogSchema.index({ occurredAt: -1, _id: -1 }, { name: AUDIT_LOG_INDEX_NAMES.timeline });
 auditLogSchema.index(
-  { "actor.kind": 1, "actor.ref": 1, occurredAt: -1 },
-  { name: "audit_logs_actor_timeline" },
+  { "actor.kind": 1, "actor.ref": 1, occurredAt: -1, _id: -1 },
+  { name: AUDIT_LOG_INDEX_NAMES.actor },
 );
 auditLogSchema.index(
-  { "resource.kind": 1, "resource.ref": 1, occurredAt: -1 },
-  { name: "audit_logs_resource_timeline" },
+  { "resource.kind": 1, "resource.ref": 1, occurredAt: -1, _id: -1 },
+  { name: AUDIT_LOG_INDEX_NAMES.resource },
 );
 auditLogSchema.index(
-  { actionCode: 1, outcome: 1, occurredAt: -1 },
-  { name: "audit_logs_action_outcome" },
+  { actionCode: 1, outcome: 1, occurredAt: -1, _id: -1 },
+  { name: AUDIT_LOG_INDEX_NAMES.action },
 );
-auditLogSchema.index({ requestId: 1 }, { name: "audit_logs_request" });
+auditLogSchema.index(
+  { requestId: 1, occurredAt: -1, _id: -1 },
+  { name: AUDIT_LOG_INDEX_NAMES.request },
+);
 auditLogSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0, name: "audit_logs_retention_ttl" });
 
 auditLogSchema.pre("validate", function enforceAuditInvariants() {

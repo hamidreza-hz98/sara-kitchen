@@ -49,6 +49,11 @@ export const AUDIT_ACTION_DEFINITIONS = Object.freeze({
     failure: "Access evaluation failed.",
     success: "Access to the requested operation was granted.",
   }),
+  "security.audit-log.read": defineAction("security", {
+    denied: "Audit-log access was denied.",
+    failure: "Audit-log read failed.",
+    success: "Audit log was read successfully.",
+  }),
   "security.rate-limit.enforce": defineAction("security", {
     denied: "Rate-limit enforcement was denied.",
     failure: "Rate-limit enforcement failed.",

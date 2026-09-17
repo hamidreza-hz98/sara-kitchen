@@ -33,3 +33,10 @@ export {
   type RecordAuditEventInput,
   type RecordAuditEventOptions,
 } from "./service/record-audit-event";
+export {
+  readAuditLogs,
+  type AuditLogListResult,
+  type AuditLogReadRequestContext,
+} from "./service/read-audit-logs";
+export { AuditLogReadForbiddenError, type AuditLogReadPrincipal } from "./policy/audit-log-read";
+export type { AuditLogListItem } from "./mapper/audit-log";

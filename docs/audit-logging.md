@@ -24,6 +24,34 @@ The service validates context before persistence, accepts an optional caller-own
 Mongoose document. Persistence errors are emitted through the redacted operational logger and then
 re-thrown; the service never reports a successful audit write when insertion failed.
 
+## Authorized reads
+
+`readAuditLogs()` is the only public read use case. The HTTP/page adapter must first resolve the
+database-backed administrator session, then pass the resulting active identity and permissions. The
+service independently requires `kind: admin`, a valid administrator ObjectId, bounded identity
+snapshot values, `active: true`, and the exact `logs:read` permission. At launch, the permission
+matrix grants that capability only to owner and manager roles; customers and other administrator
+roles fail closed before filter parsing or database access.
+
+The strict query accepts optional inclusive `dateFrom`/`dateTo`, actor kind/reference, canonical
+action, resource kind/reference, outcome, and request ID filters. Actor references require an admin
+or customer kind, resource references require a kind, unknown fields/actions are rejected, page size
+is limited to 100, and page windows cannot pass 10,000 records. Results are newest-first by
+`occurredAt` and `_id`, with stable page metadata.
+
+The repository selects and explicitly hints one named compound index: exact request ID first, then
+actor, resource, action/outcome, or the general timeline. These indexes end in
+`occurredAt: -1, _id: -1` to support deterministic newest-first ordering. The same hint applies to the
+page query and count. Integration tests execute every filter-family plan against MongoDB and require
+`IXSCAN` with the expected name and no `COLLSCAN`.
+
+Projection is fixed in repository code rather than caller-selectable. Public immutable DTOs include
+the event identity/vocabulary, safe actor/resource snapshots, bounded context, network policy label,
+user agent, and timestamps. They never include IP hashes, raw IP addresses, expiry fields, schema
+internals, or Mongoose documents. Every successful authorized read appends a
+`security.audit-log.read` event; post-authorization validation/query failures attempt a corresponding
+failure event without replacing the original error.
+
 ## Record contract
 
 Each `audit_logs` document contains:
@@ -92,7 +120,7 @@ observability copies must enforce the same disposal deadline unless a documented
 an isolated encrypted copy. Review the period with Portuguese privacy/accounting counsel before launch;
 invoice/order statutory records are separate business records and are not replaced by audit logs.
 
-Timeline, actor, resource, action/outcome, and request-ID indexes support the dashboard and incident
+Compound timeline, actor, resource, action/outcome, and request-ID indexes support the dashboard and incident
 queries without importing another module's model. The TTL index supports disposal. Index use and volume
 must be reviewed after real traffic because audit collections are write-heavy.
 

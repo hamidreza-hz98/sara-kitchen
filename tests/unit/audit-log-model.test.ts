@@ -120,10 +120,10 @@ describe("audit log schema", () => {
     expect(AuditLog.schema.path("network.ipAddress").options.select).toBe(false);
     expect(AuditLog.schema.indexes()).toEqual(
       expect.arrayContaining([
-        [{ occurredAt: -1 }, expect.any(Object)],
-        [{ "actor.kind": 1, "actor.ref": 1, occurredAt: -1 }, expect.any(Object)],
-        [{ "resource.kind": 1, "resource.ref": 1, occurredAt: -1 }, expect.any(Object)],
-        [{ requestId: 1 }, expect.any(Object)],
+        [{ occurredAt: -1, _id: -1 }, expect.any(Object)],
+        [{ "actor.kind": 1, "actor.ref": 1, occurredAt: -1, _id: -1 }, expect.any(Object)],
+        [{ "resource.kind": 1, "resource.ref": 1, occurredAt: -1, _id: -1 }, expect.any(Object)],
+        [{ requestId: 1, occurredAt: -1, _id: -1 }, expect.any(Object)],
         [{ expiresAt: 1 }, expect.objectContaining({ expireAfterSeconds: 0 })],
       ]),
     );

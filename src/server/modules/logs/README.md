@@ -10,3 +10,7 @@ and never exposes its model or repository.
 The schema, creation service, and privacy contract are documented in
 [`docs/audit-logging.md`](../../../../docs/audit-logging.md). The private Mongoose model is not a
 cross-module API. Other modules must not import it or write audit records directly.
+
+Audit reads go through `readAuditLogs()`. The service requires a resolved active administrator with
+`logs:read`, validates bounded filters/pagination, selects an explicit matching index, and maps only a
+safe projection. Raw/hashed IP data and retention internals never cross the public API.
