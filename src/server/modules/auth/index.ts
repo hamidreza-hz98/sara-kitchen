@@ -8,6 +8,14 @@ export {
 } from "./policy/customer-cookie";
 export { isSameOriginMutation } from "./policy/same-origin";
 export {
+  AuthorizationGuardError,
+  dashboardPermissionForPath,
+  requireAdminActor,
+  requireCustomerActor,
+  requireCustomerOwnership,
+  requireDashboardActor,
+} from "./policy/guards";
+export {
   ActorSessionRejectedError,
   getActorActiveSessions,
   revokeActorSessionById,

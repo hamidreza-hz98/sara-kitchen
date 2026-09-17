@@ -17,7 +17,13 @@ import type { ActiveSessionPage, ActiveSessionSummary } from "@/types/session";
 
 type Principal = "admin" | "customer";
 
-export function ActiveSessions({ principal }: { principal: Principal }) {
+export function ActiveSessions({
+  principal,
+  revokeOthers,
+}: {
+  principal: Principal;
+  revokeOthers?: () => Promise<number>;
+}) {
   const t = useTranslations("shared.sessions");
   const locale = resolveLocalePreference(useLocale());
   const [page, setPage] = useState(1);
@@ -61,6 +67,30 @@ export function ActiveSessions({ principal }: { principal: Principal }) {
   async function revoke(action: "one" | "others", sessionId?: string) {
     setPendingId(action === "others" ? "others" : (sessionId ?? null));
     try {
+      if (action === "others") {
+        if (revokeOthers) {
+          await revokeOthers();
+        } else {
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ action: "others" }),
+          });
+          if (response.status === 401) {
+            setData(null);
+            setNotice("expired");
+            return;
+          }
+          if (!response.ok) throw new Error("Session revocation failed.");
+        }
+        setNotice("revoked");
+        setConfirmOthers(false);
+        setLoading(true);
+        if (page > 1) setPage(1);
+        else setRevision((value) => value + 1);
+        return;
+      }
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -76,9 +106,7 @@ export function ActiveSessions({ principal }: { principal: Principal }) {
       setNotice("revoked");
       setConfirmOthers(false);
       setLoading(true);
-      if (action === "others" && page > 1) setPage(1);
-      else if (data && page > 1 && data.sessions.length === 1 && action === "one")
-        setPage(page - 1);
+      if (data && page > 1 && data.sessions.length === 1) setPage(page - 1);
       else setRevision((value) => value + 1);
     } catch {
       setNotice("error");

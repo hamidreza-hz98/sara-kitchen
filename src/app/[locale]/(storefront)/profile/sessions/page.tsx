@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { ActiveSessions } from "@/components/account/active-sessions";
+import { revokeOtherSessionsAction } from "@/app/actions/revoke-other-sessions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shared.sessions");
@@ -17,7 +18,10 @@ export default async function CustomerSessionsPage() {
       <Typography component="h1" variant="h2" sx={{ mb: 4 }}>
         {t("title")}
       </Typography>
-      <ActiveSessions principal="customer" />
+      <ActiveSessions
+        principal="customer"
+        revokeOthers={revokeOtherSessionsAction.bind(null, "customer")}
+      />
     </Container>
   );
 }

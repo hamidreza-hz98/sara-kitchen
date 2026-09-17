@@ -1,7 +1,14 @@
 import { notFound } from "next/navigation";
 
-// The layout rejects unauthenticated requests first; no unimplemented deep-link
-// route may accidentally render an admin page after session integration.
-export default function DashboardDeepLinkPage() {
+import { requireDashboardPage } from "@/server/auth/page-guards";
+
+// Every deep link resolves its own permission, independent of navigation visibility.
+// Unimplemented pages remain 404 after the access check.
+export default async function DashboardDeepLinkPage({
+  params,
+}: {
+  params: Promise<{ rest: string[] }>;
+}) {
+  await requireDashboardPage((await params).rest);
   notFound();
 }

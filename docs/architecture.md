@@ -97,6 +97,13 @@ Dependencies point from consumer to provider. “None” means the module accept
 | Logs         | Append-only audit events and authorized reads                       | None                                              |
 | Analytics    | Derived dashboard/report queries and rollups                        | Customers, Dishes, Logs, Orders                   |
 
+## Authorization boundary
+
+- Route Handlers, Server Actions, and server-rendered pages independently resolve the current session; neither a visible navigation item nor a parent layout authorizes a mutation.
+- Use Auth's public `requireAdminActor`/`requireCustomerActor` API at entry points. Admin mutations require their exact action permission from the role matrix; customer-owned resources require an owner-scoped repository query or `requireCustomerOwnership` after loading.
+- Dashboard deep links map to explicit read permissions and unknown sections fail closed. Profile routes require a customer session. Do not trust actor IDs, roles, or ownership flags supplied by the browser.
+- Authentication failures redirect on pages or return 401 in APIs; authenticated denials are masked as 404 on dashboard pages. Business APIs should return 403 or 404 according to disclosure policy.
+
 ## Reference and snapshot policy
 
 - MongoDB references are identifiers, not permission to populate another module’s model directly.

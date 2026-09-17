@@ -3,8 +3,26 @@ import type { Connection } from "mongoose";
 import { NextRequest } from "next/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({ connection: null as Connection | null }));
+const state = vi.hoisted(() => ({
+  connection: null as Connection | null,
+  cookieName: "",
+  cookieToken: "" as string | undefined,
+}));
 vi.mock("server-only", () => ({}));
+vi.mock("next/headers", () => ({
+  cookies: async () => ({
+    get: (name: string) =>
+      name === state.cookieName && state.cookieToken ? { value: state.cookieToken } : undefined,
+  }),
+}));
+vi.mock("next/navigation", () => ({
+  redirect: (path: string) => {
+    throw new Error(`REDIRECT:${path}`);
+  },
+  notFound: () => {
+    throw new Error("NOT_FOUND");
+  },
+}));
 vi.mock("@/server/database", () => ({
   connectToDatabase: async () => {
     if (!state.connection) throw new Error("Test database is not ready.");
@@ -19,10 +37,20 @@ vi.mock("@/server/environment", () => ({
 
 import { GET as adminGet, POST as adminPost } from "@/app/api/auth/admin/sessions/route";
 import { GET as customerGet, POST as customerPost } from "@/app/api/auth/customer/sessions/route";
+import { revokeOtherSessionsAction } from "@/app/actions/revoke-other-sessions";
+import DashboardDeepLinkPage from "@/app/[locale]/(dashboard)/dashboard/[...rest]/page";
+import { requireDashboardPage } from "@/server/auth/page-guards";
+import { requireCustomerPage } from "@/server/auth/page-guards";
 import { getAdminModel } from "@/server/modules/admins/model/admin";
 import { hashAdminPassword } from "@/server/modules/admins/service/password";
 import { resolveAdminActor } from "@/server/modules/auth/service/admin-session";
 import { resolveCustomerActor } from "@/server/modules/auth/service/customer-session";
+import {
+  AuthorizationGuardError,
+  requireAdminActor,
+  requireCustomerActor,
+  requireCustomerOwnership,
+} from "@/server/modules/auth/policy/guards";
 import { getCustomerModel } from "@/server/modules/customers/model/customer";
 import { hashCustomerPassword } from "@/server/modules/customers/service/password";
 import { issueSession } from "@/server/modules/sessions/service/issue-session";
@@ -57,6 +85,7 @@ describe("owner-scoped active session management", () => {
     other: Awaited<ReturnType<typeof issueSession>>;
   };
   let foreignAdmin: Awaited<ReturnType<typeof issueSession>>;
+  let viewerAdmin: Awaited<ReturnType<typeof issueSession>>;
   let customer: {
     current: Awaited<ReturnType<typeof issueSession>>;
     other: Awaited<ReturnType<typeof issueSession>>;
@@ -81,6 +110,13 @@ describe("owner-scoped active session management", () => {
       identifier: "other@example.com",
       role: "manager",
       passwordHash: await hashAdminPassword("Another strong administrator passphrase"),
+    });
+    const viewer = await Admin.create({
+      firstName: "Read",
+      lastName: "Only",
+      identifier: "viewer@example.com",
+      role: "viewer",
+      passwordHash: await hashAdminPassword("A read only administrator passphrase"),
     });
     const customerRecord = await getCustomerModel(client.connection).create({
       firstName: "Customer",
@@ -107,6 +143,11 @@ describe("owner-scoped active session management", () => {
     foreignAdmin = await issueSession(client.connection, {
       actorKind: "admin",
       actorId: secondAdmin._id,
+      expiresAt: expiry,
+    });
+    viewerAdmin = await issueSession(client.connection, {
+      actorKind: "admin",
+      actorId: viewer._id,
       expiresAt: expiry,
     });
     customer = {
@@ -176,6 +217,60 @@ describe("owner-scoped active session management", () => {
     expect(await resolveAdminActor(state.connection!, admin.current.token)).not.toBeNull();
   });
 
+  it("resolves each actor server-side and enforces permissions and object ownership", async () => {
+    const connection = state.connection!;
+    const owner = await requireAdminActor(connection, admin.current.token, "admins:delete");
+    const customerActor = await requireCustomerActor(connection, customer.current.token);
+    expect(owner.role).toBe("owner");
+    expect(() => requireCustomerOwnership(customerActor, customerActor.id)).not.toThrow();
+    expect(() => requireCustomerOwnership(customerActor, owner.id)).toThrowError(
+      AuthorizationGuardError,
+    );
+    await expect(
+      requireAdminActor(connection, viewerAdmin.token, "orders:read"),
+    ).rejects.toMatchObject({
+      reason: "forbidden",
+    });
+    await expect(requireAdminActor(connection, customer.current.token)).rejects.toMatchObject({
+      reason: "unauthenticated",
+    });
+    await expect(requireCustomerActor(connection, admin.current.token)).rejects.toMatchObject({
+      reason: "unauthenticated",
+    });
+  });
+
+  it("denies direct dashboard URLs independently of hidden navigation", async () => {
+    state.cookieName = "sara_admin_dev";
+    state.cookieToken = viewerAdmin.token;
+    await expect(requireDashboardPage(["orders"])).rejects.toThrow("NOT_FOUND");
+    await expect(
+      DashboardDeepLinkPage({ params: Promise.resolve({ rest: ["orders"] }) }),
+    ).rejects.toThrow("NOT_FOUND");
+    await expect(requireDashboardPage(["unknown"])).rejects.toThrow("NOT_FOUND");
+    state.cookieToken = undefined;
+    await expect(requireDashboardPage(["orders"])).rejects.toThrow("REDIRECT:/authentication");
+  });
+
+  it("protects profile pages with customer sessions, not admin cookies", async () => {
+    state.cookieName = "sara_customer_dev";
+    state.cookieToken = admin.current.token;
+    await expect(requireCustomerPage()).rejects.toThrow("REDIRECT:/login");
+    state.cookieToken = customer.current.token;
+    expect((await requireCustomerPage()).id).toMatch(/^[a-f\d]{24}$/u);
+  });
+
+  it("rechecks the actor inside a Server Action instead of trusting its calling page", async () => {
+    state.cookieName = "sara_admin_dev";
+    state.cookieToken = customer.current.token;
+    await expect(revokeOtherSessionsAction("admin")).rejects.toMatchObject({
+      reason: "unauthenticated",
+    });
+    state.cookieName = "sara_customer_dev";
+    state.cookieToken = customer.current.token;
+    expect(await revokeOtherSessionsAction("customer")).toBe(1);
+    expect(await resolveCustomerActor(state.connection!, customer.other.token)).toBeNull();
+  });
+
   it("revokes an individual admin session before its next protected request", async () => {
     const response = await adminPost(
       request("admin", admin.current.token, { action: "one", sessionId: admin.other.id }),
@@ -191,7 +286,7 @@ describe("owner-scoped active session management", () => {
       request("customer", customer.current.token, { action: "others" }),
     );
     expect(response.status).toBe(200);
-    expect((await response.json()).data).toEqual({ revoked: 1 });
+    expect((await response.json()).data).toEqual({ revoked: 0 });
     expect(await resolveCustomerActor(state.connection!, customer.other.token)).toBeNull();
     expect(await resolveCustomerActor(state.connection!, customer.current.token)).not.toBeNull();
     const refreshed = await customerGet(request("customer", customer.current.token));
