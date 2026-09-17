@@ -15,6 +15,11 @@ export {
 } from "./service/customer-password-reset";
 export { resetSmsEnabled, sendResetSms } from "./service/reset-sms";
 export {
+  changeCurrentCustomerPassword,
+  CustomerPasswordChangeRejectedError,
+  type CustomerPasswordChangeInput,
+} from "./service/customer-password-change";
+export {
   limitPasswordResetRequest,
   limitPasswordResetSubmission,
 } from "./service/password-reset-limit";

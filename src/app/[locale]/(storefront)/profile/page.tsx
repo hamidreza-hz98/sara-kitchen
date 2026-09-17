@@ -1,5 +1,7 @@
 import Container from "@mui/material/Container";
+import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import NextLink from "next/link";
 import { getTranslations } from "next-intl/server";
 
 export default async function CustomerProfilePage() {
@@ -9,6 +11,9 @@ export default async function CustomerProfilePage() {
       <Typography component="h1" variant="h2">
         {t("title")}
       </Typography>
+      <Link component={NextLink} href="/profile/change-password">
+        {t("changePassword.title")}
+      </Link>
     </Container>
   );
 }

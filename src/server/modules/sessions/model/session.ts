@@ -61,7 +61,6 @@ const sessionSchema = createBaseSchema<SessionRecord>(
       type: Number,
       required: true,
       default: 1,
-      immutable: true,
       validate: {
         validator: (value: number) => Number.isSafeInteger(value) && value >= 1,
       },

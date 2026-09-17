@@ -16,6 +16,10 @@ export {
 } from "./service/customer-reset";
 export { isStrongSignupPassword } from "./validation/signup";
 export {
+  changeCustomerPassword,
+  type CustomerPasswordChangeOutcome,
+} from "./service/customer-change-password";
+export {
   normalizeCustomerEmail,
   normalizeCustomerMobile,
   normalizeCustomerName,

@@ -105,3 +105,32 @@ export async function revokeActorSessions(
   );
   return result.modifiedCount;
 }
+
+/** Preserve explicitly retained sessions after an authenticated password change. */
+export async function advanceOtherActorSessionPasswordVersions(
+  connection: Connection,
+  actorKind: SessionActorKind,
+  actorId: string,
+  currentSessionId: string,
+  oldVersion: number,
+  newVersion: number,
+  now = new Date(),
+): Promise<number> {
+  if (!isValidObjectId(actorId) || !isValidObjectId(currentSessionId))
+    throw new TypeError("Invalid session actor or current session ID.");
+  if (newVersion !== oldVersion + 1) throw new RangeError("Invalid password-version transition.");
+  const result = await getSessionModel(connection).updateMany(
+    {
+      _id: { $ne: currentSessionId },
+      actorKind,
+      audience: actorKind,
+      actorId,
+      passwordVersion: oldVersion,
+      revokedAt: null,
+      expiresAt: { $gt: now },
+    },
+    { $set: { passwordVersion: newVersion } },
+    { runValidators: true },
+  );
+  return result.modifiedCount;
+}
