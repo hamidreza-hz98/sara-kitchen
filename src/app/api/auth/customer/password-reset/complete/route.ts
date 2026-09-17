@@ -16,6 +16,7 @@ import {
   clearCustomerCookie,
   isSameOriginMutation,
   limitPasswordResetSubmission,
+  limitPasswordResetToken,
   resetCustomerPassword,
 } from "@/server/modules/auth";
 import { isStrongSignupPassword } from "@/server/modules/customers";
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       schema,
       await getRequestValidationOptions(locale),
     );
+    await limitPasswordResetToken(connection, input.token);
     try {
       await resetCustomerPassword(connection, input.token, input.newPassword);
     } catch (error) {

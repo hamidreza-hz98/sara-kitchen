@@ -41,6 +41,14 @@ export {
 } from "./service/password-reset-limit";
 export { limitSignupIdentity, limitSignupIp } from "./service/signup-limit";
 export {
+  limitAdminLogin,
+  limitCustomerLogin,
+  limitPasswordResetToken,
+  limitSensitiveAccountOperation,
+  limitVerificationAttempt,
+  trustedClientAddress,
+} from "./service/authentication-limit";
+export {
   CustomerLoginRejectedError,
   loginCustomer,
   logoutCustomer,

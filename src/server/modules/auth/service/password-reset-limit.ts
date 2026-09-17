@@ -46,7 +46,8 @@ async function increment(connection: Connection, scope: string, value: string, l
     );
   }
   if (!record || record.count > limit) {
-    throw ApiError.rateLimit(Math.max(1, Math.ceil((windowStart + WINDOW_MS - now) / 1_000)));
+    const remaining = Math.max(1, Math.ceil((windowStart + WINDOW_MS - now) / 1_000));
+    throw ApiError.rateLimit(Math.ceil(remaining / 60) * 60);
   }
 }
 

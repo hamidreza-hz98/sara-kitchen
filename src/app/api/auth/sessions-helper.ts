@@ -12,10 +12,14 @@ import {
 } from "@/server/http";
 import {
   ActorSessionRejectedError,
+  AuthorizationGuardError,
   adminCookieName,
   customerCookieName,
   getActorActiveSessions,
   isProtectedMutation,
+  limitSensitiveAccountOperation,
+  requireAdminActor,
+  requireCustomerActor,
   revokeActorSessionById,
   revokeAllOtherActorSessions,
   type SessionPrincipal,
@@ -73,6 +77,15 @@ export async function mutateActorSessions(request: NextRequest, principal: Sessi
   );
   try {
     const connection = await connectToDatabase();
+    const actor =
+      principal === "admin"
+        ? await requireAdminActor(connection, token)
+        : await requireCustomerActor(connection, token);
+    await limitSensitiveAccountOperation(connection, request, {
+      principal,
+      actorId: actor.id,
+      operation: "sessions",
+    });
     if (input.action === "one") {
       await revokeActorSessionById(connection, principal, token, input.sessionId);
       return apiSuccess({ revoked: 1 });
@@ -80,6 +93,7 @@ export async function mutateActorSessions(request: NextRequest, principal: Sessi
     const revoked = await revokeAllOtherActorSessions(connection, principal, token);
     return apiSuccess({ revoked });
   } catch (error) {
+    if (error instanceof AuthorizationGuardError) throw ApiError.authentication();
     return rethrowSessionError(error);
   }
 }

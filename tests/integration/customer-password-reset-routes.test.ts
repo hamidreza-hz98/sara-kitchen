@@ -28,6 +28,7 @@ vi.mock("@/server/database", () => ({
 vi.mock("@/server/environment", () => ({
   getApplicationSiteUrl: () => "https://sara.example",
   getServerEnvironment: () => ({
+    AUTH_SESSION_SECRET: "test-session-secret-with-at-least-32-characters",
     AUTH_PASSWORD_RESET_SECRET: "test-reset-secret-with-at-least-32-characters",
     RESET_SMS_ENABLED: true,
     TWILIO_RESET_ACCOUNT_SID: `AC${"a".repeat(32)}`,

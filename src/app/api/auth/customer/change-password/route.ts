@@ -13,9 +13,12 @@ import {
 } from "@/server/http";
 import {
   changeCurrentCustomerPassword,
+  AuthorizationGuardError,
   CustomerPasswordChangeRejectedError,
   customerCookieName,
   isProtectedMutation,
+  limitSensitiveAccountOperation,
+  requireCustomerActor,
   serializeCustomerCookie,
 } from "@/server/modules/auth";
 import { isStrongSignupPassword } from "@/server/modules/customers";
@@ -40,9 +43,22 @@ export async function POST(request: NextRequest): Promise<Response> {
       schema,
       await getRequestValidationOptions(locale),
     );
+    const connection = await connectToDatabase();
+    let actor;
+    try {
+      actor = await requireCustomerActor(connection, token);
+    } catch (error) {
+      if (error instanceof AuthorizationGuardError) throw ApiError.authentication();
+      throw error;
+    }
+    await limitSensitiveAccountOperation(connection, request, {
+      principal: "customer",
+      actorId: actor.id,
+      operation: "change-password",
+    });
     const t = await getTranslations({ locale, namespace: "profile.changePassword" });
     try {
-      const result = await changeCurrentCustomerPassword(await connectToDatabase(), {
+      const result = await changeCurrentCustomerPassword(connection, {
         ...input,
         token,
         userAgent: request.headers.get("user-agent")?.slice(0, 512) ?? null,

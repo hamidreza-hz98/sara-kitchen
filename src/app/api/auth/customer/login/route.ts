@@ -14,6 +14,7 @@ import {
   CustomerLoginRejectedError,
   customerCookieName,
   isSameOriginMutation,
+  limitCustomerLogin,
   loginCustomer,
   serializeCustomerCookie,
 } from "@/server/modules/auth";
@@ -36,8 +37,10 @@ export async function POST(request: NextRequest): Promise<Response> {
       loginSchema,
       await getRequestValidationOptions(locale),
     );
+    const connection = await connectToDatabase();
+    await limitCustomerLogin(connection, request, input.identifier);
     try {
-      const result = await loginCustomer(await connectToDatabase(), {
+      const result = await loginCustomer(connection, {
         ...input,
         priorToken: request.cookies.get(customerCookieName())?.value ?? null,
         userAgent: request.headers.get("user-agent")?.slice(0, 512) ?? null,

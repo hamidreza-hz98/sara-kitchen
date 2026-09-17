@@ -21,6 +21,7 @@ import { POST as login } from "@/app/api/auth/admin/login/route";
 import { POST as logout } from "@/app/api/auth/admin/logout/route";
 import { getAdminModel } from "@/server/modules/admins/model/admin";
 import { hashAdminPassword } from "@/server/modules/admins/service/password";
+import { getAuthenticationLimitModel } from "@/server/modules/auth/model/authentication-limit";
 import { createCsrfToken } from "@/server/modules/auth/policy/csrf";
 import { resolveAdminActor } from "@/server/modules/auth/service/admin-session";
 
@@ -55,6 +56,7 @@ describe("admin authentication Route Handlers", () => {
     client = new Mongoose();
     await client.connect(database.uri);
     databaseState.connection = client.connection;
+    await getAuthenticationLimitModel(client.connection).syncIndexes();
     await getAdminModel(client.connection).create({
       firstName: "Sara",
       lastName: "Kazemi",
@@ -104,5 +106,18 @@ describe("admin authentication Route Handlers", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
     expect(await resolveAdminActor(databaseState.connection!, token)).toBeNull();
+  });
+
+  it("limits an identifier independently of IP without revealing whether it exists", async () => {
+    const identifier = "not-an-admin@example.com";
+    for (let index = 0; index < 7; index++) {
+      const response = await login(request("login", { identifier, password: "wrong" }));
+      expect(response.status).toBe(401);
+      expect(await response.text()).not.toContain(identifier);
+    }
+    const limited = await login(request("login", { identifier, password: "wrong" }));
+    expect(limited.status).toBe(429);
+    expect(Number(limited.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(await limited.text()).not.toContain(identifier);
   });
 });

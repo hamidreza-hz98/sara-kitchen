@@ -1,11 +1,12 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 import { connectToDatabase } from "@/server/database";
 import {
   adminCookieName,
   customerCookieName,
+  limitSensitiveAccountOperation,
   requireAdminActor,
   requireCustomerActor,
   revokeAllOtherActorSessions,
@@ -21,7 +22,14 @@ export async function revokeOtherSessionsAction(principal: "admin" | "customer")
     principal === "admin" ? adminCookieName() : customerCookieName(),
   )?.value;
   const connection = await connectToDatabase();
-  if (principal === "admin") await requireAdminActor(connection, token, "dashboard:view");
-  else await requireCustomerActor(connection, token);
+  const actor =
+    principal === "admin"
+      ? await requireAdminActor(connection, token, "dashboard:view")
+      : await requireCustomerActor(connection, token);
+  await limitSensitiveAccountOperation(
+    connection,
+    new Request("https://internal.invalid/session-action", { headers: await headers() }),
+    { principal, actorId: actor.id, operation: "sessions" },
+  );
   return revokeAllOtherActorSessions(connection, principal, token);
 }

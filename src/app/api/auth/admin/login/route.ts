@@ -6,6 +6,7 @@ import {
   AdminLoginRejectedError,
   adminCookieName,
   isSameOriginMutation,
+  limitAdminLogin,
   loginAdmin,
   serializeAdminCookie,
 } from "@/server/modules/auth";
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       await getRequestValidationOptions(locale),
     );
     const connection = await connectToDatabase();
+    await limitAdminLogin(connection, request, input.identifier);
     try {
       const result = await loginAdmin(connection, {
         ...input,

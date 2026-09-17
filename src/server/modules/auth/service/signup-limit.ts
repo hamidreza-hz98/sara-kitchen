@@ -51,7 +51,8 @@ async function increment(connection: Connection, scope: string, value: string, l
     );
   }
   if (!record || record.count > limit) {
-    throw ApiError.rateLimit(Math.max(1, Math.ceil((windowStart + WINDOW_MS - now) / 1_000)));
+    const remaining = Math.max(1, Math.ceil((windowStart + WINDOW_MS - now) / 1_000));
+    throw ApiError.rateLimit(Math.ceil(remaining / 60) * 60);
   }
 }
 
@@ -60,6 +61,10 @@ export async function limitSignupIp(connection: Connection, request: Request): P
   await increment(connection, "ip", clientAddress(request), IP_LIMIT);
 }
 
-export async function limitSignupIdentity(connection: Connection, mobile: string): Promise<void> {
-  await increment(connection, "mobile", mobile, IDENTITY_LIMIT);
+export async function limitSignupIdentity(
+  connection: Connection,
+  value: string,
+  kind: "email" | "mobile" = "mobile",
+): Promise<void> {
+  await increment(connection, kind, value, IDENTITY_LIMIT);
 }

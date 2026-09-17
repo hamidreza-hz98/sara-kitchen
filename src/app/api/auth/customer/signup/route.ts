@@ -26,6 +26,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       await getRequestValidationOptions(locale),
     );
     await limitSignupIdentity(connection, input.mobile);
+    if (input.email) await limitSignupIdentity(connection, input.email, "email");
     await registerCustomer(connection, input);
     return apiSuccess({ accepted: true as const }, { status: 202 });
   });

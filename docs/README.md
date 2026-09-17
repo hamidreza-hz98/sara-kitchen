@@ -32,6 +32,7 @@ Current records:
 - [`health-readiness.md`](./health-readiness.md) — process liveness, MongoDB/MinIO dependency checks, safe 503 responses, and deployment gates.
 - [`idempotency.md`](./idempotency.md) — checkout/payment/webhook keys, fingerprints, replay, conflicts, retention, and concurrent delivery.
 - [`request-security.md`](./request-security.md) — browser CSRF/origin policy, Server Action checks, and signed payment webhook boundary.
+- [`authentication-rate-limits.md`](./authentication-rate-limits.md) — independent IP/identity/actor buckets, thresholds, privacy, and retry contract.
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.
 - [`localization.md`](./localization.md) — locale routing, cookie persistence, catalogs, authoring rules, and acceptance coverage.
 - [`localized-formatting.md`](./localized-formatting.md) — EUR, numeric, unit, relative-time, date/time defaults, input contracts, and locale examples.

@@ -14,6 +14,7 @@ vi.mock("next/headers", () => ({
     get: (name: string) =>
       name === state.cookieName && state.cookieToken ? { value: state.cookieToken } : undefined,
   }),
+  headers: async () => new Headers({ "x-forwarded-for": "192.0.2.200" }),
 }));
 vi.mock("next/navigation", () => ({
   redirect: (path: string) => {
