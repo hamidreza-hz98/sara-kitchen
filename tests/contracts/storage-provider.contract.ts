@@ -107,7 +107,7 @@ export function storageProviderContract(name: string, createProvider: () => Stor
         body: stream(bytes("a")),
       });
       const signed = await provider.signedReadUrl(original, 60);
-      expect(signed.url).toMatch(/^https:\/\//u);
+      expect(["http:", "https:"]).toContain(new URL(signed.url).protocol);
       expect(signed.expiresAt.getTime()).toBeGreaterThan(Date.now());
       await expect(provider.signedReadUrl(original, 901)).rejects.toMatchObject({
         code: "invalid_input",

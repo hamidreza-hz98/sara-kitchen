@@ -1,3 +1,7 @@
+import { vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
+
 import { StorageError } from "@/server/modules/media";
 import type {
   StorageHealth,

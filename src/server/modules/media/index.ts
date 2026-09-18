@@ -2,6 +2,12 @@
 export const MODULE_NAME = "media" as const;
 
 export { StorageError } from "./storage/storage-provider";
+export {
+  createMediaObjectKey,
+  createMinioStorageProvider,
+  MinioStorageProvider,
+} from "./storage/minio-provider";
+export type { MinioProviderConfig } from "./storage/minio-provider";
 export type {
   StorageErrorCode,
   StorageHealth,

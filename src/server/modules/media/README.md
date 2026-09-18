@@ -15,3 +15,7 @@ The provider-neutral storage boundary is `storage/storage-provider.ts`; its erro
 semantics are documented in [`docs/media-storage-provider.md`](../../../../docs/media-storage-provider.md).
 The fake-provider contract tests exercise it without a MinIO connection. The production adapter
 belongs to SK-0072.
+
+`storage/minio-provider.ts` is the production adapter, with details and live-test instructions in
+[`docs/media-minio-provider.md`](../../../../docs/media-minio-provider.md). It remains behind
+the public storage contract; media upload and delivery use cases will inject it later.
