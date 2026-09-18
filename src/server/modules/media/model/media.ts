@@ -255,6 +255,18 @@ mediaSchema.index(
 );
 mediaSchema.index({ checksum: 1, deletedAt: 1 }, { name: "media_checksum_active" });
 mediaSchema.index(
+  { checksum: 1 },
+  {
+    unique: true,
+    name: "media_ready_checksum_unique",
+    partialFilterExpression: {
+      source: "managed",
+      processingState: "ready",
+      deletedAt: null,
+    },
+  },
+);
+mediaSchema.index(
   { source: 1, processingState: 1, createdAt: -1 },
   { name: "media_processing_queue" },
 );

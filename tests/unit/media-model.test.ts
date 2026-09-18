@@ -176,6 +176,7 @@ describe("Media schema", () => {
         "media_managed_object_unique",
         "media_processing_queue",
         "media_checksum_active",
+        "media_ready_checksum_unique",
         "media_active_kind_recent",
         "media_uploader_recent",
       ]),
@@ -186,6 +187,13 @@ describe("Media schema", () => {
     expect(managedIndex?.[1]).toMatchObject({
       unique: true,
       partialFilterExpression: { source: "managed", deletedAt: null },
+    });
+    const checksumIndex = mediaSchema
+      .indexes()
+      .find(([, options]) => options.name === "media_ready_checksum_unique");
+    expect(checksumIndex?.[1]).toMatchObject({
+      unique: true,
+      partialFilterExpression: { source: "managed", processingState: "ready", deletedAt: null },
     });
   });
 });

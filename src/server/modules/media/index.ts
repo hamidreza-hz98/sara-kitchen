@@ -19,6 +19,14 @@ export {
   processImageForRoute,
 } from "./processing/serverless-processing";
 export type { MediaProcessingPlan } from "./processing/serverless-processing";
+export { createMediaUploadRepository } from "./repository/media-upload";
+export type { MediaUploadRecord, MediaUploadRepository } from "./repository/media-upload";
+export { createMediaUpload, MediaUploadError } from "./service/create-upload";
+export type {
+  CreateMediaUploadDependencies,
+  CreateMediaUploadInput,
+  MediaUploadErrorCode,
+} from "./service/create-upload";
 
 export { StorageError } from "./storage/storage-provider";
 export {
