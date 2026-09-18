@@ -16,3 +16,31 @@ export {
   IngredientMediaReferenceError,
   validateIngredientImageReference,
 } from "./validation/ingredient-media";
+export {
+  createIngredientRepository,
+  IngredientRepositoryConflictError,
+} from "./repository/ingredient";
+export type {
+  IngredientListOptions,
+  IngredientListResult,
+  IngredientRepository,
+  IngredientSnapshot,
+  IngredientWrite,
+} from "./repository/ingredient";
+export { createIngredientServices, IngredientServiceError } from "./service/ingredient-crud";
+export type {
+  IngredientAction,
+  IngredientActor,
+  IngredientAuditEvent,
+  IngredientInput,
+  IngredientServiceDependencies,
+  IngredientUpdate,
+} from "./service/ingredient-crud";
+export { createIngredientAuditSink } from "./service/ingredient-audit";
+export {
+  ingredientCreateSchema,
+  ingredientEmptyMutationSchema,
+  ingredientIdParametersSchema,
+  ingredientListQuerySchema,
+  ingredientUpdateSchema,
+} from "./validation/ingredient-request";

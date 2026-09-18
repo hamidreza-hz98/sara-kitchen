@@ -14,7 +14,14 @@ import type { CacheTag } from "@/server/cache/policy";
 
 describe("content cache policy", () => {
   it("defines bounded, deterministic tags for every content area", () => {
-    expect(CONTENT_AREAS).toEqual(["settings", "categories", "dishes", "blogs", "seo"]);
+    expect(CONTENT_AREAS).toEqual([
+      "settings",
+      "categories",
+      "ingredients",
+      "dishes",
+      "blogs",
+      "seo",
+    ]);
     expect(contentListTag("dishes")).toBe("sk:v1:dishes:list");
     expect(contentItemTag("dishes", "507f1f77bcf86cd799439011")).toBe(
       "sk:v1:dishes:item:507f1f77bcf86cd799439011",

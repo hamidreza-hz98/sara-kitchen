@@ -1,4 +1,11 @@
-export const CONTENT_AREAS = ["settings", "categories", "dishes", "blogs", "seo"] as const;
+export const CONTENT_AREAS = [
+  "settings",
+  "categories",
+  "ingredients",
+  "dishes",
+  "blogs",
+  "seo",
+] as const;
 export type ContentArea = (typeof CONTENT_AREAS)[number];
 
 export const CONTENT_REVALIDATE_SECONDS = 60;

@@ -7,3 +7,9 @@ ingredients are unique by their normalized English name. Image references are nu
 present, must be checked through `validateIngredientImageReference` before persistence so only an
 existing, ready image is accepted. Allergen metadata uses stable EU-style codes; presentation labels
 belong in locale messages rather than persisted records.
+
+The module exposes repository and service APIs for list/detail/create/update/archive/restore and
+soft deletion. Services enforce action-level administrator permissions, append an audit event for
+every outcome, and invalidate only ingredient/detail plus dependent SEO cache tags after durable
+mutations. Destructive deletion requires an archived record and a zero reference count supplied by
+the Dishes public API; active or referenced ingredients remain intact.
