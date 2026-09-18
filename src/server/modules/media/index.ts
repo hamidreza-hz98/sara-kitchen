@@ -42,6 +42,8 @@ export type {
 } from "./service/create-upload";
 export { MEDIA_READ_URL_TTL_SECONDS, getMediaDetail, listMedia } from "./service/read-media";
 export type { MediaDetailDto, MediaListItemDto } from "./service/read-media";
+export { getMediaReferenceFacts } from "./service/reference-facts";
+export type { MediaReferenceFacts } from "./service/reference-facts";
 export { MediaUpdateError, updateMediaMetadata } from "./service/update-media";
 export type { MediaUpdateErrorCode, UpdateMediaMetadataInput } from "./service/update-media";
 export {
