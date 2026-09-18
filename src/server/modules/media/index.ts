@@ -23,6 +23,8 @@ export { createMediaUploadRepository } from "./repository/media-upload";
 export type { MediaUploadRecord, MediaUploadRepository } from "./repository/media-upload";
 export { createMediaReadRepository } from "./repository/media-read";
 export type { MediaReadRecord, MediaReadRepository } from "./repository/media-read";
+export { createMediaDeleteRepository } from "./repository/media-delete";
+export type { MediaDeleteRepository, MediaDeleteRepositoryResult } from "./repository/media-delete";
 export {
   MediaUpdateRepositoryConflictError,
   createMediaUpdateRepository,
@@ -42,6 +44,12 @@ export { MEDIA_READ_URL_TTL_SECONDS, getMediaDetail, listMedia } from "./service
 export type { MediaDetailDto, MediaListItemDto } from "./service/read-media";
 export { MediaUpdateError, updateMediaMetadata } from "./service/update-media";
 export type { MediaUpdateErrorCode, UpdateMediaMetadataInput } from "./service/update-media";
+export {
+  MEDIA_RECYCLE_WINDOW_DAYS,
+  MediaDeleteError,
+  deleteMediaSafely,
+} from "./service/delete-media";
+export type { DeleteMediaInput, MediaDeleteErrorCode } from "./service/delete-media";
 
 export { StorageError } from "./storage/storage-provider";
 export {

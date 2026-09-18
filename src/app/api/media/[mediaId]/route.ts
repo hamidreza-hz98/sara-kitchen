@@ -9,6 +9,7 @@ import {
   getRequestValidationOptions,
   handleApiRoute,
   parseJsonRequest,
+  parseQueryParameters,
   parseRouteParameters,
 } from "@/server/http";
 import {
@@ -19,10 +20,13 @@ import {
 } from "@/server/modules/auth";
 import { recordAuditEvent } from "@/server/modules/logs";
 import {
+  MediaDeleteError,
   MediaUpdateError,
+  createMediaDeleteRepository,
   createMediaReadRepository,
   createMediaUpdateRepository,
   createMinioStorageProvider,
+  deleteMediaSafely,
   getMediaDetail,
   updateMediaMetadata,
 } from "@/server/modules/media";
@@ -34,6 +38,7 @@ import { requireMediaReadConnection, rethrowMediaReadError } from "../read-helpe
 const parametersSchema = z.strictObject({
   mediaId: z.string().regex(/^[a-f\d]{24}$/iu),
 });
+const deleteQuerySchema = z.strictObject({});
 const translationSchema = z.strictObject({
   locale: z.enum(SUPPORTED_LOCALES),
   alt: z.string().trim().min(1).max(500),
@@ -158,6 +163,74 @@ export async function PATCH(request: NextRequest, context: RouteContext): Promis
       network: { policy: "omitted", ipHash: null, ipAddress: null },
       userAgent: request.headers.get("user-agent")?.slice(0, 300) ?? null,
     }).catch(() => undefined);
+    return apiSuccess(result);
+  });
+}
+
+export async function DELETE(request: NextRequest, context: RouteContext): Promise<Response> {
+  return handleApiRoute(request, async ({ requestId }) => {
+    const token = request.cookies.get(adminCookieName())?.value;
+    if (!token) throw ApiError.authentication();
+    if (!isProtectedMutation(request, "admin", token)) throw ApiError.authorization();
+    const connection = await connectToDatabase();
+    let actor;
+    try {
+      actor = await requireAdminActor(connection, token, "media:delete");
+    } catch (error) {
+      if (error instanceof AuthorizationGuardError) {
+        throw error.reason === "unauthenticated"
+          ? ApiError.authentication()
+          : ApiError.authorization();
+      }
+      throw error;
+    }
+
+    const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
+    const validation = await getRequestValidationOptions(locale);
+    const [{ mediaId }] = await Promise.all([
+      parseRouteParameters(context.params, parametersSchema, validation),
+      Promise.resolve(parseQueryParameters(request, deleteQuerySchema, validation)),
+    ]);
+
+    let result;
+    try {
+      result = await deleteMediaSafely(createMediaDeleteRepository(connection), {
+        id: mediaId,
+        actorId: actor.id,
+      });
+    } catch (error) {
+      if (error instanceof MediaDeleteError) {
+        if (error.code === "not_found") throw ApiError.notFound("media");
+        throw ApiError.conflict({
+          resource: "media",
+          publicMessage: "Referenced media cannot be deleted.",
+        });
+      }
+      throw error;
+    }
+
+    await recordAuditEvent(connection, {
+      action: "crud.resource.delete",
+      actor: {
+        kind: "admin",
+        ref: actor.id,
+        snapshot: { displayName: actor.displayName, role: actor.role },
+      },
+      resource: {
+        kind: "media",
+        ref: result.id,
+        snapshot: { code: null, label: null, status: "recycled" },
+      },
+      outcome: "success",
+      requestId,
+      context: {
+        purgeEligibleAt: result.purgeEligibleAt,
+        recycleWindowDays: result.recycleWindowDays,
+      },
+      network: { policy: "omitted", ipHash: null, ipAddress: null },
+      userAgent: request.headers.get("user-agent")?.slice(0, 300) ?? null,
+    }).catch(() => undefined);
+
     return apiSuccess(result);
   });
 }

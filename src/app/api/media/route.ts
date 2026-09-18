@@ -75,7 +75,7 @@ async function readBoundedForm(request: Request): Promise<FormData> {
     reader.releaseLock();
   }
   try {
-    return await new Response(Buffer.concat(chunks), {
+    return await new globalThis.Response(Buffer.concat(chunks), {
       headers: { "content-type": contentType },
     }).formData();
   } catch {

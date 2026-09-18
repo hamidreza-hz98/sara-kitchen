@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   connect: vi.fn(),
   admin: vi.fn(),
   detail: vi.fn(),
+  deleteMedia: vi.fn(),
   protectedMutation: vi.fn(),
   update: vi.fn(),
   audit: vi.fn(),
@@ -26,6 +27,14 @@ vi.mock("@/server/modules/auth", () => ({
 }));
 vi.mock("@/server/modules/logs", () => ({ recordAuditEvent: state.audit }));
 vi.mock("@/server/modules/media", () => ({
+  MediaDeleteError: class MediaDeleteError extends Error {
+    constructor(
+      readonly code: string,
+      readonly referenceCount?: number,
+    ) {
+      super(code);
+    }
+  },
   MediaUpdateError: class MediaUpdateError extends Error {
     constructor(readonly code: string) {
       super(code);
@@ -36,14 +45,16 @@ vi.mock("@/server/modules/media", () => ({
       super(code);
     }
   },
+  createMediaDeleteRepository: () => ({}),
   createMediaReadRepository: () => ({}),
   createMediaUpdateRepository: () => ({}),
   createMinioStorageProvider: () => ({}),
+  deleteMediaSafely: state.deleteMedia,
   getMediaDetail: state.detail,
   updateMediaMetadata: state.update,
 }));
 
-import { GET, PATCH } from "@/app/api/media/[mediaId]/route";
+import { DELETE, GET, PATCH } from "@/app/api/media/[mediaId]/route";
 
 const id = "507f1f77bcf86cd799439011";
 
@@ -66,6 +77,12 @@ describe("media detail Route Handler", () => {
         url: "https://objects.example/original?signature=private",
         expiresAt: "2026-09-18T12:05:00.000Z",
       },
+    });
+    state.deleteMedia.mockResolvedValue({
+      id,
+      deletedAt: "2026-09-18T10:00:00.000Z",
+      purgeEligibleAt: "2026-10-18T10:00:00.000Z",
+      recycleWindowDays: 30,
     });
     state.update.mockResolvedValue({
       id,
@@ -148,5 +165,55 @@ describe("media detail Route Handler", () => {
       expect(response.status).toBe(400);
     }
     expect(state.update).not.toHaveBeenCalled();
+  });
+
+  it("recycles media with delete permission, CSRF protection, and an audit event", async () => {
+    const response = await DELETE(
+      new NextRequest(`http://localhost:3000/api/media/${id}`, {
+        method: "DELETE",
+        headers: {
+          cookie: "sara_admin_dev=test-token",
+          origin: "http://localhost:3000",
+        },
+      }),
+      { params: Promise.resolve({ mediaId: id }) },
+    );
+
+    expect(response.status).toBe(200);
+    expect(state.admin).toHaveBeenCalledWith({}, "test-token", "media:delete");
+    expect(state.deleteMedia.mock.calls[0]?.[1]).toMatchObject({ id, actorId: "admin" });
+    expect(state.audit).toHaveBeenCalledWith(
+      {},
+      expect.objectContaining({
+        action: "crud.resource.delete",
+        resource: expect.objectContaining({
+          ref: id,
+          snapshot: expect.objectContaining({ status: "recycled" }),
+        }),
+      }),
+    );
+  });
+
+  it("rejects force controls and returns conflict for referenced media", async () => {
+    const forceResponse = await DELETE(
+      new NextRequest(`http://localhost:3000/api/media/${id}?force=true`, {
+        method: "DELETE",
+        headers: { cookie: "sara_admin_dev=test-token", origin: "http://localhost:3000" },
+      }),
+      { params: Promise.resolve({ mediaId: id }) },
+    );
+    expect(forceResponse.status).toBe(400);
+    expect(state.deleteMedia).not.toHaveBeenCalled();
+
+    const { MediaDeleteError } = await import("@/server/modules/media");
+    state.deleteMedia.mockRejectedValueOnce(new MediaDeleteError("referenced", 2));
+    const mapped = await DELETE(
+      new NextRequest(`http://localhost:3000/api/media/${id}`, {
+        method: "DELETE",
+        headers: { cookie: "sara_admin_dev=test-token", origin: "http://localhost:3000" },
+      }),
+      { params: Promise.resolve({ mediaId: id }) },
+    );
+    expect(mapped.status).toBe(409);
   });
 });

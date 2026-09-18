@@ -43,3 +43,8 @@ object access. The `GET /api/media` and `GET /api/media/:mediaId` contracts are 
 mutation boundary used by `PATCH /api/media/:mediaId`. Only a same-extension original display filename
 and a complete translated-alt set are editable. See
 [`docs/media-update.md`](../../../../docs/media-update.md).
+
+`repository/media-delete.ts` and `service/delete-media.ts` provide atomic reference-safe recycling for
+`DELETE /api/media/:mediaId`. Referenced media cannot be deleted, no force path exists, and managed
+objects remain untouched for the 30-day recycle window. See
+[`docs/media-deletion.md`](../../../../docs/media-deletion.md).
