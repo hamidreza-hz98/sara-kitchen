@@ -36,6 +36,8 @@ export type CategoryListOptions = Readonly<{
   pageSize: number;
   status?: CategoryStatus;
   search?: string;
+  sortBy?: "sortOrder" | "createdAt" | "slug" | "status";
+  sortDirection?: "asc" | "desc";
 }>;
 
 export type CategoryListResult = Readonly<{
@@ -134,9 +136,11 @@ export function createCategoryRepository(connection: Connection): CategoryReposi
       const filter: Record<string, unknown> = { deletedAt: null };
       if (options.status) filter.status = options.status;
       if (options.search) filter.$text = { $search: options.search };
+      const sortBy = options.sortBy ?? "sortOrder";
+      const direction = options.sortDirection === "desc" ? -1 : 1;
       const [documents, total] = await Promise.all([
         Category.find(filter)
-          .sort({ sortOrder: 1, _id: 1 })
+          .sort({ [sortBy]: direction, _id: direction })
           .skip((options.page - 1) * options.pageSize)
           .limit(options.pageSize),
         Category.countDocuments(filter),

@@ -39,6 +39,8 @@ export const categoryListQuerySchema = z
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
     status: z.enum(["draft", "published", "archived"]).optional(),
     search: z.string().trim().min(2).max(80).optional(),
+    sortBy: z.enum(["sortOrder", "createdAt", "slug", "status"]).default("sortOrder"),
+    sortDirection: z.enum(["asc", "desc"]).default("asc"),
   })
   .refine((value) => value.page * value.pageSize <= 10_000, {
     path: ["page"],

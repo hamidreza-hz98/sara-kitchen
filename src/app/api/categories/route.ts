@@ -31,12 +31,14 @@ export async function GET(request: NextRequest): Promise<Response> {
       pageSize: query.pageSize,
       ...(query.status ? { status: query.status } : {}),
       ...(query.search ? { search: query.search } : {}),
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
     });
     const page = pageResult(result.items, result.total, {
       page: query.page,
       pageSize: query.pageSize,
-      sortBy: "sortOrder",
-      sortDirection: "asc",
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
     });
     await createCategoryAuditSink(connection, { requestId })({
       action: "read",

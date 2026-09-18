@@ -94,7 +94,13 @@ describe("category Route Handler contracts", () => {
     const response = await list(request("/api/categories?page=2&pageSize=12&status=published"));
     expect(response.status).toBe(200);
     expect(state.admin).toHaveBeenCalledWith({}, "test-token", "categories:read");
-    expect(state.list).toHaveBeenCalledWith({ page: 2, pageSize: 12, status: "published" });
+    expect(state.list).toHaveBeenCalledWith({
+      page: 2,
+      pageSize: 12,
+      status: "published",
+      sortBy: "sortOrder",
+      sortDirection: "asc",
+    });
     expect(state.audit).toHaveBeenCalledWith(
       expect.objectContaining({ action: "read", outcome: "success" }),
     );
@@ -106,6 +112,16 @@ describe("category Route Handler contracts", () => {
       },
     });
     expect((await list(request("/api/categories?page=1000&pageSize=100"))).status).toBe(400);
+    expect((await list(request("/api/categories?sortBy=unsafe"))).status).toBe(400);
+    expect(
+      (await list(request("/api/categories?sortBy=createdAt&sortDirection=desc"))).status,
+    ).toBe(200);
+    expect(state.list).toHaveBeenLastCalledWith({
+      page: 1,
+      pageSize: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc",
+    });
     state.admin.mockRejectedValueOnce(new AuthorizationGuardError("forbidden"));
     expect((await list(request("/api/categories"))).status).toBe(403);
   });
