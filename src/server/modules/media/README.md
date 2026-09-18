@@ -6,3 +6,7 @@ Owns media metadata, upload policy, object-storage provider coordination, proces
 owns its stable enums and safe metadata checks. See [`docs/media-model.md`](../../../../docs/media-model.md)
 for the persisted contract. Upload/storage providers, processing, CRUD, usage changes, and public DTOs
 remain later tasks and must be exposed through this module's `index.ts` rather than exporting the model.
+
+The public `index.ts` also exports upload admission policy and validators. See
+[`docs/media-upload-policy.md`](../../../../docs/media-upload-policy.md). Admission does not
+publish files; storage, atomic quota reservations, full decoding, and malware checks remain later work.
