@@ -2,6 +2,7 @@
 
 import AddRounded from "@mui/icons-material/AddRounded";
 import CategoryRounded from "@mui/icons-material/CategoryRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
 import ImageNotSupportedRounded from "@mui/icons-material/ImageNotSupportedRounded";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
@@ -119,7 +120,7 @@ function CategoryImage({ id, alt }: { id: string | null; alt: string }) {
   );
 }
 
-export function CategoryList({ canCreate }: { canCreate: boolean }) {
+export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; canUpdate: boolean }) {
   const t = useTranslations("dashboard.categories");
   const locale = useLocale();
   const router = useRouter();
@@ -231,6 +232,21 @@ export function CategoryList({ canCreate }: { canCreate: boolean }) {
       </IconButton>
     </Tooltip>
   );
+  const actionButtons = (item: Category) => (
+    <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
+      {viewButton(item)}
+      {canUpdate ? (
+        <Tooltip title={t("edit")}>
+          <IconButton
+            aria-label={t("editCategory", { name: translation(item)?.name ?? item.slug })}
+            onClick={() => router.push(`/dashboard/categories/modify?id=${item.id}`)}
+          >
+            <EditRounded />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+    </Stack>
+  );
 
   return (
     <Stack spacing={3}>
@@ -256,13 +272,13 @@ export function CategoryList({ canCreate }: { canCreate: boolean }) {
             {t("refresh")}
           </Button>
           {canCreate ? (
-            <Tooltip title={t("createPending")}>
-              <span>
-                <Button variant="contained" startIcon={<AddRounded />} disabled>
-                  {t("add")}
-                </Button>
-              </span>
-            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={<AddRounded />}
+              onClick={() => router.push("/dashboard/categories/modify")}
+            >
+              {t("add")}
+            </Button>
           ) : null}
         </Stack>
       </Stack>
@@ -399,7 +415,7 @@ export function CategoryList({ canCreate }: { canCreate: boolean }) {
                         <span>{item.dishCount ?? "—"}</span>
                       </Tooltip>
                     </TableCell>
-                    <TableCell align="right">{viewButton(item)}</TableCell>
+                    <TableCell align="right">{actionButtons(item)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -427,7 +443,7 @@ export function CategoryList({ canCreate }: { canCreate: boolean }) {
                       </Typography>
                     </Stack>
                   </Box>
-                  {viewButton(item)}
+                  {actionButtons(item)}
                 </Stack>
               </Paper>
             ))}

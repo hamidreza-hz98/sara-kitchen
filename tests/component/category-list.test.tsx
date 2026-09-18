@@ -22,7 +22,7 @@ function renderList() {
   return render(
     <NextIntlClientProvider locale="en" messages={messages} timeZone={PROJECT_TIME_ZONE}>
       <ThemeProvider theme={appTheme} defaultMode="light">
-        <CategoryList canCreate />
+        <CategoryList canCreate canUpdate />
       </ThemeProvider>
     </NextIntlClientProvider>,
   );
@@ -62,7 +62,7 @@ describe("category list", () => {
     expect(screen.getByLabelText("Loading categories")).toBeVisible();
     expect((await screen.findAllByText("Persian starters")).length).toBeGreaterThan(0);
     expect(screen.getAllByText("persian-starters").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Add category" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Add category" })).toBeEnabled();
     expect(screen.getByRole("navigation", { name: "Category pages" })).toBeVisible();
   });
 
