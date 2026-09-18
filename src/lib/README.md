@@ -9,3 +9,7 @@ Framework-agnostic shared utilities and infrastructure adapters belong here.
 - Every helper needs a concrete consumer or test; avoid generic “utils” collections.
 
 Prefer named files and named exports over a large catch-all barrel.
+
+`media-bulk-upload.ts` is the browser-side, bounded worker pool for the media upload page. It composes
+independent atomic requests rather than moving multi-file orchestration into a Vercel Function. See
+[`docs/media-bulk-upload.md`](../../docs/media-bulk-upload.md).
