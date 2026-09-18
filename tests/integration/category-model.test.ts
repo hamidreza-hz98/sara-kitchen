@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { getCategoryModel } from "@/server/modules/categories/model/category";
+import { createCategoryRepository } from "@/server/modules/categories/repository/category";
 import { validateCategoryMediaReferences } from "@/server/modules/categories/validation/category-media";
 import { getMediaModel } from "@/server/modules/media/model/media";
 
@@ -98,5 +99,36 @@ describe("Category persistence", () => {
         imageMediaId: new Types.ObjectId(),
       }),
     ).rejects.toMatchObject({ field: "imageMediaId" });
+  });
+
+  it("persists CRUD snapshots, optimistic updates, archive, soft delete, and restore", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const repository = createCategoryRepository(client.connection);
+    const actorId = new Types.ObjectId().toHexString();
+    const write = {
+      translations: [{ locale: "en" as const, name: "Side dishes", description: "Sides" }],
+      slug: "side-dishes",
+      bannerMediaId: null,
+      imageMediaId: null,
+      status: "draft" as const,
+      sortOrder: 3,
+    };
+    const created = await repository.create(write, actorId);
+    expect(await repository.findBySlug("side-dishes")).toMatchObject({ id: created.id });
+    expect((await repository.list({ page: 1, pageSize: 12 })).items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: created.id })]),
+    );
+    const updated = await repository.save(
+      created,
+      { ...write, status: "archived", sortOrder: 4 },
+      actorId,
+    );
+    await expect(repository.save(created, write, actorId)).rejects.toThrow("category_conflict");
+    const deleted = await repository.softDelete(updated, actorId, new Date());
+    expect(await repository.findById(created.id)).toBeNull();
+    expect(await repository.isSlugTaken("side-dishes")).toBe(true);
+    const restored = await repository.restore(deleted, actorId);
+    expect(restored.deletedAt).toBeNull();
+    expect(restored.status).toBe("archived");
   });
 });

@@ -13,3 +13,16 @@ before persisting media IDs. That helper queries Media through its public API an
 rejects missing, deleted, unready, or non-image assets without crossing model
 boundaries. The `seoPageId` reference is an optional link; SEO record lifecycle is
 owned by the SEO module.
+
+The CRUD service uses the real MongoDB repository and enforces action-level admin
+permissions, translation/input validation, collision-safe slug selection,
+archive-before-soft-delete, dish-reference checks, audit outcomes, and targeted
+category/SEO cache-tag invalidation. SEO synchronization and Dish reference counting
+are **required injected ports**, not no-op fallbacks. Their production adapters
+cannot be wired until the SEO and Dish modules are implemented. Route handlers
+in SK-0085 will also need to supply the request-scoped audit sink and media
+reference validator. Do not expose the service through an endpoint with dummy
+ports. For a fully atomic catalog/SEO/audit write, the eventual adapters should
+share a MongoDB transaction or durable outbox; a port failure after a category
+write currently requires repair/retry. Media usage-count reconciliation is likewise
+required before live category mutations are enabled.

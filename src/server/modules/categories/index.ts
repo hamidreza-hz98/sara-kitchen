@@ -7,3 +7,21 @@ export {
   CategoryMediaReferenceError,
   validateCategoryMediaReferences,
 } from "./validation/category-media";
+export { createCategoryRepository, CategoryRepositoryConflictError } from "./repository/category";
+export type {
+  CategoryListOptions,
+  CategoryListResult,
+  CategoryRepository,
+  CategorySnapshot,
+  CategoryWrite,
+} from "./repository/category";
+export { createCategoryServices, CategoryServiceError } from "./service/category-crud";
+export type {
+  CategoryActor,
+  CategoryAuditEvent,
+  CategoryInput,
+  CategorySeoPort,
+  CategoryServiceDependencies,
+  CategoryUpdate,
+} from "./service/category-crud";
+export { createCategoryAuditSink } from "./service/category-audit";
