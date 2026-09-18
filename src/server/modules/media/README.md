@@ -48,3 +48,8 @@ and a complete translated-alt set are editable. See
 `DELETE /api/media/:mediaId`. Referenced media cannot be deleted, no force path exists, and managed
 objects remain untouched for the 30-day recycle window. See
 [`docs/media-deletion.md`](../../../../docs/media-deletion.md).
+
+The protected dashboard media library is implemented at
+`src/app/[locale]/(dashboard)/dashboard/media`. It consumes only the public list, update, and delete
+HTTP contracts and keeps its query state in the URL. See
+[`docs/media-library.md`](../../../../docs/media-library.md).
