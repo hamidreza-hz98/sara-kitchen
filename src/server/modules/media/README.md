@@ -38,3 +38,8 @@ in [`docs/media-create-upload.md`](../../../../docs/media-create-upload.md).
 authorized detail/list reads, indexed search and filters, safe DTO projection, and five-minute private
 object access. The `GET /api/media` and `GET /api/media/:mediaId` contracts are documented in
 [`docs/media-reads.md`](../../../../docs/media-reads.md).
+
+`repository/media-update.ts` and `service/update-media.ts` implement the deliberately narrow metadata
+mutation boundary used by `PATCH /api/media/:mediaId`. Only a same-extension original display filename
+and a complete translated-alt set are editable. See
+[`docs/media-update.md`](../../../../docs/media-update.md).
