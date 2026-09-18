@@ -128,6 +128,40 @@
       "leastUsed": "Referências (menos)"
     }
   },
+  "mediaPicker": {
+    "title": "Escolher multimédia para {field}",
+    "browse": "Explorar multimédia",
+    "search": "Pesquisar multimédia",
+    "find": "Pesquisar",
+    "type": "Tipo",
+    "allTypes": "Todos os tipos",
+    "kinds": { "image": "Imagem", "video": "Vídeo", "pdf": "PDF" },
+    "upload": "Carregar imagem",
+    "uploadPicker": "Escolher imagem para carregar",
+    "uploadProgress": "A carregar {progress}%",
+    "cancelUpload": "Cancelar carregamento",
+    "uploadCanceled": "Carregamento cancelado.",
+    "uploadError": "Não foi possível carregar a imagem. Tente novamente.",
+    "duplicateUpload": "Esta imagem já existe na biblioteca.",
+    "readError": "Não foi possível carregar os ficheiros. Feche e reabra para tentar novamente.",
+    "searchLength": "Introduza pelo menos dois caracteres para pesquisar.",
+    "maxItems": "Selecione no máximo {count} itens.",
+    "loading": "A carregar multimédia…",
+    "empty": "Nenhum ficheiro encontrado.",
+    "results": "Resultados de multimédia",
+    "selectItem": "Selecionar {name}",
+    "pages": "Páginas de multimédia",
+    "selected": "{count, plural, one {# item selecionado} other {# itens selecionados}}",
+    "cancel": "Cancelar",
+    "useSelection": "Usar seleção",
+    "uploadErrors": {
+      "empty_file": "Este ficheiro está vazio.",
+      "file_too_large": "Este ficheiro excede o limite de 3 MB.",
+      "invalid_name": "Utilize um nome seguro com uma extensão.",
+      "type_mismatch": "O tipo do ficheiro não corresponde à extensão.",
+      "unsupported_type": "Este formato de imagem não é suportado."
+    }
+  },
   "mediaUpload": {
     "title": "Carregar multimédia",
     "description": "Adicione imagens e descreva cada uma em todos os idiomas.",

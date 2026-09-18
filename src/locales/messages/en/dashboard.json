@@ -128,6 +128,40 @@
       "leastUsed": "References (fewest)"
     }
   },
+  "mediaPicker": {
+    "title": "Choose media for {field}",
+    "browse": "Browse media",
+    "search": "Search media",
+    "find": "Search",
+    "type": "Type",
+    "allTypes": "All types",
+    "kinds": { "image": "Image", "video": "Video", "pdf": "PDF" },
+    "upload": "Upload image",
+    "uploadPicker": "Choose image to upload",
+    "uploadProgress": "Uploading {progress}%",
+    "cancelUpload": "Cancel upload",
+    "uploadCanceled": "Upload canceled.",
+    "uploadError": "Image could not be uploaded. Try again.",
+    "duplicateUpload": "This image already exists in the media library.",
+    "readError": "Media could not be loaded. Close and reopen to retry.",
+    "searchLength": "Enter at least two characters to search.",
+    "maxItems": "Select no more than {count} items.",
+    "loading": "Loading media…",
+    "empty": "No matching media found.",
+    "results": "Media results",
+    "selectItem": "Select {name}",
+    "pages": "Media pages",
+    "selected": "{count, plural, one {# item selected} other {# items selected}}",
+    "cancel": "Cancel",
+    "useSelection": "Use selection",
+    "uploadErrors": {
+      "empty_file": "This file is empty.",
+      "file_too_large": "This file exceeds the 3 MB upload limit.",
+      "invalid_name": "Use a safe filename with one extension.",
+      "type_mismatch": "The file type does not match its extension.",
+      "unsupported_type": "This image format is not supported."
+    }
+  },
   "mediaUpload": {
     "title": "Upload media",
     "description": "Add images and describe each one for every language.",
