@@ -98,6 +98,10 @@ export class ApiError extends Error {
     });
   }
 
+  static serviceUnavailable(publicMessage?: string): ApiError {
+    return new ApiError("unavailable", publicMessage ? { publicMessage } : {});
+  }
+
   static internal(cause?: unknown, internalMessage = "Unhandled internal API error."): ApiError {
     return new ApiError("internal", { cause, internalMessage });
   }

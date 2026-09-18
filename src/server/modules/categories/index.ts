@@ -25,3 +25,10 @@ export type {
   CategoryUpdate,
 } from "./service/category-crud";
 export { createCategoryAuditSink } from "./service/category-audit";
+export {
+  categoryArchiveSchema,
+  categoryCreateSchema,
+  categoryIdParametersSchema,
+  categoryListQuerySchema,
+  categoryUpdateSchema,
+} from "./validation/category-request";

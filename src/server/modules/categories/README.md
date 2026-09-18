@@ -26,3 +26,12 @@ ports. For a fully atomic catalog/SEO/audit write, the eventual adapters should
 share a MongoDB transaction or durable outbox; a port failure after a category
 write currently requires repair/retry. Media usage-count reconciliation is likewise
 required before live category mutations are enabled.
+
+The `/api/categories` list/detail handlers are live for authorized admins and
+return bounded page metadata. Create, update, and archive handlers share Zod
+request schemas, CSRF/permission checks, and domain-to-API error mapping. Their
+mutation-service resolver deliberately returns unavailable (503) in production
+until the required adapters above are present; it runs before any category write.
+Contract tests exercise success paths with an injected service and verify that
+the live gate cannot mutate data. This gate must not be removed merely to expose
+the dashboard forms.
