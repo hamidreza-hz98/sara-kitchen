@@ -13,12 +13,13 @@ reference-count services.
 | Derived variants | Embedded on the image original with distinct object keys, MIME, bytes, optional dimensions/checksum, and independent processing state/failure code. Ready variants require a checksum. Variant keys cannot duplicate each other or the original.                                    |
 | Localization     | `translations: [{locale, alt}]` uses the shared canonical-English, unique-locale validator. Alt text is linguistic; keys, measurements, status, and provider are not.                                                                                                               |
 | Ownership/usage  | Uploader is an Admin ObjectId; `usageCount` is a nonnegative safe integer. Usage changes must be controlled by future reference-safe services, not arbitrary client updates.                                                                                                        |
-| Lifecycle        | Shared timestamps, actor provenance, schema version, hidden normalized filename search, and paired soft-delete timestamp/actor. Deletion is independent of processing state and remains explicitly visible to authorized maintenance flows.                                         |
+| Lifecycle        | Shared timestamps, actor provenance, schema version, hidden normalized filename/alt search material, and paired soft-delete timestamp/actor. Deletion is independent of processing state and remains explicitly visible to authorized maintenance flows.                            |
 
 The unique `(bucket, objectKey)` index applies only to active managed originals. It prevents two
 active records from claiming one object but allows restoration/replacement workflows after a soft
-delete. Checksum, processing queue, kind/recent, uploader/recent, and filename-search indexes support
-later deduplication and management lists. Embedded variant keys are validated within their parent;
+delete. Checksum and processing-queue indexes support deduplication and processing. Management reads
+use compound recent, state/kind, MIME, uploader, and usage indexes plus one weighted text index over
+original filename and translated alt text. Embedded variant keys are validated within their parent;
 object storage creation must additionally use collision-resistant keys and conditional writes
 because MongoDB cannot enforce global uniqueness across embedded array values.
 

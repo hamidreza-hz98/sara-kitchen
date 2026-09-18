@@ -173,7 +173,7 @@ export function createListQueryControls(config: ListQueryConfig) {
 export function pageResult<Items>(
   items: readonly Items[],
   totalItems: number,
-  plan: ListQueryPlan,
+  plan: ListQueryPlan | Pick<ListQueryPlan, "page" | "pageSize" | "sortBy" | "sortDirection">,
 ) {
   if (!Number.isSafeInteger(totalItems) || totalItems < 0) {
     throw new RangeError("totalItems must be a non-negative safe integer.");

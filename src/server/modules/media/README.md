@@ -33,3 +33,8 @@ calculates a SHA-256 checksum, rejects existing content, creates all variants, u
 objects, and only then persists a ready Media record. Failed object or database writes trigger bounded
 compensating deletion. The authenticated `POST /api/media` route and operational contract are documented
 in [`docs/media-create-upload.md`](../../../../docs/media-create-upload.md).
+
+`repository/media-read.ts`, `validation/media-read-query.ts`, and `service/read-media.ts` implement
+authorized detail/list reads, indexed search and filters, safe DTO projection, and five-minute private
+object access. The `GET /api/media` and `GET /api/media/:mediaId` contracts are documented in
+[`docs/media-reads.md`](../../../../docs/media-reads.md).

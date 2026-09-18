@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   protectedMutation: vi.fn(),
   admin: vi.fn(),
   create: vi.fn(),
+  list: vi.fn(),
   audit: vi.fn(),
 }));
 
@@ -34,12 +35,14 @@ vi.mock("@/server/modules/media", async (importOriginal) => {
   return {
     ...actual,
     createMediaUpload: state.create,
+    listMedia: state.list,
+    createMediaReadRepository: () => ({}),
     createMediaUploadRepository: () => ({}),
     createMinioStorageProvider: () => ({}),
   };
 });
 
-import { POST } from "@/app/api/media/route";
+import { GET, POST } from "@/app/api/media/route";
 import { UploadPolicyError } from "@/server/modules/media";
 
 function uploadRequest(
@@ -77,6 +80,13 @@ describe("media upload Route Handler", () => {
       displayName: "Sara",
     });
     state.create.mockResolvedValue({ id: "media-1", checksum: "a".repeat(64), variantCount: 4 });
+    state.list.mockResolvedValue({
+      data: [{ id: "media-1", originalName: "meal.png" }],
+      meta: {
+        pagination: { page: 1, pageSize: 20, totalItems: 1, totalPages: 1 },
+        sort: { by: "createdAt", direction: "desc" },
+      },
+    });
     state.audit.mockResolvedValue(undefined);
   });
 
@@ -119,6 +129,25 @@ describe("media upload Route Handler", () => {
     await expect(response.json()).resolves.toMatchObject({
       ok: false,
       error: { code: "VALIDATION_ERROR" },
+    });
+  });
+
+  it("authorizes and returns a filtered media page", async () => {
+    const response = await GET(
+      new NextRequest(
+        "http://localhost:3000/api/media?kind=image&usage=used&processingState=ready",
+        { headers: { cookie: "sara_admin_dev=test-token" } },
+      ),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      data: [{ id: "media-1", originalName: "meal.png" }],
+      meta: { pagination: { totalItems: 1 } },
+    });
+    expect(state.admin).toHaveBeenCalledWith({}, "test-token", "media:read");
+    expect(state.list.mock.calls[0]?.[2]).toMatchObject({
+      filter: { deletedAt: null, kind: "image", usageCount: { $gt: 0 }, processingState: "ready" },
     });
   });
 });

@@ -21,12 +21,16 @@ export {
 export type { MediaProcessingPlan } from "./processing/serverless-processing";
 export { createMediaUploadRepository } from "./repository/media-upload";
 export type { MediaUploadRecord, MediaUploadRepository } from "./repository/media-upload";
+export { createMediaReadRepository } from "./repository/media-read";
+export type { MediaReadRecord, MediaReadRepository } from "./repository/media-read";
 export { createMediaUpload, MediaUploadError } from "./service/create-upload";
 export type {
   CreateMediaUploadDependencies,
   CreateMediaUploadInput,
   MediaUploadErrorCode,
 } from "./service/create-upload";
+export { MEDIA_READ_URL_TTL_SECONDS, getMediaDetail, listMedia } from "./service/read-media";
+export type { MediaDetailDto, MediaListItemDto } from "./service/read-media";
 
 export { StorageError } from "./storage/storage-provider";
 export {
@@ -53,6 +57,8 @@ export {
   inspectUpload,
   inspectUploadBatch,
 } from "./validation/upload-policy";
+export { parseMediaListQuery } from "./validation/media-read-query";
+export type { MediaListQueryPlan } from "./validation/media-read-query";
 export type {
   InspectedUpload,
   UploadCandidate,

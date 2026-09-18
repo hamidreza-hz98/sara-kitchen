@@ -2,9 +2,10 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { SUPPORTED_LOCALES } from "@/constants";
+import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/locales/routing";
 import { connectToDatabase } from "@/server/database";
 import { getServerEnvironment } from "@/server/environment";
-import { ApiError, apiSuccess, handleApiRoute } from "@/server/http";
+import { ApiError, apiSuccess, getRequestValidationOptions, handleApiRoute } from "@/server/http";
 import { recordOperationalMetric } from "@/server/metrics";
 import {
   AuthorizationGuardError,
@@ -20,9 +21,14 @@ import {
   StorageError,
   UploadPolicyError,
   createMediaUpload,
+  createMediaReadRepository,
   createMediaUploadRepository,
   createMinioStorageProvider,
+  listMedia,
+  parseMediaListQuery,
 } from "@/server/modules/media";
+
+import { requireMediaReadConnection, rethrowMediaReadError } from "./read-helper";
 
 export const runtime = "nodejs";
 export const maxDuration = 15;
@@ -114,6 +120,24 @@ function uploadFailureReason(error: unknown): "validation" | "storage" | "proces
   if (error instanceof ImageProcessingError) return "processing";
   if (error instanceof StorageError) return "storage";
   return "unknown";
+}
+
+export async function GET(request: NextRequest): Promise<Response> {
+  return handleApiRoute(request, async () => {
+    const connection = await requireMediaReadConnection(request);
+    const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
+    const plan = parseMediaListQuery(request, await getRequestValidationOptions(locale));
+    try {
+      const result = await listMedia(
+        createMediaReadRepository(connection),
+        createMinioStorageProvider(),
+        plan,
+      );
+      return apiSuccess(result.data, { meta: result.meta });
+    } catch (error) {
+      return rethrowMediaReadError(error);
+    }
+  });
 }
 
 export async function POST(request: NextRequest): Promise<Response> {

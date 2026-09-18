@@ -177,7 +177,12 @@ export const mediaSchema = createBaseSchema<MediaRecord>(
       },
     },
   },
-  { collection: "media", schemaVersion: 1, softDelete: true, searchSourcePaths: ["originalName"] },
+  {
+    collection: "media",
+    schemaVersion: 1,
+    softDelete: true,
+    searchSourcePaths: ["originalName", "translations"],
+  },
 );
 
 mediaSchema.pre("validate", function validateMediaState() {
@@ -270,8 +275,31 @@ mediaSchema.index(
   { source: 1, processingState: 1, createdAt: -1 },
   { name: "media_processing_queue" },
 );
-mediaSchema.index({ kind: 1, deletedAt: 1, createdAt: -1 }, { name: "media_active_kind_recent" });
-mediaSchema.index({ uploaderId: 1, createdAt: -1 }, { name: "media_uploader_recent" });
+mediaSchema.index({ deletedAt: 1, createdAt: -1, _id: -1 }, { name: "media_list_recent" });
+mediaSchema.index(
+  { deletedAt: 1, processingState: 1, kind: 1, createdAt: -1, _id: -1 },
+  { name: "media_list_state_kind_recent" },
+);
+mediaSchema.index(
+  { deletedAt: 1, mimeType: 1, createdAt: -1, _id: -1 },
+  { name: "media_list_mime_recent" },
+);
+mediaSchema.index(
+  { deletedAt: 1, uploaderId: 1, createdAt: -1, _id: -1 },
+  { name: "media_list_uploader_recent" },
+);
+mediaSchema.index(
+  { deletedAt: 1, usageCount: 1, createdAt: -1, _id: -1 },
+  { name: "media_list_usage_recent" },
+);
+mediaSchema.index(
+  { originalName: "text", "translations.alt": "text" },
+  {
+    name: "media_text_search",
+    default_language: "none",
+    weights: { originalName: 5, "translations.alt": 3 },
+  },
+);
 
 export function getMediaModel(connection: Connection): Model<MediaRecord> {
   return (

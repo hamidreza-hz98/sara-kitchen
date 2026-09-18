@@ -50,6 +50,7 @@ describe("Media schema", () => {
     expect(document.usageCount).toBe(0);
     expect(document.deletedAt).toBeNull();
     expect(document.toJSON()).toMatchObject({ id: document._id.toHexString(), schemaVersion: 1 });
+    expect(document.get("normalizedSearchText")).toContain("persian meal on a plate");
   });
 
   it("accepts external assets without claiming a MinIO object", async () => {
@@ -177,8 +178,12 @@ describe("Media schema", () => {
         "media_processing_queue",
         "media_checksum_active",
         "media_ready_checksum_unique",
-        "media_active_kind_recent",
-        "media_uploader_recent",
+        "media_list_recent",
+        "media_list_state_kind_recent",
+        "media_list_mime_recent",
+        "media_list_uploader_recent",
+        "media_list_usage_recent",
+        "media_text_search",
       ]),
     );
     const managedIndex = mediaSchema
