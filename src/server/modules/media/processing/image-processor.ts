@@ -25,7 +25,10 @@ export type ImageProcessingErrorCode =
   | "image_too_large"
   | "pixel_limit"
   | "dimension_limit"
-  | "decode_failed";
+  | "decode_failed"
+  | "processing_timeout"
+  | "processing_busy"
+  | "requires_background_processing";
 
 export class ImageProcessingError extends Error {
   constructor(readonly code: ImageProcessingErrorCode) {
@@ -51,6 +54,13 @@ export interface ProcessedImage {
   readonly variants: readonly ImageVariantOutput[];
 }
 
+export interface ImageProcessingOptions {
+  /** Absolute epoch deadline, leaving route time for storage and response. */
+  readonly deadlineAtMs?: number;
+  /** Native libvips timeout for each sequential variant. */
+  readonly variantTimeoutSeconds?: number;
+}
+
 const supportedFormats: Record<ImageMimeType, string> = {
   "image/jpeg": "jpeg",
   "image/png": "png",
@@ -71,10 +81,12 @@ async function renderVariant(
   role: ImageVariantRole,
   side: number,
   format: "webp" | "jpeg" | "png",
+  timeoutSeconds: number,
 ): Promise<ImageVariantOutput> {
   let pipeline = decoder(input)
     .autoOrient()
-    .resize({ width: side, height: side, fit: "inside", withoutEnlargement: true });
+    .resize({ width: side, height: side, fit: "inside", withoutEnlargement: true })
+    .timeout({ seconds: timeoutSeconds });
 
   if (format === "webp") {
     pipeline = pipeline.webp({ quality: IMAGE_PROCESSING_POLICY.webpQuality, effort: 5 });
@@ -104,7 +116,19 @@ async function renderVariant(
 export async function processImage(
   input: Buffer,
   mimeType: ImageMimeType,
+  options: ImageProcessingOptions = {},
 ): Promise<ProcessedImage> {
+  const deadlineAtMs = options.deadlineAtMs ?? Number.POSITIVE_INFINITY;
+  const variantTimeoutSeconds = options.variantTimeoutSeconds ?? 5;
+  if (
+    (deadlineAtMs !== Number.POSITIVE_INFINITY && !Number.isFinite(deadlineAtMs)) ||
+    !Number.isInteger(variantTimeoutSeconds) ||
+    variantTimeoutSeconds < 1 ||
+    variantTimeoutSeconds > 10
+  ) {
+    throw new ImageProcessingError("invalid_image");
+  }
+  if (Date.now() >= deadlineAtMs) throw new ImageProcessingError("processing_timeout");
   if (!(mimeType in supportedFormats)) throw new ImageProcessingError("unsupported_format");
   if (input.length === 0) throw new ImageProcessingError("invalid_image");
   if (input.length > IMAGE_PROCESSING_POLICY.maxInputBytes) {
@@ -140,13 +164,24 @@ export async function processImage(
   const fallback = metadata.hasAlpha ? "png" : "jpeg";
   let variants: ImageVariantOutput[];
   try {
-    variants = await Promise.all([
-      renderVariant(input, "display_webp", IMAGE_PROCESSING_POLICY.displaySide, "webp"),
-      renderVariant(input, "display_fallback", IMAGE_PROCESSING_POLICY.displaySide, fallback),
-      renderVariant(input, "thumbnail_webp", IMAGE_PROCESSING_POLICY.thumbnailSide, "webp"),
-      renderVariant(input, "thumbnail_fallback", IMAGE_PROCESSING_POLICY.thumbnailSide, fallback),
-    ]);
-  } catch {
+    variants = [];
+    for (const [role, side, format] of [
+      ["display_webp", IMAGE_PROCESSING_POLICY.displaySide, "webp"],
+      ["display_fallback", IMAGE_PROCESSING_POLICY.displaySide, fallback],
+      ["thumbnail_webp", IMAGE_PROCESSING_POLICY.thumbnailSide, "webp"],
+      ["thumbnail_fallback", IMAGE_PROCESSING_POLICY.thumbnailSide, fallback],
+    ] as const) {
+      const remainingMs = deadlineAtMs - Date.now();
+      if (remainingMs <= 0) throw new ImageProcessingError("processing_timeout");
+      const seconds = Math.min(variantTimeoutSeconds, Math.max(1, Math.floor(remainingMs / 1000)));
+      variants.push(await renderVariant(input, role, side, format, seconds));
+    }
+    if (Date.now() >= deadlineAtMs) throw new ImageProcessingError("processing_timeout");
+  } catch (error) {
+    if (error instanceof ImageProcessingError) throw error;
+    if (error instanceof Error && /timeout/iu.test(error.message)) {
+      throw new ImageProcessingError("processing_timeout");
+    }
     throw new ImageProcessingError("decode_failed");
   }
   return {

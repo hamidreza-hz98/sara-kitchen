@@ -24,3 +24,7 @@ the public storage contract; media upload and delivery use cases will inject it 
 images. Its limits, variant roles, and privacy policy are in
 [`docs/media-image-processing.md`](../../../../docs/media-image-processing.md). Storage and
 Media-record state transitions are later service work.
+
+`processing/serverless-processing.ts` is the strict inline-only planning and execution boundary;
+see [`docs/media-serverless-processing.md`](../../../../docs/media-serverless-processing.md).
+There is no approved background worker, so large image/video/PDF processing is unsupported for MVP.

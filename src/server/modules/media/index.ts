@@ -13,6 +13,12 @@ export type {
   ImageVariantRole,
   ProcessedImage,
 } from "./processing/image-processor";
+export {
+  INLINE_PROCESSING_POLICY,
+  planMediaProcessing,
+  processImageForRoute,
+} from "./processing/serverless-processing";
+export type { MediaProcessingPlan } from "./processing/serverless-processing";
 
 export { StorageError } from "./storage/storage-provider";
 export {
