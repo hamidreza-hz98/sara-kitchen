@@ -19,3 +19,8 @@ belongs to SK-0072.
 `storage/minio-provider.ts` is the production adapter, with details and live-test instructions in
 [`docs/media-minio-provider.md`](../../../../docs/media-minio-provider.md). It remains behind
 the public storage contract; media upload and delivery use cases will inject it later.
+
+`processing/image-processor.ts` creates metadata-free display and thumbnail outputs from admitted
+images. Its limits, variant roles, and privacy policy are in
+[`docs/media-image-processing.md`](../../../../docs/media-image-processing.md). Storage and
+Media-record state transitions are later service work.

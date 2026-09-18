@@ -1,6 +1,19 @@
 /** Public entry point for media metadata, storage, and processing use cases. */
 export const MODULE_NAME = "media" as const;
 
+export {
+  IMAGE_PROCESSING_POLICY,
+  ImageProcessingError,
+  processImage,
+} from "./processing/image-processor";
+export type {
+  ImageMimeType,
+  ImageProcessingErrorCode,
+  ImageVariantOutput,
+  ImageVariantRole,
+  ProcessedImage,
+} from "./processing/image-processor";
+
 export { StorageError } from "./storage/storage-provider";
 export {
   createMediaObjectKey,
