@@ -47,3 +47,10 @@ ties, and a fixed public projection. Allergen exclusions and derived `contains` 
 Ingredients public allergen catalog. See
 [`docs/dish-catalog-query.md`](../../../../docs/dish-catalog-query.md) for the query and performance
 contract.
+
+Dish detail views use the privacy-safe `createDishViewCounter()` boundary. A visible page must remain
+engaged for three seconds before emitting a signal; obvious bots/prefetches are rejected and an HMAC
+receipt permits one count per dish/browser-network fingerprint per six-hour window. Persistence runs
+through an injected post-response scheduler, and every error is isolated from rendering. See
+[`docs/dish-view-counting.md`](../../../../docs/dish-view-counting.md) for integration and privacy
+rules.

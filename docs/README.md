@@ -28,6 +28,7 @@ Current records:
 - [`dish-pricing.md`](./dish-pricing.md) — authoritative integer-cent discounts, schedules, half-up rounding, validation, and display metadata;
 - [`dish-crud.md`](./dish-crud.md) — lifecycle, reference integrity, acyclic dish relations, SEO/audit/cache effects, and concurrency behavior;
 - [`dish-catalog-query.md`](./dish-catalog-query.md) — localized public projection, indexed menu filters, allergen exclusions, sorting, and stable pagination;
+- [`dish-view-counting.md`](./dish-view-counting.md) — meaningful-view policy, privacy-safe duplicate suppression, post-response persistence, and failure isolation;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
 - [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
 - [`error-monitoring.md`](./error-monitoring.md) — Sentry runtimes, privacy redaction, source maps, release tags, alert routing, and verification.

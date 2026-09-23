@@ -14,6 +14,8 @@ export {
   dishSchema,
   getDishModel,
 } from "./model/dish";
+export { dishViewReceiptSchema, getDishViewReceiptModel } from "./model/dish-view-receipt";
+export type { DishViewReceiptRecord } from "./model/dish-view-receipt";
 export type {
   DishAvailability,
   DishAvailabilityMode,
@@ -48,6 +50,8 @@ export type {
   DishPricingIssue,
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
+export { createDishViewRepository } from "./repository/dish-view";
+export type { DishViewPersistenceResult, DishViewRepository } from "./repository/dish-view";
 export { createDishCatalogRepository } from "./repository/catalog";
 export type {
   DishCatalogQueryPlan,
@@ -78,6 +82,20 @@ export {
   DishCatalogQueryError,
   createDishCatalogService,
 } from "./service/catalog-query";
+export {
+  DISH_VIEW_DEDUPLICATION_WINDOW_MS,
+  DISH_VIEW_MINIMUM_ENGAGEMENT_MS,
+  DISH_VIEW_RECEIPT_RETENTION_MS,
+  DISH_VIEW_USER_AGENT_MAX_LENGTH,
+  evaluateDishViewSignal,
+} from "./policy/dish-view";
+export type { DishViewCandidate, DishViewDecision, DishViewSignal } from "./policy/dish-view";
+export { createDishViewCounter } from "./service/dish-view";
+export type {
+  DishViewCounterDependencies,
+  DishViewQueueResult,
+  DishViewWorkScheduler,
+} from "./service/dish-view";
 export type {
   DishCatalogAvailabilityFilter,
   DishCatalogDependencies,
