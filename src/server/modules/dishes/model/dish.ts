@@ -20,6 +20,8 @@ import {
   normalizeSlug,
 } from "@/server/slugs";
 
+import { validateDishPricingDefinition } from "../pricing/dish-pricing";
+
 export const DISH_STATUSES = ["draft", "published", "archived"] as const;
 export const DISH_AVAILABILITY_MODES = ["available", "unavailable", "scheduled"] as const;
 export const DISH_DISCOUNT_TYPES = ["none", "fixed", "percentage"] as const;
@@ -356,44 +358,8 @@ dishSchema.pre("validate", function validateDishInvariants() {
     }
   }
 
-  if (this.discount.type === "none") {
-    if (
-      this.discount.amountCents !== null ||
-      this.discount.basisPoints !== null ||
-      this.discount.startsAt !== null ||
-      this.discount.endsAt !== null
-    ) {
-      this.invalidate("discount", "A none discount cannot contain value or schedule fields.");
-    }
-  } else if (this.discount.type === "fixed") {
-    if (
-      !Number.isSafeInteger(this.discount.amountCents) ||
-      (this.discount.amountCents ?? 0) <= 0 ||
-      (this.discount.amountCents ?? 0) > this.basePriceCents ||
-      this.discount.basisPoints !== null
-    ) {
-      this.invalidate(
-        "discount.amountCents",
-        "Fixed discount cents must be positive, not exceed base price, and exclude basis points.",
-      );
-    }
-  } else if (
-    !Number.isSafeInteger(this.discount.basisPoints) ||
-    (this.discount.basisPoints ?? 0) <= 0 ||
-    (this.discount.basisPoints ?? 0) > 10_000 ||
-    this.discount.amountCents !== null
-  ) {
-    this.invalidate(
-      "discount.basisPoints",
-      "Percentage discount basis points must be from 1 through 10,000 and exclude cents.",
-    );
-  }
-  if (
-    this.discount.startsAt &&
-    this.discount.endsAt &&
-    this.discount.endsAt.getTime() <= this.discount.startsAt.getTime()
-  ) {
-    this.invalidate("discount.endsAt", "Discount end must be later than its start.");
+  for (const pricingIssue of validateDishPricingDefinition(this.basePriceCents, this.discount)) {
+    this.invalidate(pricingIssue.path, pricingIssue.message);
   }
 
   if (this.availability.mode === "scheduled") {

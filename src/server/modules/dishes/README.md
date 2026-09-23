@@ -25,3 +25,9 @@ Named indexes cover public/category/featured/price catalog reads, availability a
 localized text search, every reverse-reference path, dietary/allergen filters, and the unique slug.
 Integration coverage proves MongoDB uniqueness plus index selection for the core public and category
 queries.
+
+`calculateDishPrice()` is the single unit-price resolver. It validates the persisted definition,
+applies inclusive-start/exclusive-end discount schedules, performs percentage half-up rounding with a
+non-overflowing integer intermediate, and returns numeric EUR values plus structured display metadata.
+The model delegates price/discount invariants to the same validator. See
+[`docs/dish-pricing.md`](../../../../docs/dish-pricing.md) for the public contract and consumer rules.

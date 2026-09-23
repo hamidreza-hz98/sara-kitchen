@@ -30,4 +30,21 @@ export type {
   DishStatus,
   DishTranslation,
 } from "./model/dish";
+export {
+  DISH_PERCENTAGE_BASIS_POINTS,
+  DISH_PRICE_CURRENCY,
+  DISH_PRICING_ERROR_CODES,
+  DishPricingError,
+  calculateDishPrice,
+  validateDishPricingDefinition,
+} from "./pricing/dish-pricing";
+export type {
+  CalculateDishPriceInput,
+  DishDiscountMetadata,
+  DishDiscountState,
+  DishPriceBadge,
+  DishPriceResult,
+  DishPricingErrorCode,
+  DishPricingIssue,
+} from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
