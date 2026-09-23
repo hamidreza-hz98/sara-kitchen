@@ -151,14 +151,27 @@ describe("Dish Route Handler contracts", () => {
 
   it("protects management reads with exact permissions and bounded pagination", async () => {
     const response = await managementList(
-      request("/api/dishes/manage?page=2&pageSize=10&status=draft", "GET", undefined, true),
+      request(
+        "/api/dishes/manage?page=2&pageSize=10&status=draft&availability=scheduled&featured=true&sortBy=soldCount&sortDirection=desc",
+        "GET",
+        undefined,
+        true,
+      ),
     );
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(state.adminContext).toHaveBeenCalledWith(expect.any(NextRequest), "dishes:read");
     expect(state.list).toHaveBeenCalledWith(
       actor,
-      expect.objectContaining({ page: 2, pageSize: 10, status: "draft" }),
+      expect.objectContaining({
+        page: 2,
+        pageSize: 10,
+        status: "draft",
+        availability: "scheduled",
+        featured: true,
+        sortBy: "soldCount",
+        sortDirection: "desc",
+      }),
     );
     expect((await managementList(request("/api/dishes/manage?pageSize=1000"))).status).toBe(400);
     state.adminContext.mockRejectedValueOnce(ApiError.authentication());

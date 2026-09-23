@@ -185,8 +185,20 @@ const listOptionsSchema = z.strictObject({
   pageSize: z.number().int().safe().min(1).max(100),
   status: z.enum(["draft", "published", "archived"]).optional(),
   categoryId: objectId.optional(),
+  availability: z.enum(["available", "unavailable", "scheduled"]).optional(),
+  featured: z.boolean().optional(),
   search: z.string().trim().max(80).optional(),
-  sortBy: z.enum(["name", "createdAt", "basePriceCents", "status"]).optional(),
+  sortBy: z
+    .enum([
+      "name",
+      "createdAt",
+      "basePriceCents",
+      "status",
+      "soldCount",
+      "viewCount",
+      "featuredOrder",
+    ])
+    .optional(),
   sortDirection: z.enum(["asc", "desc"]).optional(),
 });
 
@@ -474,6 +486,10 @@ export function createDishServices(deps: DishServiceDependencies) {
           pageSize: parsed.data.pageSize,
           ...(parsed.data.status !== undefined ? { status: parsed.data.status } : {}),
           ...(parsed.data.categoryId !== undefined ? { categoryId: parsed.data.categoryId } : {}),
+          ...(parsed.data.availability !== undefined
+            ? { availability: parsed.data.availability }
+            : {}),
+          ...(parsed.data.featured !== undefined ? { featured: parsed.data.featured } : {}),
           ...(parsed.data.search !== undefined ? { search: parsed.data.search } : {}),
           ...(parsed.data.sortBy !== undefined ? { sortBy: parsed.data.sortBy } : {}),
           ...(parsed.data.sortDirection !== undefined

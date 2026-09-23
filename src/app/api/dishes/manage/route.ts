@@ -22,6 +22,8 @@ export async function GET(request: NextRequest): Promise<Response> {
           sortDirection: query.sortDirection,
           ...(query.status ? { status: query.status } : {}),
           ...(query.categoryId ? { categoryId: query.categoryId } : {}),
+          ...(query.availability ? { availability: query.availability } : {}),
+          ...(query.featured !== undefined ? { featured: query.featured } : {}),
           ...(query.search ? { search: query.search } : {}),
         },
       );

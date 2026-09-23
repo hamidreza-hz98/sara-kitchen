@@ -153,8 +153,20 @@ export const dishManagementListQuerySchema = z
     pageSize: z.coerce.number().int().min(1).max(100).default(20),
     status: z.enum(DISH_STATUSES).optional(),
     categoryId: objectId.optional(),
+    availability: z.enum(DISH_AVAILABILITY_MODES).optional(),
+    featured: queryBoolean.optional(),
     search: z.string().trim().min(2).max(80).optional(),
-    sortBy: z.enum(["name", "createdAt", "basePriceCents", "status"]).default("createdAt"),
+    sortBy: z
+      .enum([
+        "name",
+        "createdAt",
+        "basePriceCents",
+        "status",
+        "soldCount",
+        "viewCount",
+        "featuredOrder",
+      ])
+      .default("createdAt"),
     sortDirection: z.enum(["asc", "desc"]).default("desc"),
   })
   .refine((value) => value.page * value.pageSize <= 10_000, "The requested page is too deep.");

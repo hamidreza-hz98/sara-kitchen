@@ -82,8 +82,17 @@ export type DishListOptions = Readonly<{
   pageSize: number;
   status?: DishStatus;
   categoryId?: string;
+  availability?: DishAvailability["mode"];
+  featured?: boolean;
   search?: string;
-  sortBy?: "name" | "createdAt" | "basePriceCents" | "status";
+  sortBy?:
+    | "name"
+    | "createdAt"
+    | "basePriceCents"
+    | "status"
+    | "soldCount"
+    | "viewCount"
+    | "featuredOrder";
   sortDirection?: "asc" | "desc";
 }>;
 
@@ -236,6 +245,8 @@ export function createDishRepository(connection: Connection): DishRepository {
       if (options.categoryId && Types.ObjectId.isValid(options.categoryId)) {
         filter.categoryIds = new Types.ObjectId(options.categoryId);
       }
+      if (options.availability) filter["availability.mode"] = options.availability;
+      if (options.featured !== undefined) filter.isFeatured = options.featured;
       if (options.search) {
         filter.normalizedSearchText = {
           $regex: escapeSearchPattern(normalizeSearchText(options.search)),
