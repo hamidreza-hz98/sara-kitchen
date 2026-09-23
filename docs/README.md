@@ -26,6 +26,7 @@ Current records:
 - [`design-tokens.md`](./design-tokens.md) — typed color, typography, spacing, breakpoint, radius, shadow, and motion decisions traced to the supplied UI/UX exports;
 - [`dish-domain-rules.md`](./dish-domain-rules.md) — sellable portions, availability, made-to-order stock, tax, allergen/dietary, quantity, and lead-time contracts;
 - [`dish-pricing.md`](./dish-pricing.md) — authoritative integer-cent discounts, schedules, half-up rounding, validation, and display metadata;
+- [`dish-crud.md`](./dish-crud.md) — lifecycle, reference integrity, acyclic dish relations, SEO/audit/cache effects, and concurrency behavior;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
 - [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
 - [`error-monitoring.md`](./error-monitoring.md) — Sentry runtimes, privacy redaction, source maps, release tags, alert routing, and verification.

@@ -48,3 +48,33 @@ export type {
   DishPricingIssue,
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
+export { DishRepositoryConflictError, createDishRepository } from "./repository/dish";
+export type {
+  DishIngredientSnapshot,
+  DishListOptions,
+  DishListResult,
+  DishRepository,
+  DishSnapshot,
+  DishWrite,
+} from "./repository/dish";
+export { createDishAuditSink } from "./service/dish-audit";
+export {
+  DISH_REFERENCE_KINDS,
+  DISH_SERVICE_ERROR_CODES,
+  DishServiceError,
+  createDishServices,
+} from "./service/dish-crud";
+export type {
+  DishAction,
+  DishActor,
+  DishAuditEvent,
+  DishInput,
+  DishReferenceInspection,
+  DishReferenceIssue,
+  DishReferenceKind,
+  DishReferenceSet,
+  DishSeoPort,
+  DishServiceDependencies,
+  DishServiceErrorCode,
+  DishUpdate,
+} from "./service/dish-crud";

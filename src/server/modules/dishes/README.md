@@ -31,3 +31,11 @@ applies inclusive-start/exclusive-end discount schedules, performs percentage ha
 non-overflowing integer intermediate, and returns numeric EUR values plus structured display metadata.
 The model delegates price/discount invariants to the same validator. See
 [`docs/dish-pricing.md`](../../../../docs/dish-pricing.md) for the public contract and consumer rules.
+
+CRUD operations are exposed only through `createDishServices()` and documented in
+[`docs/dish-crud.md`](../../../../docs/dish-crud.md). The service owns action permissions,
+publication validation, collision-safe slugs, missing/archived reference rejection, acyclic
+related-dish rules, SEO synchronization, append-only audit outcomes, and targeted cache invalidation.
+Its repository is the only layer that accesses the Dish model. Cross-module dependency inspection is
+injected through a public port, so this module never imports another aggregate's persistence internals.
+Archive removes inbound related-dish edges; restore returns to draft after dependency validation.
