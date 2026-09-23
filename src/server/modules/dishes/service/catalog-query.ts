@@ -18,6 +18,7 @@ import type {
   DishCatalogQueryPlan,
   DishCatalogRecord,
   DishCatalogRepository,
+  DishCatalogDetailRecord,
 } from "../repository/catalog";
 
 export const DISH_CATALOG_AVAILABILITY_FILTERS = ["all", "available", "unavailable"] as const;
@@ -92,6 +93,15 @@ export type DishCatalogResult = Readonly<{
     }>;
 }>;
 
+export type DishCatalogDetail = DishCatalogItem &
+  Readonly<{
+    description: DishCatalogDetailRecord["translations"][number]["description"] | null;
+    specifications: DishCatalogDetailRecord["translations"][number]["specifications"];
+    ingredients: DishCatalogDetailRecord["ingredients"];
+    relatedDishIds: readonly string[];
+    relatedBlogIds: readonly string[];
+  }>;
+
 export type DishCatalogDependencies = Readonly<{
   repository: DishCatalogRepository;
   ingredients: IngredientAllergenCatalog;
@@ -99,11 +109,17 @@ export type DishCatalogDependencies = Readonly<{
 }>;
 
 export class DishCatalogQueryError extends Error {
-  constructor(readonly code: "invalid_query" | "invalid_catalog_data") {
+  constructor(readonly code: "invalid_query" | "invalid_catalog_data" | "not_found") {
     super(code);
     this.name = "DishCatalogQueryError";
   }
 }
+
+const detailSchema = z.strictObject({
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
+  locale: z.enum(SUPPORTED_LOCALES).default(DEFAULT_LOCALE),
+  fallbackLocale: z.enum(SUPPORTED_LOCALES).nullable().optional(),
+});
 
 const objectId = z.string().regex(/^[a-f\d]{24}$/iu);
 const querySchema = z
@@ -304,6 +320,38 @@ function allergensFor(
   };
 }
 
+function toCatalogItem(
+  record: DishCatalogRecord,
+  parsed: Pick<ParsedDishCatalogQuery, "locale" | "fallbackLocale">,
+  at: Date,
+  ingredientAllergens: Awaited<
+    ReturnType<IngredientAllergenCatalog["getAllergensByIngredientIds"]>
+  >,
+): DishCatalogItem {
+  const name = localizedText(record, "name", parsed.locale, parsed.fallbackLocale);
+  if (!name) throw new DishCatalogQueryError("invalid_catalog_data");
+  return {
+    id: record.id,
+    slug: record.slug,
+    name,
+    excerpt: localizedText(record, "excerpt", parsed.locale, parsed.fallbackLocale),
+    mediaIds: record.mediaIds,
+    categoryIds: record.categoryIds,
+    price: calculateDishPrice({
+      basePriceCents: record.basePriceCents,
+      discount: record.discount,
+      at,
+    }),
+    portion: { amount: record.portionAmount, unit: record.portionUnit },
+    availability: resolveAvailability(record, at),
+    leadTimeMinutes: record.leadTimeMinutes,
+    maxQuantityPerOrder: record.maxQuantityPerOrder,
+    dietaryTags: record.dietaryTags,
+    allergens: allergensFor(record, ingredientAllergens),
+    isFeatured: record.isFeatured,
+  };
+}
+
 export function createDishCatalogService(dependencies: DishCatalogDependencies) {
   return {
     async list(raw: DishCatalogQueryInput = {}): Promise<DishCatalogResult> {
@@ -317,30 +365,9 @@ export function createDishCatalogService(dependencies: DishCatalogDependencies) 
       const ingredientIds = result.items.flatMap((item) => item.ingredientIds);
       const ingredientAllergens =
         await dependencies.ingredients.getAllergensByIngredientIds(ingredientIds);
-      const items = result.items.map((record): DishCatalogItem => {
-        const name = localizedText(record, "name", parsed.data.locale, parsed.data.fallbackLocale);
-        if (!name) throw new DishCatalogQueryError("invalid_catalog_data");
-        return {
-          id: record.id,
-          slug: record.slug,
-          name,
-          excerpt: localizedText(record, "excerpt", parsed.data.locale, parsed.data.fallbackLocale),
-          mediaIds: record.mediaIds,
-          categoryIds: record.categoryIds,
-          price: calculateDishPrice({
-            basePriceCents: record.basePriceCents,
-            discount: record.discount,
-            at,
-          }),
-          portion: { amount: record.portionAmount, unit: record.portionUnit },
-          availability: resolveAvailability(record, at),
-          leadTimeMinutes: record.leadTimeMinutes,
-          maxQuantityPerOrder: record.maxQuantityPerOrder,
-          dietaryTags: record.dietaryTags,
-          allergens: allergensFor(record, ingredientAllergens),
-          isFeatured: record.isFeatured,
-        };
-      });
+      const items = result.items.map((record) =>
+        toCatalogItem(record, parsed.data, at, ingredientAllergens),
+      );
       const pagination = pageResult(items, result.total, {
         page: parsed.data.page,
         pageSize: parsed.data.pageSize,
@@ -356,6 +383,46 @@ export function createDishCatalogService(dependencies: DishCatalogDependencies) 
           viewMode: parsed.data.viewMode,
           evaluatedAt: at.toISOString(),
         },
+      };
+    },
+    async getBySlug(raw: {
+      slug: string;
+      locale?: SupportedLocale;
+      fallbackLocale?: SupportedLocale | null;
+    }): Promise<DishCatalogDetail> {
+      const parsed = detailSchema.safeParse(raw);
+      if (!parsed.success) throw new DishCatalogQueryError("invalid_query");
+      const record = await dependencies.repository.findBySlug(parsed.data.slug);
+      if (!record) throw new DishCatalogQueryError("not_found");
+      const at = dependencies.now?.() ?? new Date();
+      const ingredientAllergens = await dependencies.ingredients.getAllergensByIngredientIds(
+        record.ingredientIds,
+      );
+      const item = toCatalogItem(record, parsed.data, at, ingredientAllergens);
+      const localeOptions = {
+        ...(parsed.data.fallbackLocale !== undefined
+          ? { fallbackLocale: parsed.data.fallbackLocale }
+          : {}),
+      };
+      const description = resolveLocalizedValue(
+        record.translations,
+        "description",
+        parsed.data.locale,
+        localeOptions,
+      );
+      const specifications = resolveLocalizedValue(
+        record.translations,
+        "specifications",
+        parsed.data.locale,
+        localeOptions,
+      );
+      return {
+        ...item,
+        description: description?.value ?? null,
+        specifications: specifications?.value ?? [],
+        ingredients: record.ingredients,
+        relatedDishIds: record.relatedDishIds,
+        relatedBlogIds: record.relatedBlogIds,
       };
     },
   };

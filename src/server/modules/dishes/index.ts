@@ -59,6 +59,7 @@ export { createDishViewRepository } from "./repository/dish-view";
 export type { DishViewPersistenceResult, DishViewRepository } from "./repository/dish-view";
 export { createDishCatalogRepository } from "./repository/catalog";
 export type {
+  DishCatalogDetailRecord,
   DishCatalogQueryPlan,
   DishCatalogRecord,
   DishCatalogRepository,
@@ -127,6 +128,7 @@ export type {
 export type {
   DishCatalogAvailabilityFilter,
   DishCatalogDependencies,
+  DishCatalogDetail,
   DishCatalogItem,
   DishCatalogLocalizedText,
   DishCatalogQueryInput,
@@ -148,3 +150,13 @@ export type {
   DishServiceErrorCode,
   DishUpdate,
 } from "./service/dish-crud";
+export {
+  dishCatalogQuerySchema,
+  dishCreateSchema,
+  dishDetailQuerySchema,
+  dishEmptyMutationSchema,
+  dishIdParametersSchema,
+  dishManagementListQuerySchema,
+  dishSlugParametersSchema,
+  dishUpdateSchema,
+} from "./validation/dish-request";

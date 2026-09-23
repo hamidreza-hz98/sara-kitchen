@@ -61,3 +61,10 @@ Orders-owned MongoDB transaction. Duplicate retries are no-ops, stale revisions 
 cancellation plus item/full refund transitions reverse only their prior contribution. Dishes never
 imports Order persistence. See
 [`docs/dish-sold-count.md`](../../../../docs/dish-sold-count.md) for lifecycle and integration rules.
+
+Public and administrative HTTP boundaries are documented in
+[`docs/dish-api.md`](../../../../docs/dish-api.md). Public catalog/detail projections are localized,
+bounded, rate-limited, and explicitly cached for one minute. Management list/detail/create/update/
+archive/restore handlers require exact permissions, mutation origin/CSRF protection where applicable,
+shared validation/error contracts, audit-backed services, and targeted revalidation. Blog references
+and SEO persistence fail closed or remain unset until their owning phases provide public adapters.

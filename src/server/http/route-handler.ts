@@ -35,7 +35,7 @@ function resolveRequestId(request: Request): string {
 
 function responseHeaders(requestId: string, custom?: HeadersInit): Headers {
   const headers = new Headers(custom);
-  headers.set("cache-control", "no-store");
+  if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
   headers.set(REQUEST_ID_HEADER, requestId);
   return headers;
 }

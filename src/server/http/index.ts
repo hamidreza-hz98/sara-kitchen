@@ -37,3 +37,4 @@ export {
   type RouteParameterValue,
 } from "./request-validation";
 export { getRequestValidationOptions } from "./validation-translator";
+export { consumeRequestRateLimit, type RequestRateLimitPolicy } from "./request-rate-limit";

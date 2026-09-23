@@ -7,6 +7,7 @@ import {
   createDishCatalogService,
 } from "@/server/modules/dishes/service/catalog-query";
 import type {
+  DishCatalogDetailRecord,
   DishCatalogQueryPlan,
   DishCatalogRecord,
   DishCatalogRepository,
@@ -70,6 +71,7 @@ function harness(items: readonly DishCatalogRecord[] = [record()], total = items
       capturedPlan = plan;
       return { items, total };
     }),
+    findBySlug: vi.fn(async () => null),
   };
   const ingredients: IngredientAllergenCatalog = {
     findIngredientIdsContainingAny: vi.fn(async () => ["9".repeat(24)]),
@@ -79,12 +81,42 @@ function harness(items: readonly DishCatalogRecord[] = [record()], total = items
   };
   return {
     service: createDishCatalogService({ repository, ingredients, now: () => now }),
+    repository,
     ingredients,
     plan: () => capturedPlan,
   };
 }
 
 describe("public Dish catalog query service", () => {
+  it("returns localized public detail and hides missing unpublished records", async () => {
+    const test = harness();
+    const detail: DishCatalogDetailRecord = {
+      ...record(),
+      ingredients: [
+        {
+          ingredientId: "4".repeat(24),
+          notes: [{ locale: "en", note: "Ground" }],
+          quantityAmount: 200,
+          quantityUnit: "gram",
+        },
+      ],
+      relatedDishIds: ["5".repeat(24)],
+      relatedBlogIds: ["6".repeat(24)],
+    };
+    vi.mocked(test.repository.findBySlug).mockResolvedValueOnce(detail);
+    await expect(test.service.getBySlug({ slug: "fesenjan", locale: "fa" })).resolves.toMatchObject(
+      {
+        slug: "fesenjan",
+        name: { value: "فسنجان", direction: "rtl" },
+        ingredients: [{ ingredientId: "4".repeat(24), quantityAmount: 200 }],
+        relatedDishIds: ["5".repeat(24)],
+      },
+    );
+    await expect(test.service.getBySlug({ slug: "missing", locale: "en" })).rejects.toMatchObject({
+      code: "not_found",
+    });
+  });
+
   it("returns a localized public projection with pricing, availability, allergens, and metadata", async () => {
     const test = harness();
     const result = await test.service.list({ locale: "fa", viewMode: "list" });

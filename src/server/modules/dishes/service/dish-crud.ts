@@ -57,7 +57,7 @@ export type DishReferenceInspection = Readonly<{
 }>;
 
 export type DishSeoPort = Readonly<{
-  sync(dish: DishSnapshot): Promise<string>;
+  sync(dish: DishSnapshot): Promise<string | null>;
 }>;
 
 export type DishServiceDependencies = Readonly<{
@@ -414,7 +414,7 @@ async function synchronizeSeo(
   actorId: string,
 ): Promise<DishSnapshot> {
   const seoPageId = await deps.seo.sync(dish);
-  return dish.seoPageId === seoPageId
+  return seoPageId === null || dish.seoPageId === seoPageId
     ? dish
     : deps.repository.setSeoPageId(dish, seoPageId, actorId);
 }

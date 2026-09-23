@@ -34,6 +34,18 @@ export type DishCatalogRecord = Readonly<{
   featuredOrder: number;
 }>;
 
+export type DishCatalogDetailRecord = DishCatalogRecord &
+  Readonly<{
+    ingredients: readonly Readonly<{
+      ingredientId: string;
+      notes: readonly Readonly<{ locale: "en" | "pt-PT" | "fa"; note: string }>[];
+      quantityAmount: number | null;
+      quantityUnit: DishRecord["ingredients"][number]["quantityUnit"];
+    }>[];
+    relatedDishIds: readonly string[];
+    relatedBlogIds: readonly string[];
+  }>;
+
 export type DishCatalogQueryPlan = Readonly<{
   filter: Readonly<Record<string, unknown>>;
   sort: Readonly<Record<string, 1 | -1>>;
@@ -48,6 +60,7 @@ export type DishCatalogRepositoryResult = Readonly<{
 
 export interface DishCatalogRepository {
   list(plan: DishCatalogQueryPlan): Promise<DishCatalogRepositoryResult>;
+  findBySlug(slug: string): Promise<DishCatalogDetailRecord | null>;
 }
 
 const PUBLIC_CATALOG_PROJECTION = {
@@ -67,6 +80,13 @@ const PUBLIC_CATALOG_PROJECTION = {
   dietaryTags: 1,
   isFeatured: 1,
   featuredOrder: 1,
+} as const;
+
+const PUBLIC_DETAIL_PROJECTION = {
+  ...PUBLIC_CATALOG_PROJECTION,
+  ingredients: 1,
+  relatedDishIds: 1,
+  relatedBlogIds: 1,
 } as const;
 
 type ProjectedDish = Pick<
@@ -126,6 +146,23 @@ function toRecord(value: ProjectedDish): DishCatalogRecord {
   };
 }
 
+type ProjectedDishDetail = ProjectedDish &
+  Pick<DishRecord, "ingredients" | "relatedDishIds" | "relatedBlogIds">;
+
+function toDetailRecord(value: ProjectedDishDetail): DishCatalogDetailRecord {
+  return {
+    ...toRecord(value),
+    ingredients: value.ingredients.map((ingredient) => ({
+      ingredientId: ingredient.ingredientId.toHexString(),
+      notes: ingredient.notes.map((note) => ({ ...note })),
+      quantityAmount: ingredient.quantityAmount,
+      quantityUnit: ingredient.quantityUnit,
+    })),
+    relatedDishIds: value.relatedDishIds.map((id) => id.toHexString()),
+    relatedBlogIds: value.relatedBlogIds.map((id) => id.toHexString()),
+  };
+}
+
 export function createDishCatalogRepository(connection: Connection): DishCatalogRepository {
   const Dish = getDishModel(connection);
   return {
@@ -139,6 +176,13 @@ export function createDishCatalogRepository(connection: Connection): DishCatalog
         Dish.countDocuments(plan.filter),
       ]);
       return { items: items.map(toRecord), total };
+    },
+    async findBySlug(slug) {
+      const item = await Dish.findOne(
+        { slug, deletedAt: null, status: "published" },
+        PUBLIC_DETAIL_PROJECTION,
+      ).lean<ProjectedDishDetail | null>();
+      return item ? toDetailRecord(item) : null;
     },
   };
 }
