@@ -48,6 +48,13 @@ export type {
   DishPricingIssue,
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
+export { createDishCatalogRepository } from "./repository/catalog";
+export type {
+  DishCatalogQueryPlan,
+  DishCatalogRecord,
+  DishCatalogRepository,
+  DishCatalogRepositoryResult,
+} from "./repository/catalog";
 export { DishRepositoryConflictError, createDishRepository } from "./repository/dish";
 export type {
   DishIngredientSnapshot,
@@ -64,6 +71,23 @@ export {
   DishServiceError,
   createDishServices,
 } from "./service/dish-crud";
+export {
+  DISH_CATALOG_AVAILABILITY_FILTERS,
+  DISH_CATALOG_SORTS,
+  DISH_CATALOG_VIEW_MODES,
+  DishCatalogQueryError,
+  createDishCatalogService,
+} from "./service/catalog-query";
+export type {
+  DishCatalogAvailabilityFilter,
+  DishCatalogDependencies,
+  DishCatalogItem,
+  DishCatalogLocalizedText,
+  DishCatalogQueryInput,
+  DishCatalogResult,
+  DishCatalogSort,
+  DishCatalogViewMode,
+} from "./service/catalog-query";
 export type {
   DishAction,
   DishActor,

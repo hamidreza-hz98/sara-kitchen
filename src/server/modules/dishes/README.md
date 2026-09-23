@@ -39,3 +39,11 @@ related-dish rules, SEO synchronization, append-only audit outcomes, and targete
 Its repository is the only layer that accesses the Dish model. Cross-module dependency inspection is
 injected through a public port, so this module never imports another aggregate's persistence internals.
 Archive removes inbound related-dish edges; restore returns to draft after dependency validation.
+
+Public menu lists use `createDishCatalogService()` rather than the administrative repository. It
+applies published/non-deleted scope, localization fallback, active price and orderability resolution,
+category/featured/discount/dietary/allergen filters, allow-listed indexed sorts, deterministic page
+ties, and a fixed public projection. Allergen exclusions and derived `contains` tags come through the
+Ingredients public allergen catalog. See
+[`docs/dish-catalog-query.md`](../../../../docs/dish-catalog-query.md) for the query and performance
+contract.

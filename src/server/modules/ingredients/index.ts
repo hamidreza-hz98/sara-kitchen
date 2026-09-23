@@ -37,6 +37,11 @@ export type {
   IngredientUpdate,
 } from "./service/ingredient-crud";
 export { createIngredientAuditSink } from "./service/ingredient-audit";
+export { createIngredientAllergenCatalog } from "./repository/catalog-allergens";
+export type {
+  IngredientAllergenCatalog,
+  IngredientAllergenMap,
+} from "./repository/catalog-allergens";
 export {
   ingredientCreateSchema,
   ingredientEmptyMutationSchema,

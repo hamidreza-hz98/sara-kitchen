@@ -13,3 +13,7 @@ soft deletion. Services enforce action-level administrator permissions, append a
 every outcome, and invalidate only ingredient/detail plus dependent SEO cache tags after durable
 mutations. Destructive deletion requires an archived record and a zero reference count supplied by
 the Dishes public API; active or referenced ingredients remain intact.
+
+`createIngredientAllergenCatalog()` is the read-only cross-module projection for public catalog
+filtering. It exposes only matching Ingredient IDs and ID-to-allergen-code maps for published,
+non-deleted ingredients; consumers never access Ingredient documents or persistence models.

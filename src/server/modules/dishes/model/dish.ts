@@ -397,7 +397,7 @@ dishSchema.index(
   { name: "dish_category_catalog" },
 );
 dishSchema.index(
-  { deletedAt: 1, status: 1, isFeatured: 1, featuredOrder: 1, _id: 1 },
+  { deletedAt: 1, status: 1, isFeatured: -1, featuredOrder: 1, _id: 1 },
   { name: "dish_featured_catalog" },
 );
 dishSchema.index(
@@ -411,6 +411,26 @@ dishSchema.index(
 dishSchema.index(
   { "discount.type": 1, "discount.startsAt": 1, "discount.endsAt": 1 },
   { name: "dish_discount_schedule" },
+);
+dishSchema.index(
+  {
+    deletedAt: 1,
+    status: 1,
+    "discount.type": 1,
+    "discount.startsAt": 1,
+    "discount.endsAt": 1,
+    createdAt: -1,
+    _id: 1,
+  },
+  { name: "dish_discounted_catalog" },
+);
+dishSchema.index(
+  { deletedAt: 1, status: 1, viewCount: -1, _id: 1 },
+  { name: "dish_popular_catalog" },
+);
+dishSchema.index(
+  { deletedAt: 1, status: 1, soldCount: -1, _id: 1 },
+  { name: "dish_best_selling_catalog" },
 );
 dishSchema.index(
   { "translations.name": "text", "translations.excerpt": "text" },
