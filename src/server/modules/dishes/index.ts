@@ -16,6 +16,11 @@ export {
 } from "./model/dish";
 export { dishViewReceiptSchema, getDishViewReceiptModel } from "./model/dish-view-receipt";
 export type { DishViewReceiptRecord } from "./model/dish-view-receipt";
+export { dishSoldProjectionSchema, getDishSoldProjectionModel } from "./model/dish-sold-projection";
+export type {
+  DishSoldContributionRecord,
+  DishSoldProjectionRecord,
+} from "./model/dish-sold-projection";
 export type {
   DishAvailability,
   DishAvailabilityMode,
@@ -90,12 +95,35 @@ export {
   evaluateDishViewSignal,
 } from "./policy/dish-view";
 export type { DishViewCandidate, DishViewDecision, DishViewSignal } from "./policy/dish-view";
+export {
+  SOLD_COUNT_FULFILLMENT_STATES,
+  SOLD_COUNT_PAYMENT_STATES,
+  SoldCountPolicyError,
+  deriveSoldCountProjection,
+} from "./policy/sold-count";
+export type {
+  NormalizedSoldCountProjection,
+  SoldCountContribution,
+  SoldCountFulfillmentState,
+  SoldCountOrderItem,
+  SoldCountOrderSnapshot,
+  SoldCountPaymentState,
+} from "./policy/sold-count";
 export { createDishViewCounter } from "./service/dish-view";
 export type {
   DishViewCounterDependencies,
   DishViewQueueResult,
   DishViewWorkScheduler,
 } from "./service/dish-view";
+export { createDishSoldCountProjector } from "./service/sold-count";
+export type { DishSoldCountProjector } from "./service/sold-count";
+export { SoldCountProjectionError, createDishSoldCountRepository } from "./repository/sold-count";
+export type {
+  DishSoldCountRepository,
+  SoldCountDelta,
+  SoldCountProjectionResult,
+  SoldCountProjectionStatus,
+} from "./repository/sold-count";
 export type {
   DishCatalogAvailabilityFilter,
   DishCatalogDependencies,

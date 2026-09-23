@@ -54,3 +54,10 @@ receipt permits one count per dish/browser-network fingerprint per six-hour wind
 through an injected post-response scheduler, and every error is isolated from rendering. See
 [`docs/dish-view-counting.md`](../../../../docs/dish-view-counting.md) for integration and privacy
 rules.
+
+Sold counts use `createDishSoldCountProjector()` as an Orders-facing public API. A private per-order
+revision/fingerprint projection applies only the delta for completed and settled dish units inside the
+Orders-owned MongoDB transaction. Duplicate retries are no-ops, stale revisions are ignored, and
+cancellation plus item/full refund transitions reverse only their prior contribution. Dishes never
+imports Order persistence. See
+[`docs/dish-sold-count.md`](../../../../docs/dish-sold-count.md) for lifecycle and integration rules.
