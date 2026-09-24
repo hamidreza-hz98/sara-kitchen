@@ -15,3 +15,8 @@ Homepage settings add an exact strict codec for hero slides, linked banners, fea
 testimonials, category banners, discounted dishes, and blog selections. The public reference validator allows
 valid unpublished work in drafts but requires ready image media and public, non-archived content at publish
 time. See [`homepage-settings.md`](../../../../../docs/homepage-settings.md).
+
+Contact settings add normalized E.164/email/location data, translated address and service-area copy, complete
+Lisbon-time business hours, safe optional map data, and an allow-listed locale-aware public projection. The
+strict codec cannot store provider credentials. See
+[`contact-settings.md`](../../../../../docs/contact-settings.md).

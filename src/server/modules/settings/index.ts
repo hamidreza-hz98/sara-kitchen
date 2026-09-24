@@ -52,6 +52,24 @@ export {
   createHomepageReferenceDependencies,
   validateHomepageSettingsReferences,
 } from "./service/homepage-references";
+export {
+  CONTACT_MAP_PROVIDERS,
+  CONTACT_MAX_PHONES,
+  CONTACT_WEEKDAYS,
+  contactSettingsDataSchema,
+  contactSettingsPayloadSchema,
+  contactSettingsTranslationValueSchema,
+  parseContactSettings,
+} from "./validation/contact-settings";
+export type {
+  ContactSettingsData,
+  ContactSettingsPayload,
+  ContactSettingsTranslation,
+  ContactSettingsTranslationValue,
+  ContactWeekday,
+} from "./validation/contact-settings";
+export { projectPublicContactSettings } from "./service/contact-public";
+export type { PublicContactSettings } from "./service/contact-public";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,
