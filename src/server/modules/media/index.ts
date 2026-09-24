@@ -44,6 +44,8 @@ export { MEDIA_READ_URL_TTL_SECONDS, getMediaDetail, listMedia } from "./service
 export type { MediaDetailDto, MediaListItemDto } from "./service/read-media";
 export { getMediaReferenceFacts } from "./service/reference-facts";
 export type { MediaReferenceFacts } from "./service/reference-facts";
+export { resolveSeoMediaImage } from "./service/seo-image";
+export type { SeoMediaImage } from "./service/seo-image";
 export { MediaUpdateError, updateMediaMetadata } from "./service/update-media";
 export type { MediaUpdateErrorCode, UpdateMediaMetadataInput } from "./service/update-media";
 export {

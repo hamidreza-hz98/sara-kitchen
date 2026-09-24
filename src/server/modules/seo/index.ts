@@ -40,6 +40,14 @@ export type {
 } from "./model/page-seo";
 export { AutomaticSeoError, createAutomaticSeoSynchronizer } from "./service/automatic-seo";
 export type { AutomaticSeoSynchronizer } from "./service/automatic-seo";
+export { findSeoMetadataByPath } from "./repository/metadata-read";
+export type { SeoMetadataRecord } from "./repository/metadata-read";
+export { createFallbackNextMetadata, createNextMetadata } from "./service/next-metadata";
+export type {
+  SeoMetadataFallback,
+  SeoMetadataImage,
+  SeoSiteMetadataSettings,
+} from "./service/next-metadata";
 export {
   SEO_EXCLUDED_PATH_PREFIXES,
   STATIC_SEO_PAGES,

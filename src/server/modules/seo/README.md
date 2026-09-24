@@ -20,3 +20,8 @@ Static metadata is administered through the code-owned route registry and the pr
 routes are excluded by policy; browser input can never introduce a new static path. See
 [`static-seo.md`](../../../../../docs/static-seo.md) for the approved route set and management
 contract.
+
+Public rendering uses the narrow `findSeoMetadataByPath()` projection and `createNextMetadata()` mapper.
+The mapper owns canonical, hreflang, robots, Open Graph, Twitter, icon, and localized fallback behavior;
+pages supply site settings and Media resolves approved share-image URLs through its public API. See
+[`next-metadata.md`](../../../../../docs/next-metadata.md).

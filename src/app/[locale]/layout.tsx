@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getMessages, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 
-import { isRtlLocale, isSupportedLocale, PROJECT_TIME_ZONE } from "@/constants";
+import { isRtlLocale, isSupportedLocale, PROJECT_NAME, PROJECT_TIME_ZONE } from "@/constants";
 import { routing } from "@/locales/routing";
 import {
   AppThemeProvider,
@@ -13,6 +13,7 @@ import {
   LocaleProvider,
 } from "@/providers";
 import { applicationFontVariables } from "@/theme/fonts.server";
+import { getApplicationSiteUrl } from "@/server/environment";
 
 import "../globals.css";
 
@@ -35,8 +36,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
   const translations = await getTranslations({ locale, namespace: "storefront.metadata" });
 
   return {
+    metadataBase: new URL(getApplicationSiteUrl()),
+    applicationName: PROJECT_NAME,
     title: translations("title"),
     description: translations("description"),
+    icons: { shortcut: ["/favicon.ico"] },
   };
 }
 
