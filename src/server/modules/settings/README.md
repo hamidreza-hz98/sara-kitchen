@@ -20,3 +20,7 @@ Contact settings add normalized E.164/email/location data, translated address an
 Lisbon-time business hours, safe optional map data, and an allow-listed locale-aware public projection. The
 strict codec cannot store provider credentials. See
 [`contact-settings.md`](../../../../../docs/contact-settings.md).
+
+Social settings use finite platform and icon registries, strict platform-aware URL or handle destinations,
+translated labels, active state, and unique ordering. The public projection returns sorted safe anchor data,
+never executable markup. See [`social-settings.md`](../../../../../docs/social-settings.md).

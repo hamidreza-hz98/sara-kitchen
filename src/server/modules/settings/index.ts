@@ -70,6 +70,25 @@ export type {
 } from "./validation/contact-settings";
 export { projectPublicContactSettings } from "./service/contact-public";
 export type { PublicContactSettings } from "./service/contact-public";
+export {
+  SOCIAL_ICON_KEYS,
+  SOCIAL_MAX_LINKS,
+  SOCIAL_PLATFORMS,
+  parseSocialSettings,
+  socialSettingsDataSchema,
+  socialSettingsPayloadSchema,
+  socialSettingsTranslationValueSchema,
+} from "./validation/social-settings";
+export type {
+  SocialIconKey,
+  SocialPlatform,
+  SocialSettingsData,
+  SocialSettingsPayload,
+  SocialSettingsTranslation,
+  SocialSettingsTranslationValue,
+} from "./validation/social-settings";
+export { projectPublicSocialSettings } from "./service/social-public";
+export type { PublicSocialLink, PublicSocialSettings } from "./service/social-public";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,
