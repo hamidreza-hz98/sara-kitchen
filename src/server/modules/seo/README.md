@@ -32,3 +32,8 @@ documented in [`structured-data.md`](../../../../../docs/structured-data.md).
 
 Sitemap assembly consumes only public domain projections, applies the single-public-URL locale policy, and
 splits safely before protocol limits. See [`sitemap.md`](../../../../../docs/sitemap.md).
+
+Dashboard editing uses one shared localized control surface for Category, Dish, and Blog SEO plus the
+protected static-page manager. Field-level ownership changes are validated server-side and automatic
+resets synchronize immediately. See
+[`seo-admin-controls.md`](../../../../../docs/seo-admin-controls.md).

@@ -22,6 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ErrorState } from "@/components/ui";
 import { MediaPicker } from "@/components/media";
+import { EntitySeoPanel } from "@/components/seo";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { useRouter } from "@/locales/navigation";
 
@@ -127,6 +128,15 @@ export function CategoryEditor({
     : editing
       ? originalSlug
       : previewSlug(values.translations.en.name);
+  const seoTranslations = useMemo(
+    () =>
+      LANGUAGES.filter((language) => values.translations[language].name.trim()).map((language) => ({
+        locale: language,
+        title: values.translations[language].name,
+        description: plainText(values.translations[language].description),
+      })),
+    [values.translations],
+  );
   const update = useCallback(
     (patch: Partial<FormValues>) => setValues((current) => ({ ...current, ...patch })),
     [],
@@ -464,6 +474,13 @@ export function CategoryEditor({
       <Typography variant="body2" color="text.secondary">
         {t("availabilityNote")}
       </Typography>
+      <EntitySeoPanel
+        canUpdate={canUpdate}
+        entityId={validId ? id : null}
+        entityKind="category"
+        path={`/menu/category/${slug || "category"}`}
+        translations={seoTranslations}
+      />
     </Stack>
   );
 }

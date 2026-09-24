@@ -15,6 +15,7 @@ import PeopleRounded from "@mui/icons-material/PeopleRounded";
 import PaymentsRounded from "@mui/icons-material/PaymentsRounded";
 import RestaurantMenuRounded from "@mui/icons-material/RestaurantMenuRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
+import TravelExploreRounded from "@mui/icons-material/TravelExploreRounded";
 import ShoppingBagRounded from "@mui/icons-material/ShoppingBagRounded";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
@@ -88,6 +89,7 @@ const itemIcons = {
   transactions: <PaymentsRounded />,
   contacts: <ContactMailRounded />,
   activity: <HistoryRounded />,
+  seo: <TravelExploreRounded />,
   settings: <SettingsRounded />,
 } as const;
 

@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { getPageSeoModel } from "@/server/modules/seo";
+import { applyEntitySeoOverrides, getPageSeoModel } from "@/server/modules/seo";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
 
@@ -62,5 +62,83 @@ describe("Page SEO persistence", () => {
         }),
       ).save(),
     ).resolves.toBeDefined();
+  });
+
+  it("changes field ownership independently and never overwrites automatic values", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const PageSeo = getPageSeoModel(client.connection);
+    const entityId = new Types.ObjectId();
+    const adminId = new Types.ObjectId().toHexString();
+    await new PageSeo({
+      targetType: "entity",
+      entityKind: "category",
+      entityId,
+      path: "/menu/persian-stews",
+      slug: "persian-stews",
+      translations: [
+        {
+          locale: "en",
+          title: "Generated title",
+          description: "Generated description",
+          keywords: ["generated"],
+        },
+      ],
+    }).save();
+
+    const commonAutomatic = { mode: "automatic" as const };
+    const updated = await applyEntitySeoOverrides(
+      client.connection,
+      "category",
+      entityId.toHexString(),
+      {
+        translations: [
+          {
+            locale: "en",
+            title: { mode: "manual", value: "Hand-authored search title" },
+            description: commonAutomatic,
+            keywords: commonAutomatic,
+            openGraphTitle: commonAutomatic,
+            openGraphDescription: commonAutomatic,
+            twitterTitle: commonAutomatic,
+            twitterDescription: commonAutomatic,
+          },
+        ],
+        canonicalUrl: {
+          mode: "manual",
+          value: "https://sarakitchen.pt/menu/persian-stews",
+        },
+      },
+      adminId,
+    );
+
+    expect(updated?.translations[0]?.title).toBe("Hand-authored search title");
+    expect(updated?.translations[0]?.description).toBe("Generated description");
+    expect(updated?.manualOverrides.root).toEqual(["canonicalUrl"]);
+    expect(updated?.manualOverrides.translations).toEqual([{ locale: "en", fields: ["title"] }]);
+
+    const reset = await applyEntitySeoOverrides(
+      client.connection,
+      "category",
+      entityId.toHexString(),
+      {
+        translations: [
+          {
+            locale: "en",
+            title: commonAutomatic,
+            description: commonAutomatic,
+            keywords: commonAutomatic,
+            openGraphTitle: commonAutomatic,
+            openGraphDescription: commonAutomatic,
+            twitterTitle: commonAutomatic,
+            twitterDescription: commonAutomatic,
+          },
+        ],
+        canonicalUrl: commonAutomatic,
+      },
+      adminId,
+    );
+
+    expect(reset?.manualOverrides.root).toEqual([]);
+    expect(reset?.manualOverrides.translations).toEqual([{ locale: "en", fields: [] }]);
   });
 });

@@ -24,6 +24,7 @@ export type DashboardNavKey =
   | "transactions"
   | "contacts"
   | "activity"
+  | "seo"
   | "settings";
 
 export type DashboardNavItem = {
@@ -51,6 +52,7 @@ export const dashboardNavItems = [
   },
   { key: "contacts", path: "/contact", permission: "contacts:read", section: "management" },
   { key: "activity", path: "/activity", permission: "logs:read", section: "management" },
+  { key: "seo", path: "/seo", permission: "seo:read", section: "settings" },
   { key: "settings", path: "/settings", permission: "settings:read", section: "settings" },
 ] as const satisfies readonly DashboardNavItem[];
 

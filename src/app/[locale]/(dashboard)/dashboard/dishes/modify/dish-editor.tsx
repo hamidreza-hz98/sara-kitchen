@@ -31,6 +31,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MediaPicker } from "@/components/media";
+import { EntitySeoPanel } from "@/components/seo";
 import { RemoteRelationSelector, type RemoteRelationOption } from "@/components/relations";
 import { ErrorState } from "@/components/ui";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
@@ -328,6 +329,15 @@ export function DishEditor({
     : editing
       ? originalSlug
       : previewSlug(values.translations.en.name);
+  const seoTranslations = useMemo(
+    () =>
+      LANGUAGES.filter((language) => values.translations[language].name.trim()).map((language) => ({
+        locale: language,
+        title: values.translations[language].name,
+        description: values.translations[language].excerpt,
+      })),
+    [values.translations],
+  );
   const update = useCallback(
     (patch: Partial<FormValues>) => setValues((current) => ({ ...current, ...patch })),
     [],
@@ -1298,6 +1308,13 @@ export function DishEditor({
               </Select>
             </FormControl>
           </Paper>
+          <EntitySeoPanel
+            canUpdate={canUpdate}
+            entityId={validId ? id : null}
+            entityKind="dish"
+            path={`/menu/${slug || "dish"}`}
+            translations={seoTranslations}
+          />
         </Stack>
       </Stack>
     </Stack>

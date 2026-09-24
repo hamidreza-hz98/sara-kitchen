@@ -75,6 +75,8 @@ export {
   isStaticSeoPageKey,
 } from "./policy/static-pages";
 export type { StaticSeoPageKey } from "./policy/static-pages";
+export { applyEntitySeoOverrides, findEntitySeo } from "./repository/entity-seo";
+export type { EntitySeoSnapshot } from "./repository/entity-seo";
 export {
   StaticSeoRepositoryConflictError,
   createStaticSeoRepository,
@@ -99,3 +101,9 @@ export {
   staticSeoUpdateSchema,
 } from "./validation/static-seo-request";
 export type { StaticSeoCreateInput, StaticSeoUpdateInput } from "./validation/static-seo-request";
+export {
+  ENTITY_SEO_TRANSLATION_FIELDS,
+  entitySeoParametersSchema,
+  entitySeoUpdateSchema,
+} from "./validation/entity-seo-request";
+export type { EntitySeoUpdateInput } from "./validation/entity-seo-request";

@@ -26,6 +26,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MediaPicker } from "@/components/media";
+import { EntitySeoPanel } from "@/components/seo";
 import { RemoteRelationSelector, type RemoteRelationOption } from "@/components/relations";
 import { ErrorState, RichContent } from "@/components/ui";
 import { useFeedback } from "@/hooks";
@@ -247,6 +248,17 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
     : itemId
       ? originalSlug
       : previewSlug(values.translations.en.title);
+  const seoTranslations = useMemo(
+    () =>
+      LANGUAGES.filter((language) => values.translations[language].title.trim()).map(
+        (language) => ({
+          locale: language,
+          title: values.translations[language].title,
+          description: values.translations[language].excerpt,
+        }),
+      ),
+    [values.translations],
+  );
 
   const update = useCallback(
     (patch: Partial<FormValues>) => setValues((current) => ({ ...current, ...patch })),
@@ -897,6 +909,13 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
               </Typography>
             </Stack>
           </Paper>
+          <EntitySeoPanel
+            canUpdate={canUpdate}
+            entityId={itemId}
+            entityKind="blog"
+            path={`/blog/${slug || "article"}`}
+            translations={seoTranslations}
+          />
         </Stack>
       </Stack>
 

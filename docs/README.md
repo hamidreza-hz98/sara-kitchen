@@ -30,6 +30,7 @@ Current records:
 - [`automatic-seo.md`](./automatic-seo.md) — generated entity metadata, manual-field ownership, idempotency, and compensating creation rollback;
 - [`static-seo.md`](./static-seo.md) — approved static routes, excluded surfaces, localized metadata management, authorization, and uniqueness guarantees;
 - [`next-metadata.md`](./next-metadata.md) — locale-aware Next.js metadata mapping, site settings, social images, fallbacks, and rendered-head verification;
+- [`seo-admin-controls.md`](./seo-admin-controls.md) — reusable entity controls, manual/automatic ownership, guidance, previews, and static-page workflow;
 - [`structured-data.md`](./structured-data.md) — validated JSON-LD eligibility, source provenance, safe rendering, and schema fixtures;
 - [`sitemap.md`](./sitemap.md) — public discovery projections, same-URL locale alternates, XML/sharding policy, and live URL verification;
 - [`robots-and-manifest.md`](./robots-and-manifest.md) — deployment-aware crawler rules and the localized, branded install manifest;
