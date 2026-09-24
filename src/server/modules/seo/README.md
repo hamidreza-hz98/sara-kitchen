@@ -14,3 +14,9 @@ Automatic entity synchronization is implemented by `createAutomaticSeoSynchroniz
 to follow later Category, Dish, and Blog updates. See
 [`automatic-seo.md`](../../../../../docs/automatic-seo.md) for merge, retry, and compensating-rollback
 rules.
+
+Static metadata is administered through the code-owned route registry and the protected
+`/api/seo/static` endpoints. Authentication, account, dashboard, profile, checkout and payment-result
+routes are excluded by policy; browser input can never introduce a new static path. See
+[`static-seo.md`](../../../../../docs/static-seo.md) for the approved route set and management
+contract.

@@ -40,3 +40,35 @@ export type {
 } from "./model/page-seo";
 export { AutomaticSeoError, createAutomaticSeoSynchronizer } from "./service/automatic-seo";
 export type { AutomaticSeoSynchronizer } from "./service/automatic-seo";
+export {
+  SEO_EXCLUDED_PATH_PREFIXES,
+  STATIC_SEO_PAGES,
+  STATIC_SEO_PAGE_KEYS,
+  isSeoExcludedPath,
+  isStaticSeoPageKey,
+} from "./policy/static-pages";
+export type { StaticSeoPageKey } from "./policy/static-pages";
+export {
+  StaticSeoRepositoryConflictError,
+  createStaticSeoRepository,
+} from "./repository/static-seo";
+export type {
+  StaticSeoRepository,
+  StaticSeoSnapshot,
+  StaticSeoWrite,
+} from "./repository/static-seo";
+export { StaticSeoServiceError, createStaticSeoServices } from "./service/static-seo";
+export type {
+  StaticSeoAction,
+  StaticSeoActor,
+  StaticSeoAuditEvent,
+  StaticSeoServiceDependencies,
+} from "./service/static-seo";
+export { createStaticSeoAuditSink } from "./service/seo-audit";
+export {
+  staticSeoCreateSchema,
+  staticSeoKeyParametersSchema,
+  staticSeoTranslationSchema,
+  staticSeoUpdateSchema,
+} from "./validation/static-seo-request";
+export type { StaticSeoCreateInput, StaticSeoUpdateInput } from "./validation/static-seo-request";
