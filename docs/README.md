@@ -61,6 +61,7 @@ Current records:
 - [`right-to-left.md`](./right-to-left.md) — locale direction, RTL Emotion processing, logical CSS, icon policy, and visual verification.
 - [`request-validation.md`](./request-validation.md) — transport parsing, strict Zod schemas, localized field-safe issues, and file-metadata limits.
 - [`schema-conventions.md`](./schema-conventions.md) — ObjectId, timestamps, actor provenance, soft deletion, normalized search, versions, and JSON rules.
+- [`settings-storage.md`](./settings-storage.md) — singleton section registry, staged/direct revisions, editor provenance, safe payload envelope, and sequential migrations.
 - [`slugs.md`](./slugs.md) — canonical generation, admin overrides, reserved routes, deterministic collisions, and unique-index concurrency rules.
 - [`storefront-shell.md`](./storefront-shell.md) — supplied-layout mapping, responsive public navigation, locale/cart/account controls, footer, and keyboard behavior.
 - [`theme.md`](./theme.md) — executable palette, typography, shape, elevation, motion, component overrides, and responsive showcase verification.
