@@ -119,6 +119,30 @@ export type {
   AboutReferenceErrorCode,
   AboutReferenceIssue,
 } from "./service/about-references";
+export {
+  FAQ_MAX_ENTRIES,
+  faqSettingsDataSchema,
+  faqSettingsPayloadSchema,
+  faqSettingsTranslationValueSchema,
+  parseFaqSettings,
+} from "./validation/faq-settings";
+export type {
+  FaqSettingsData,
+  FaqSettingsPayload,
+  FaqSettingsTranslation,
+  FaqSettingsTranslationValue,
+} from "./validation/faq-settings";
+export {
+  FaqSettingsOperationError,
+  applyFaqSettingsOperation,
+  projectPublicFaqSettings,
+  toFaqStructuredDataInputs,
+} from "./service/faq-settings";
+export type {
+  FaqSettingsOperation,
+  PublicFaqEntry,
+  PublicFaqSettings,
+} from "./service/faq-settings";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,

@@ -28,3 +28,7 @@ never executable markup. See [`social-settings.md`](../../../../../docs/social-s
 About settings use staged revisions, versioned sanitized rich-text documents, stable translated item IDs,
 bounded kitchen/team/value/story/CTA collections, and Media-boundary validation for explicit and embedded
 references. See [`about-settings.md`](../../../../../docs/about-settings.md).
+
+FAQ settings use stable IDs, active state, unique order, canonical English coverage, item-level locale fallback,
+immutable add/edit/remove/reorder operations, and an active-only projection for the existing FAQPage SEO
+generator. See [`faq-settings.md`](../../../../../docs/faq-settings.md).

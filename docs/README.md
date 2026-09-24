@@ -41,6 +41,7 @@ Current records:
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.
 - [`environment.md`](./environment.md) — validated server/client variables, setup, and secret boundaries.
 - [`error-monitoring.md`](./error-monitoring.md) — Sentry runtimes, privacy redaction, source maps, release tags, alert routing, and verification.
+- [`faq-settings.md`](./faq-settings.md) — staged ordered FAQs, per-item locale fallback, immutable authoring operations, active projection, and FAQPage structured-data handoff.
 - [`operational-metrics.md`](./operational-metrics.md) — typed signals, live instrumentation boundaries, dashboard queries, and launch alerts.
 - [`media-model.md`](./media-model.md) — Media storage, variants, processing, localization, deletion, and index invariants.
 - [`feedback.md`](./feedback.md) — localized notification queues, safe confirmations, connectivity status, and route/global recovery.
