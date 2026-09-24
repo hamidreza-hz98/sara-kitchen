@@ -44,6 +44,8 @@ export type {
   BlogWrite,
 } from "./repository/blog";
 export { createBlogViewRepository } from "./repository/blog-view";
+export { isPublishedBlogSlug, listPublishedBlogsForSitemap } from "./repository/sitemap";
+export type { BlogSitemapEntry } from "./repository/sitemap";
 export type { BlogViewPersistenceResult, BlogViewRepository } from "./repository/blog-view";
 export { createBlogAuditSink } from "./service/blog-audit";
 export { BlogServiceError, createBlogServices } from "./service/blog-crud";

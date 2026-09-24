@@ -53,6 +53,15 @@ export {
   serializeStructuredData,
   structuredDataGraphSchema,
 } from "./service/structured-data";
+export {
+  SITEMAP_URL_LIMIT,
+  createSitemapEntries,
+  renderSitemapIndexXml,
+  renderSitemapXml,
+  selectSitemapShard,
+  sitemapShardCount,
+} from "./service/sitemap";
+export type { SitemapEntry, SitemapSourceEntry } from "./service/sitemap";
 export type {
   StructuredDataAddress,
   StructuredDataGraph,

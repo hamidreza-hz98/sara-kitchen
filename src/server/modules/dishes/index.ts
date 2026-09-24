@@ -56,6 +56,8 @@ export type {
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
 export { countDishesUsingCategory } from "./repository/category-references";
+export { isAvailableDishSlug, listAvailableDishesForSitemap } from "./repository/sitemap";
+export type { DishSitemapEntry } from "./repository/sitemap";
 export { removeBlogRelationshipsFromDishes } from "./repository/blog-references";
 export { createDishViewRepository } from "./repository/dish-view";
 export type { DishViewPersistenceResult, DishViewRepository } from "./repository/dish-view";

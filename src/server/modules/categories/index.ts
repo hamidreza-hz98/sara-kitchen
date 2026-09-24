@@ -8,6 +8,8 @@ export {
   validateCategoryMediaReferences,
 } from "./validation/category-media";
 export { createCategoryRepository, CategoryRepositoryConflictError } from "./repository/category";
+export { isPublishedCategorySlug, listPublishedCategoriesForSitemap } from "./repository/sitemap";
+export type { CategorySitemapEntry } from "./repository/sitemap";
 export type {
   CategoryListOptions,
   CategoryListResult,

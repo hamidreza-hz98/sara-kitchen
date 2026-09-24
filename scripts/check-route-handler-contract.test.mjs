@@ -40,3 +40,26 @@ test("rejects a second HTTP method that bypasses the wrapper", () => {
   assert.equal(findings.length, 1);
   assert.match(findings[0], /\(1\/2\)/u);
 });
+
+test("accepts explicitly marked XML sitemap handlers through their response boundary", () => {
+  const findings = validateRouteHandlerSource(`
+    // route-response: xml
+    import {sitemapXmlResponse} from "../sitemap-response";
+    export function GET() {
+      return sitemapXmlResponse("<urlset />");
+    }
+  `);
+  assert.deepEqual(findings, []);
+});
+
+test("rejects marked XML handlers that bypass their response boundary", () => {
+  const findings = validateRouteHandlerSource(`
+    // route-response: xml
+    export function GET() {
+      return Response.json({unsafe: true});
+    }
+  `);
+  assert.equal(findings.length, 2);
+  assert.match(findings.join("\n"), /sitemapXmlResponse/u);
+  assert.match(findings.join("\n"), /cannot return JSON/u);
+});

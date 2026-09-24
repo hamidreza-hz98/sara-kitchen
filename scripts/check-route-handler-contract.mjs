@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 const PUBLIC_HTTP_IMPORT = /from\s+["']@\/server\/http["']/u;
 const HANDLER_WRAPPER = /\bhandleApiRoute\s*\(/u;
 const HANDLER_WRAPPERS = /\bhandleApiRoute\s*\(/gu;
+const XML_ROUTE_MARKER = /^\s*\/\/\s*route-response:\s*xml\s*$/mu;
+const XML_RESPONSE_WRAPPER = /\bsitemapXmlResponse\s*\(/gu;
 const FUNCTION_METHOD_EXPORT =
   /\bexport\s+(?:async\s+)?function\s+(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s*\(/gu;
 const VARIABLE_METHOD_EXPORT =
@@ -17,16 +19,28 @@ const RAW_RESPONSE_PATTERNS = [
 
 export function validateRouteHandlerSource(source, file = "route.ts") {
   const errors = [];
+  const methodCount = [
+    ...(source.match(FUNCTION_METHOD_EXPORT) ?? []),
+    ...(source.match(VARIABLE_METHOD_EXPORT) ?? []),
+  ].length;
+  if (XML_ROUTE_MARKER.test(source)) {
+    const responseCount = (source.match(XML_RESPONSE_WRAPPER) ?? []).length;
+    if (responseCount < methodCount) {
+      errors.push(
+        `${file}: every XML method must use sitemapXmlResponse() (${responseCount}/${methodCount}).`,
+      );
+    }
+    if (/\b(?:Response|NextResponse)\.json\s*\(/u.test(source)) {
+      errors.push(`${file}: XML handlers cannot return JSON responses.`);
+    }
+    return errors;
+  }
   if (!PUBLIC_HTTP_IMPORT.test(source)) {
     errors.push(`${file}: import the public API from @/server/http.`);
   }
   if (!HANDLER_WRAPPER.test(source)) {
     errors.push(`${file}: execute each JSON handler through handleApiRoute().`);
   }
-  const methodCount = [
-    ...(source.match(FUNCTION_METHOD_EXPORT) ?? []),
-    ...(source.match(VARIABLE_METHOD_EXPORT) ?? []),
-  ].length;
   const wrapperCount = (source.match(HANDLER_WRAPPERS) ?? []).length;
   if (methodCount > wrapperCount) {
     errors.push(

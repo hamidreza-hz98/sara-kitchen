@@ -29,3 +29,6 @@ pages supply site settings and Media resolves approved share-image URLs through 
 JSON-LD generation treats configured schema types as candidates and emits only nodes backed by complete,
 truthful data. Runtime validation, source provenance, business specialization, and script-safe rendering are
 documented in [`structured-data.md`](../../../../../docs/structured-data.md).
+
+Sitemap assembly consumes only public domain projections, applies the single-public-URL locale policy, and
+splits safely before protocol limits. See [`sitemap.md`](../../../../../docs/sitemap.md).
