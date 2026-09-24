@@ -1,5 +1,5 @@
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { getMessages, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -26,6 +26,14 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FF6161" },
+    { media: "(prefers-color-scheme: dark)", color: "#230F0F" },
+  ],
+};
+
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
   const { locale } = await params;
 
@@ -38,9 +46,17 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
   return {
     metadataBase: new URL(getApplicationSiteUrl()),
     applicationName: PROJECT_NAME,
+    manifest: "/manifest.webmanifest",
     title: translations("title"),
     description: translations("description"),
-    icons: { shortcut: ["/favicon.ico"] },
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+      ],
+      apple: [{ url: "/icons/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+      shortcut: ["/favicon.ico"],
+    },
   };
 }
 
