@@ -114,12 +114,17 @@ function dishDefaults(dish: DishSnapshot, siteUrl: URL): GeneratedEntitySeo {
     shareImageMediaId: dish.mediaIds[0] ?? null,
     slug: dish.slug,
     structuredData: {
-      types: ["web-page", "product", "breadcrumb-list"],
-      inputs: {
-        priceCents: dish.basePriceCents,
-        currency: "EUR",
-        availability: dish.availability.mode,
-      },
+      types: ["web-page", "product", "menu-item", "breadcrumb-list"],
+      // Scheduled availability and discounts require request-time evaluation. Until a public dish
+      // projection supplies that current value, omit Offer data rather than publish a stale price.
+      inputs:
+        dish.discount.type === "none" && dish.availability.mode !== "scheduled"
+          ? {
+              priceCents: dish.basePriceCents,
+              currency: "EUR",
+              availability: dish.availability.mode,
+            }
+          : {},
     },
     translations: dish.translations.map((entry) => ({
       locale: entry.locale,
@@ -146,6 +151,7 @@ function blogDefaults(blog: BlogSnapshot, siteUrl: URL): GeneratedEntitySeo {
       inputs: {
         author: blog.authorSnapshot.displayName,
         ...(blog.publishedAt ? { publishedAt: blog.publishedAt } : {}),
+        modifiedAt: blog.updatedAt,
       },
     },
     translations: blog.translations.map((entry) => ({

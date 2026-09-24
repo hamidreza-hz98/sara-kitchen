@@ -30,6 +30,7 @@ Current records:
 - [`automatic-seo.md`](./automatic-seo.md) — generated entity metadata, manual-field ownership, idempotency, and compensating creation rollback;
 - [`static-seo.md`](./static-seo.md) — approved static routes, excluded surfaces, localized metadata management, authorization, and uniqueness guarantees;
 - [`next-metadata.md`](./next-metadata.md) — locale-aware Next.js metadata mapping, site settings, social images, fallbacks, and rendered-head verification;
+- [`structured-data.md`](./structured-data.md) — validated JSON-LD eligibility, source provenance, safe rendering, and schema fixtures;
 - [`dish-catalog-query.md`](./dish-catalog-query.md) — localized public projection, indexed menu filters, allergen exclusions, sorting, and stable pagination;
 - [`dish-view-counting.md`](./dish-view-counting.md) — meaningful-view policy, privacy-safe duplicate suppression, post-response persistence, and failure isolation;
 - [`dependencies.md`](./dependencies.md) — direct package inventory, purpose, runtime boundaries, and selection policy.

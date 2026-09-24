@@ -25,3 +25,7 @@ Public rendering uses the narrow `findSeoMetadataByPath()` projection and `creat
 The mapper owns canonical, hreflang, robots, Open Graph, Twitter, icon, and localized fallback behavior;
 pages supply site settings and Media resolves approved share-image URLs through its public API. See
 [`next-metadata.md`](../../../../../docs/next-metadata.md).
+
+JSON-LD generation treats configured schema types as candidates and emits only nodes backed by complete,
+truthful data. Runtime validation, source provenance, business specialization, and script-safe rendering are
+documented in [`structured-data.md`](../../../../../docs/structured-data.md).

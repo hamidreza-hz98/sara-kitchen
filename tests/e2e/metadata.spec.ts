@@ -29,4 +29,19 @@ test("the homepage renders localized discovery metadata at the clean public URL"
   );
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", /\/favicon\.ico/);
   await expect(page.locator('link[rel="shortcut icon"]')).toHaveAttribute("href", "/favicon.ico");
+
+  const jsonLd = page.locator('script[type="application/ld+json"]');
+  await expect(jsonLd).toHaveCount(1);
+  const graph = JSON.parse((await jsonLd.textContent()) ?? "null") as {
+    "@context": string;
+    "@graph": Array<{ "@type": string; inLanguage?: string }>;
+  };
+  expect(graph["@context"]).toBe("https://schema.org");
+  expect(graph["@graph"]).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ "@type": "WebPage", inLanguage: "pt-PT" }),
+      expect.objectContaining({ "@type": "WebSite" }),
+      expect.objectContaining({ "@type": "Organization" }),
+    ]),
+  );
 });

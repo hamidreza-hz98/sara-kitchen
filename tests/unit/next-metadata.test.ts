@@ -49,6 +49,9 @@ const record: SeoMetadataRecord = {
   openGraph: { type: "product", siteName: null },
   twitter: { card: "summary_large_image", site: "@sarakitchenpt", creator: null },
   shareImageMediaId: "507f1f77bcf86cd799439011",
+  structuredData: { types: ["web-page", "product"], inputs: {} },
+  targetType: "entity",
+  entityKind: "dish",
 };
 
 describe("Next.js SEO metadata mapping", () => {

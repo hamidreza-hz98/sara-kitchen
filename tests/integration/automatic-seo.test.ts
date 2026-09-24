@@ -153,7 +153,9 @@ describe("automatic entity SEO", () => {
     );
     expect(records.find((value) => value.entityKind === "dish")).toMatchObject({
       openGraph: { type: "product" },
-      structuredData: { types: ["web-page", "product", "breadcrumb-list"] },
+      structuredData: {
+        types: ["web-page", "product", "menu-item", "breadcrumb-list"],
+      },
     });
   });
 

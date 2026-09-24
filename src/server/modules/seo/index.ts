@@ -49,6 +49,16 @@ export type {
   SeoSiteMetadataSettings,
 } from "./service/next-metadata";
 export {
+  createStructuredDataGraph,
+  serializeStructuredData,
+  structuredDataGraphSchema,
+} from "./service/structured-data";
+export type {
+  StructuredDataAddress,
+  StructuredDataGraph,
+  StructuredDataSite,
+} from "./service/structured-data";
+export {
   SEO_EXCLUDED_PATH_PREFIXES,
   STATIC_SEO_PAGES,
   STATIC_SEO_PAGE_KEYS,

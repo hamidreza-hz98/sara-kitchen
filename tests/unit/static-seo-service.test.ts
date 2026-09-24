@@ -101,7 +101,13 @@ describe("static-page SEO management", () => {
   it("allows authorized creation once per approved route", async () => {
     const test = harness();
     const created = await test.services.create(owner, input);
-    expect(created).toMatchObject({ key: "home", path: "/", slug: "home", active: true });
+    expect(created).toMatchObject({
+      key: "home",
+      path: "/",
+      slug: "home",
+      active: true,
+      structuredData: { types: ["web-page", "website", "organization"] },
+    });
     expect(created.translations).toHaveLength(3);
     expect(test.audit).toHaveBeenCalledWith(expect.objectContaining({ outcome: "success" }));
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:seo:list");

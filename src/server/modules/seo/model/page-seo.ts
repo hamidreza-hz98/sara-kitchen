@@ -20,8 +20,12 @@ export const SEO_IMAGE_PREVIEW_VALUES = ["none", "standard", "large"] as const;
 export const SEO_STRUCTURED_DATA_TYPES = [
   "web-page",
   "website",
+  "organization",
+  "local-business",
+  "food-establishment",
   "restaurant",
   "menu",
+  "menu-item",
   "product",
   "article",
   "faq-page",

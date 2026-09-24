@@ -9,6 +9,7 @@ import type {
   StaticSeoSnapshot,
   StaticSeoWrite,
 } from "../repository/static-seo";
+import type { SeoStructuredDataType } from "../model/page-seo";
 import type { StaticSeoPageKey } from "../policy/static-pages";
 import {
   staticSeoCreateSchema,
@@ -65,6 +66,13 @@ function translation(input: StaticSeoCreateInput["translations"][number]): PageS
   };
 }
 
+function defaultStructuredTypes(key: StaticSeoPageKey): readonly SeoStructuredDataType[] {
+  if (key === "home") return ["web-page", "website", "organization"];
+  if (key === "menu") return ["web-page", "menu", "breadcrumb-list"];
+  if (key === "faq") return ["web-page", "faq-page", "breadcrumb-list"];
+  return ["web-page", "breadcrumb-list"];
+}
+
 function defaults(input: StaticSeoCreateInput): StaticSeoWrite {
   return {
     translations: input.translations.map(translation),
@@ -90,7 +98,7 @@ function defaults(input: StaticSeoCreateInput): StaticSeoWrite {
     },
     shareImageMediaId: input.shareImageMediaId ?? null,
     structuredData: {
-      types: [...(input.structuredData?.types ?? ["web-page"])],
+      types: [...(input.structuredData?.types ?? defaultStructuredTypes(input.key))],
       inputs: structuredClone(input.structuredData?.inputs ?? {}) as Record<string, unknown>,
     },
     active: input.active ?? true,
