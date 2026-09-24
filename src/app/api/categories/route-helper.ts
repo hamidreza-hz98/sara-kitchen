@@ -2,10 +2,12 @@ import "server-only";
 
 import type { NextRequest } from "next/server";
 import type { Connection } from "mongoose";
+import { revalidateTag } from "next/cache";
 
 import type { AdminPermission } from "@/constants/admin-access";
 import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/locales/routing";
 import { connectToDatabase } from "@/server/database";
+import { getApplicationSiteUrl } from "@/server/environment";
 import { ApiError, getRequestValidationOptions } from "@/server/http";
 import {
   AuthorizationGuardError,
@@ -17,8 +19,13 @@ import {
   CategoryMediaReferenceError,
   CategoryRepositoryConflictError,
   CategoryServiceError,
-  type createCategoryServices,
+  createCategoryAuditSink,
+  createCategoryRepository,
+  createCategoryServices,
+  validateCategoryMediaReferences,
 } from "@/server/modules/categories";
+import { countDishesUsingCategory } from "@/server/modules/dishes";
+import { createAutomaticSeoSynchronizer } from "@/server/modules/seo";
 import { SlugPolicyError } from "@/server/slugs";
 
 export type CategoryMutationServices = Pick<
@@ -54,14 +61,22 @@ export function categoryMutationUnavailable(): never {
   throw ApiError.serviceUnavailable("Category changes are temporarily unavailable.");
 }
 
-/** No production binding until SEO/Dish/media consistency adapters are available. */
 export function resolveCategoryMutationServices(
   connection: Connection,
   requestId: string,
-): CategoryMutationServices | null {
-  void connection;
-  void requestId;
-  return null;
+): CategoryMutationServices {
+  const seo = createAutomaticSeoSynchronizer(connection, { siteUrl: getApplicationSiteUrl() });
+  return createCategoryServices({
+    repository: createCategoryRepository(connection),
+    validateMedia: (references) => validateCategoryMediaReferences(connection, references),
+    countDishReferences: (categoryId) => countDishesUsingCategory(connection, categoryId),
+    seo: {
+      sync: seo.category,
+      remove: (category) => seo.remove("category", category.id),
+    },
+    audit: createCategoryAuditSink(connection, { requestId }),
+    invalidate: (tag) => revalidateTag(tag, { expire: 0 }),
+  });
 }
 
 export function translateCategoryServiceError(error: unknown): never {

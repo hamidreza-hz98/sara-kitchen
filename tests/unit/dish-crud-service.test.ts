@@ -51,6 +51,7 @@ function harness() {
   let forceCycle = false;
   const audit = vi.fn(async () => undefined);
   const sync = vi.fn(async () => "f".repeat(24));
+  const remove = vi.fn(async () => undefined);
   const invalidate = vi.fn();
   const inspectReferences = vi.fn(async () => ({
     missing: [...missing.values()],
@@ -93,6 +94,7 @@ function harness() {
       records.set(current.id, record);
       return record;
     },
+    rollbackCreate: async (current) => records.delete(current.id),
     removeInboundRelationships: async (dishId) => {
       const affected: string[] = [];
       for (const [id, record] of records) {
@@ -111,7 +113,7 @@ function harness() {
   const dependencies: DishServiceDependencies = {
     repository,
     inspectReferences,
-    seo: { sync },
+    seo: { sync, remove },
     audit,
     invalidate,
   };
@@ -121,6 +123,7 @@ function harness() {
     records,
     audit,
     sync,
+    remove,
     invalidate,
     inspectReferences,
     markMissing: (issue: DishReferenceIssue) => missing.set(`${issue.kind}:${issue.id}`, issue),
@@ -154,6 +157,14 @@ describe("Dish CRUD services", () => {
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:dishes:list");
     expect(test.invalidate).toHaveBeenCalledWith(`sk:v1:dishes:item:${second.id}`);
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:seo:list");
+  });
+
+  it("rolls back a newly created dish when SEO synchronization fails", async () => {
+    const test = harness();
+    test.sync.mockRejectedValueOnce(new Error("seo unavailable"));
+    await expect(test.services.create(actor, input)).rejects.toThrow("seo unavailable");
+    expect(test.records.size).toBe(0);
+    expect(test.remove).toHaveBeenCalledOnce();
   });
 
   it("rejects missing references with typed, field-safe issue metadata", async () => {

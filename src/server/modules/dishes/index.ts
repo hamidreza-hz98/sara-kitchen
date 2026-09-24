@@ -55,6 +55,7 @@ export type {
   DishPricingIssue,
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
+export { countDishesUsingCategory } from "./repository/category-references";
 export { removeBlogRelationshipsFromDishes } from "./repository/blog-references";
 export { createDishViewRepository } from "./repository/dish-view";
 export type { DishViewPersistenceResult, DishViewRepository } from "./repository/dish-view";

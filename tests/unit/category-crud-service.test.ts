@@ -77,6 +77,7 @@ function harness() {
       records.set(current.id, record);
       return record;
     },
+    rollbackCreate: async (current) => records.delete(current.id),
     softDelete: async (current, _actorId, now) => {
       const record = { ...current, deletedAt: now.toISOString(), version: current.version + 1 };
       records.set(current.id, record);
@@ -125,6 +126,14 @@ describe("Category CRUD services", () => {
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:categories:list");
     expect(test.invalidate).toHaveBeenCalledWith(`sk:v1:categories:item:${second.id}`);
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:seo:list");
+  });
+
+  it("rolls back a newly created category when SEO synchronization fails", async () => {
+    const test = harness();
+    test.sync.mockRejectedValueOnce(new Error("seo unavailable"));
+    await expect(test.services.create(actor, input)).rejects.toThrow("seo unavailable");
+    expect(test.records.size).toBe(0);
+    expect(test.remove).toHaveBeenCalledOnce();
   });
 
   it("preserves slug on translated updates and validates media references", async () => {

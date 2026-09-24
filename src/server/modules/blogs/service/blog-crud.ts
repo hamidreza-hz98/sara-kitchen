@@ -51,7 +51,10 @@ export type BlogReferenceInspection = Readonly<{
   archived: readonly BlogReferenceIssue[];
   missing: readonly BlogReferenceIssue[];
 }>;
-export type BlogSeoPort = Readonly<{ sync(blog: BlogSnapshot): Promise<string | null> }>;
+export type BlogSeoPort = Readonly<{
+  sync(blog: BlogSnapshot): Promise<string>;
+  remove(blog: BlogSnapshot): Promise<void>;
+}>;
 export type BlogServiceDependencies = Readonly<{
   repository: BlogRepository;
   inspectReferences(references: BlogReferenceSet): Promise<BlogReferenceInspection>;
@@ -294,9 +297,16 @@ async function syncSeo(
   actorId: string,
 ): Promise<BlogSnapshot> {
   const seoPageId = await deps.seo.sync(value);
-  return seoPageId && seoPageId !== value.seoPageId
+  return seoPageId !== value.seoPageId
     ? deps.repository.setSeoPageId(value, seoPageId, actorId)
     : value;
+}
+
+async function compensateFailedCreate(
+  deps: BlogServiceDependencies,
+  blog: BlogSnapshot,
+): Promise<void> {
+  await Promise.allSettled([deps.seo.remove(blog), deps.repository.rollbackCreate(blog)]);
 }
 
 function publicValue(value: BlogSnapshot, locale: SupportedLocale, detail: false): BlogPublicItem;
@@ -350,11 +360,14 @@ export function createBlogServices(deps: BlogServiceDependencies) {
           const write = createWrite(input, actor, slug);
           await validateReferences(deps, write);
           try {
-            const synced = await syncSeo(
-              deps,
-              await deps.repository.create(write, actor.id),
-              actor.id,
-            );
+            const created = await deps.repository.create(write, actor.id);
+            let synced: BlogSnapshot;
+            try {
+              synced = await syncSeo(deps, created, actor.id);
+            } catch (error) {
+              await compensateFailedCreate(deps, created);
+              throw error;
+            }
             return { value: synced, id: synced.id, changedIds: [synced.id, synced.slug] };
           } catch (error) {
             if (!(error instanceof BlogRepositoryConflictError)) throw error;

@@ -31,6 +31,8 @@ import {
 import { createDishRepository, removeBlogRelationshipsFromDishes } from "@/server/modules/dishes";
 import { getMediaReferenceFacts } from "@/server/modules/media";
 import { createApplicationLogger } from "@/server/observability";
+import { createAutomaticSeoSynchronizer } from "@/server/modules/seo";
+import { getApplicationSiteUrl } from "@/server/environment";
 import { SlugPolicyError } from "@/server/slugs";
 
 export const BLOG_PUBLIC_CACHE_CONTROL = `public, s-maxage=${CONTENT_REVALIDATE_SECONDS}, stale-while-revalidate=300`;
@@ -115,11 +117,14 @@ async function inspectBlogReferences(
 
 export function resolveBlogServices(connection: Connection, requestId: string) {
   const repository = createBlogRepository(connection);
+  const seo = createAutomaticSeoSynchronizer(connection, { siteUrl: getApplicationSiteUrl() });
   return createBlogServices({
     repository,
     inspectReferences: (references) => inspectBlogReferences(connection, repository, references),
-    // The SEO port is already enforced by the service; SK-0107/0108 supplies persistence.
-    seo: { sync: async () => null },
+    seo: {
+      sync: seo.blog,
+      remove: (blog) => seo.remove("blog", blog.id),
+    },
     removeInboundDishRelationships: (blogId, actorId) =>
       removeBlogRelationshipsFromDishes(connection, blogId, actorId),
     audit: createBlogAuditSink(connection, { requestId }),

@@ -8,3 +8,9 @@ structured-data inputs remain language-neutral because storefront locale selecti
 the URL. Partial unique indexes allow history while guaranteeing one active record for a target and
 one active owner of a normalized path. Structured-data inputs are bounded plain JSON and are inputs
 to trusted renderers, never preassembled JSON-LD copied directly into a page.
+
+Automatic entity synchronization is implemented by `createAutomaticSeoSynchronizer()`. Its granular
+`manualOverrides` ownership map protects administrator edits while allowing unchanged generated fields
+to follow later Category, Dish, and Blog updates. See
+[`automatic-seo.md`](../../../../../docs/automatic-seo.md) for merge, retry, and compensating-rollback
+rules.

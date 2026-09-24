@@ -35,6 +35,8 @@ import {
   createIngredientRepository,
 } from "@/server/modules/ingredients";
 import { getMediaReferenceFacts } from "@/server/modules/media";
+import { createAutomaticSeoSynchronizer } from "@/server/modules/seo";
+import { getApplicationSiteUrl } from "@/server/environment";
 import { SlugPolicyError } from "@/server/slugs";
 
 export const DISH_PUBLIC_CACHE_CONTROL = `public, s-maxage=${CONTENT_REVALIDATE_SECONDS}, stale-while-revalidate=300`;
@@ -138,11 +140,14 @@ async function inspectDishReferences(
 
 export function resolveDishServices(connection: Connection, requestId: string) {
   const repository = createDishRepository(connection);
+  const seo = createAutomaticSeoSynchronizer(connection, { siteUrl: getApplicationSiteUrl() });
   return createDishServices({
     repository,
     inspectReferences: (references) => inspectDishReferences(connection, repository, references),
-    // SEO persistence is introduced by SK-0193; null deliberately leaves the reference unset.
-    seo: { sync: async () => null },
+    seo: {
+      sync: seo.dish,
+      remove: (dish) => seo.remove("dish", dish.id),
+    },
     audit: createDishAuditSink(connection, { requestId }),
     invalidate: (tag) => revalidateTag(tag, { expire: 0 }),
   });

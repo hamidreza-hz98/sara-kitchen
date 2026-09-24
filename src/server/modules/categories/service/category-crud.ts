@@ -196,6 +196,13 @@ async function synchronizeSeo(
   return deps.repository.setSeoPageId(category, seoPageId, actorId);
 }
 
+async function compensateFailedCreate(
+  deps: CategoryServiceDependencies,
+  category: CategorySnapshot,
+): Promise<void> {
+  await Promise.allSettled([deps.seo.remove(category), deps.repository.rollbackCreate(category)]);
+}
+
 export function createCategoryServices(deps: CategoryServiceDependencies) {
   return {
     async create(actor: CategoryActor, raw: CategoryInput): Promise<CategorySnapshot> {
@@ -226,8 +233,13 @@ export function createCategoryServices(deps: CategoryServiceDependencies) {
               },
               actor.id,
             );
-            const synced = await synchronizeSeo(deps, created, actor.id);
-            return { value: synced, id: synced.id, changedIds: [synced.id, synced.slug] };
+            try {
+              const synced = await synchronizeSeo(deps, created, actor.id);
+              return { value: synced, id: synced.id, changedIds: [synced.id, synced.slug] };
+            } catch (error) {
+              await compensateFailedCreate(deps, created);
+              throw error;
+            }
           } catch (error) {
             if (!(error instanceof CategoryRepositoryConflictError)) throw error;
           }

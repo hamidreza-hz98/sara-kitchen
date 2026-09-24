@@ -7,6 +7,8 @@ export {
   SEO_MAX_KEYWORDS,
   SEO_MAX_STRUCTURED_DATA_BYTES,
   SEO_MAX_STRUCTURED_DATA_DEPTH,
+  SEO_MANUAL_ROOT_FIELDS,
+  SEO_MANUAL_TRANSLATION_FIELDS,
   SEO_OPEN_GRAPH_TYPES,
   SEO_STRUCTURED_DATA_TYPES,
   SEO_TARGET_TYPES,
@@ -22,6 +24,9 @@ export type {
   PageSeoTranslation,
   SeoEntityKind,
   SeoImagePreview,
+  SeoManualOverrides,
+  SeoManualRootField,
+  SeoManualTranslationField,
   SeoOpenGraphData,
   SeoOpenGraphType,
   SeoRobotsDirectives,
@@ -29,6 +34,9 @@ export type {
   SeoStructuredData,
   SeoStructuredDataType,
   SeoTargetType,
+  SeoTranslationManualOverrides,
   SeoTwitterCardType,
   SeoTwitterData,
 } from "./model/page-seo";
+export { AutomaticSeoError, createAutomaticSeoSynchronizer } from "./service/automatic-seo";
+export type { AutomaticSeoSynchronizer } from "./service/automatic-seo";

@@ -80,6 +80,7 @@ export interface BlogRepository {
   create(value: BlogWrite, actorId: string): Promise<BlogSnapshot>;
   save(current: BlogSnapshot, value: BlogWrite, actorId: string): Promise<BlogSnapshot>;
   setSeoPageId(current: BlogSnapshot, seoPageId: string, actorId: string): Promise<BlogSnapshot>;
+  rollbackCreate(current: BlogSnapshot): Promise<boolean>;
   removeInboundRelationships(blogId: string, actorId: string): Promise<readonly string[]>;
   publishDue(at: Date): Promise<readonly BlogSnapshot[]>;
 }
@@ -264,6 +265,14 @@ export function createBlogRepository(connection: Connection): BlogRepository {
       document.updatedBy = createActorMetadata("admin", actorId);
       await document.save();
       return snapshot(document);
+    },
+    async rollbackCreate(current) {
+      const result = await Blog.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        seoPageId: null,
+      });
+      return result.deletedCount === 1;
     },
     async removeInboundRelationships(blogId, actorId) {
       const id = new Types.ObjectId(blogId);

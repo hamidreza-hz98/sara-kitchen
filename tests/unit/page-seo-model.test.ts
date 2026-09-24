@@ -126,7 +126,6 @@ describe("Page SEO schema", () => {
     [{ slug: "another-dish" }, /slug/u],
     [{ canonicalUrl: "http://sarakitchen.pt/menu/fesenjan" }, /canonicalUrl/u],
     [{ canonicalUrl: "https://user:secret@sarakitchen.pt/menu/fesenjan" }, /canonicalUrl/u],
-    [{ canonicalUrl: "https://sarakitchen.pt/menu/another-dish" }, /canonicalUrl/u],
     [{ canonicalUrl: "https://sarakitchen.pt/menu/fesenjan?campaign=x" }, /canonicalUrl/u],
   ])("rejects non-normalized routing and canonical data: %j", async (overrides, expected) => {
     await expect(entitySeo(overrides).validate()).rejects.toThrow(expected);
@@ -206,8 +205,8 @@ describe("Page SEO schema", () => {
   it("validates paths, canonical URLs and bounded structured inputs independently", () => {
     expect(isNormalizedSeoPath("/menu/fesenjan")).toBe(true);
     expect(isNormalizedSeoPath("/menu//fesenjan")).toBe(false);
-    expect(isSafeCanonicalUrl("https://sarakitchen.pt/menu/fesenjan", "/menu/fesenjan")).toBe(true);
-    expect(isSafeCanonicalUrl("javascript:alert(1)", "/menu/fesenjan")).toBe(false);
+    expect(isSafeCanonicalUrl("https://sarakitchen.pt/menu/fesenjan")).toBe(true);
+    expect(isSafeCanonicalUrl("javascript:alert(1)")).toBe(false);
     expect(isSafeStructuredDataInputs({ nested: { value: [1, true, null] } })).toBe(true);
 
     let tooDeep: Record<string, unknown> = {};

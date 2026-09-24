@@ -64,6 +64,7 @@ export interface CategoryRepository {
     seoPageId: string,
     actorId: string,
   ): Promise<CategorySnapshot>;
+  rollbackCreate(current: CategorySnapshot): Promise<boolean>;
   softDelete(current: CategorySnapshot, actorId: string, now: Date): Promise<CategorySnapshot>;
   restore(current: CategorySnapshot, actorId: string): Promise<CategorySnapshot>;
 }
@@ -186,6 +187,14 @@ export function createCategoryRepository(connection: Connection): CategoryReposi
       document.updatedBy = createActorMetadata("admin", actorId);
       await document.save();
       return snapshot(document);
+    },
+    async rollbackCreate(current) {
+      const result = await Category.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        seoPageId: null,
+      });
+      return result.deletedCount === 1;
     },
     async softDelete(current, actorId, now) {
       const document = await load(current);

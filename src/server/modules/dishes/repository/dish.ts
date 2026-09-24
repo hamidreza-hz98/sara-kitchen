@@ -114,6 +114,7 @@ export interface DishRepository {
   create(value: DishWrite, actorId: string): Promise<DishSnapshot>;
   save(current: DishSnapshot, value: DishWrite, actorId: string): Promise<DishSnapshot>;
   setSeoPageId(current: DishSnapshot, seoPageId: string, actorId: string): Promise<DishSnapshot>;
+  rollbackCreate(current: DishSnapshot): Promise<boolean>;
   removeInboundRelationships(dishId: string, actorId: string): Promise<readonly string[]>;
 }
 
@@ -332,6 +333,14 @@ export function createDishRepository(connection: Connection): DishRepository {
         throw error;
       }
       return snapshot(document);
+    },
+    async rollbackCreate(current) {
+      const result = await Dish.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        seoPageId: null,
+      });
+      return result.deletedCount === 1;
     },
     async removeInboundRelationships(dishId, actorId) {
       const id = new Types.ObjectId(dishId);

@@ -81,13 +81,17 @@ function harness() {
       values.set(current.id, value);
       return value;
     }),
+    rollbackCreate: vi.fn(async (current) => values.delete(current.id)),
     removeInboundRelationships: vi.fn(async () => []),
     publishDue: vi.fn(async () => []),
   };
   const audit = vi.fn(async () => undefined);
   const invalidate = vi.fn();
   const removeInboundDishRelationships = vi.fn(async () => [] as readonly string[]);
-  const seo = { sync: vi.fn(async () => "f".repeat(24)) };
+  const seo = {
+    sync: vi.fn(async () => "f".repeat(24)),
+    remove: vi.fn(async () => undefined),
+  };
   const services = createBlogServices({
     repository,
     inspectReferences: vi.fn(async () => ({ missing: [], archived: [] })),
@@ -129,6 +133,13 @@ describe("blog CRUD and publishing", () => {
     );
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:blogs:list");
     expect(test.invalidate).toHaveBeenCalledWith("sk:v1:seo:list");
+  });
+
+  it("rolls back a newly created blog when SEO synchronization fails", async () => {
+    test.seo.sync.mockRejectedValueOnce(new Error("seo unavailable"));
+    await expect(test.services.create(actor, input)).rejects.toThrow("seo unavailable");
+    expect(test.values.size).toBe(0);
+    expect(test.seo.remove).toHaveBeenCalledOnce();
   });
 
   it("keeps drafts private, supports authorized preview, then publish and unpublish", async () => {

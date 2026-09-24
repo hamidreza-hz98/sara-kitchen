@@ -27,6 +27,22 @@ export const SEO_STRUCTURED_DATA_TYPES = [
   "faq-page",
   "breadcrumb-list",
 ] as const;
+export const SEO_MANUAL_ROOT_FIELDS = [
+  "route",
+  "canonicalUrl",
+  "shareImage",
+  "openGraphType",
+  "structuredData",
+] as const;
+export const SEO_MANUAL_TRANSLATION_FIELDS = [
+  "title",
+  "description",
+  "keywords",
+  "openGraphTitle",
+  "openGraphDescription",
+  "twitterTitle",
+  "twitterDescription",
+] as const;
 
 export const SEO_MAX_KEYWORDS = 20;
 export const SEO_MAX_STRUCTURED_DATA_BYTES = 32_768;
@@ -38,6 +54,18 @@ export type SeoOpenGraphType = (typeof SEO_OPEN_GRAPH_TYPES)[number];
 export type SeoTwitterCardType = (typeof SEO_TWITTER_CARD_TYPES)[number];
 export type SeoImagePreview = (typeof SEO_IMAGE_PREVIEW_VALUES)[number];
 export type SeoStructuredDataType = (typeof SEO_STRUCTURED_DATA_TYPES)[number];
+export type SeoManualRootField = (typeof SEO_MANUAL_ROOT_FIELDS)[number];
+export type SeoManualTranslationField = (typeof SEO_MANUAL_TRANSLATION_FIELDS)[number];
+
+export type SeoTranslationManualOverrides = {
+  fields: SeoManualTranslationField[];
+  locale: SupportedLocale;
+};
+
+export type SeoManualOverrides = {
+  root: SeoManualRootField[];
+  translations: SeoTranslationManualOverrides[];
+};
 
 export type SeoSocialTranslation = {
   description: string | null;
@@ -87,6 +115,7 @@ export type PageSeoRecord = BaseDocumentFields &
     entityId: Types.ObjectId | null;
     entityKind: SeoEntityKind | null;
     openGraph: SeoOpenGraphData;
+    manualOverrides: SeoManualOverrides;
     path: string;
     robots: SeoRobotsDirectives;
     shareImageMediaId: Types.ObjectId | null;
@@ -113,7 +142,7 @@ export function isNormalizedSeoPath(value: unknown): value is string {
   return segments.every((segment) => SLUG_PATTERN.test(segment));
 }
 
-export function isSafeCanonicalUrl(value: unknown, expectedPath?: string): value is string | null {
+export function isSafeCanonicalUrl(value: unknown): value is string | null {
   if (value === null) return true;
   if (typeof value !== "string" || value.length > 2_048) return false;
 
@@ -125,8 +154,7 @@ export function isSafeCanonicalUrl(value: unknown, expectedPath?: string): value
       url.password === "" &&
       url.search === "" &&
       url.hash === "" &&
-      isNormalizedSeoPath(url.pathname) &&
-      (expectedPath === undefined || url.pathname === expectedPath)
+      isNormalizedSeoPath(url.pathname)
     );
   } catch {
     return false;
@@ -274,6 +302,44 @@ const structuredDataSchema = new Schema<SeoStructuredData>(
   { _id: false, id: false },
 );
 
+const translationManualOverridesSchema = new Schema<SeoTranslationManualOverrides>(
+  {
+    locale: { type: String, enum: ["en", "pt-PT", "fa"], immutable: true, required: true },
+    fields: {
+      type: [{ type: String, enum: SEO_MANUAL_TRANSLATION_FIELDS }],
+      default: [],
+      validate: {
+        validator: (values: readonly string[]) => new Set(values).size === values.length,
+        message: "Manual translation fields must be unique.",
+      },
+    },
+  },
+  { _id: false, id: false },
+);
+
+const manualOverridesSchema = new Schema<SeoManualOverrides>(
+  {
+    root: {
+      type: [{ type: String, enum: SEO_MANUAL_ROOT_FIELDS }],
+      default: [],
+      validate: {
+        validator: (values: readonly string[]) => new Set(values).size === values.length,
+        message: "Manual root fields must be unique.",
+      },
+    },
+    translations: {
+      type: [translationManualOverridesSchema],
+      default: [],
+      validate: {
+        validator: (values: readonly SeoTranslationManualOverrides[]) =>
+          new Set(values.map((value) => value.locale)).size === values.length,
+        message: "Manual translation overrides must contain one entry per locale.",
+      },
+    },
+  },
+  { _id: false, id: false },
+);
+
 export const pageSeoSchema = createBaseSchema<PageSeoRecord>(
   {
     targetType: { type: String, enum: SEO_TARGET_TYPES, immutable: true, required: true },
@@ -299,7 +365,7 @@ export const pageSeoSchema = createBaseSchema<PageSeoRecord>(
         message: "Static page key must be a normalized lowercase key.",
       },
     },
-    targetKey: { type: String, required: true, immutable: true, select: false },
+    targetKey: { type: String, required: true, immutable: true },
     path: {
       type: String,
       required: true,
@@ -335,10 +401,8 @@ export const pageSeoSchema = createBaseSchema<PageSeoRecord>(
       trim: true,
       default: null,
       validate: {
-        validator(this: PageSeoRecord, value: string | null) {
-          return isSafeCanonicalUrl(value, this.path);
-        },
-        message: "Canonical URL must be credential-free HTTPS and match the normalized path.",
+        validator: isSafeCanonicalUrl,
+        message: "Canonical URL must be credential-free HTTPS with a normalized path.",
       },
     },
     robots: { type: robotsSchema, required: true, default: () => ({}) },
@@ -354,6 +418,7 @@ export const pageSeoSchema = createBaseSchema<PageSeoRecord>(
       },
     },
     structuredData: { type: structuredDataSchema, required: true, default: () => ({}) },
+    manualOverrides: { type: manualOverridesSchema, required: true, default: () => ({}) },
     active: { type: Boolean, required: true, default: true },
   },
   {

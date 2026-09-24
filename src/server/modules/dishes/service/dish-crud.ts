@@ -57,7 +57,8 @@ export type DishReferenceInspection = Readonly<{
 }>;
 
 export type DishSeoPort = Readonly<{
-  sync(dish: DishSnapshot): Promise<string | null>;
+  sync(dish: DishSnapshot): Promise<string>;
+  remove(dish: DishSnapshot): Promise<void>;
 }>;
 
 export type DishServiceDependencies = Readonly<{
@@ -426,9 +427,16 @@ async function synchronizeSeo(
   actorId: string,
 ): Promise<DishSnapshot> {
   const seoPageId = await deps.seo.sync(dish);
-  return seoPageId === null || dish.seoPageId === seoPageId
+  return dish.seoPageId === seoPageId
     ? dish
     : deps.repository.setSeoPageId(dish, seoPageId, actorId);
+}
+
+async function compensateFailedCreate(
+  deps: DishServiceDependencies,
+  dish: DishSnapshot,
+): Promise<void> {
+  await Promise.allSettled([deps.seo.remove(dish), deps.repository.rollbackCreate(dish)]);
 }
 
 export function createDishServices(deps: DishServiceDependencies) {
@@ -459,8 +467,13 @@ export function createDishServices(deps: DishServiceDependencies) {
             if (!(error instanceof DishRepositoryConflictError)) throw error;
             continue;
           }
-          const synced = await synchronizeSeo(deps, created, actor.id);
-          return { value: synced, id: synced.id, changedIds: [synced.id, synced.slug] };
+          try {
+            const synced = await synchronizeSeo(deps, created, actor.id);
+            return { value: synced, id: synced.id, changedIds: [synced.id, synced.slug] };
+          } catch (error) {
+            await compensateFailedCreate(deps, created);
+            throw error;
+          }
         }
         throw new DishServiceError("conflict");
       });
