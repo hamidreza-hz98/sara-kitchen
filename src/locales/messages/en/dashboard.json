@@ -379,6 +379,94 @@
       "upload_failed": "Upload failed. Check the file and try again."
     }
   },
+  "blogs": {
+    "title": "Blog",
+    "description": "Manage translated articles, publishing schedules, authors, and readership.",
+    "refresh": "Refresh",
+    "add": "Add article",
+    "search": "Search articles",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "sort": "Sort by",
+    "article": "Article",
+    "author": "Author",
+    "publication": "Publication",
+    "readTime": "Read time",
+    "viewsHeading": "Views",
+    "actions": "Actions",
+    "view": "View details",
+    "edit": "Edit",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "cancelSchedule": "Cancel schedule",
+    "archive": "Archive",
+    "viewBlog": "View {title}",
+    "editBlog": "Edit {title}",
+    "publishBlog": "Publish {title}",
+    "unpublishBlog": "Unpublish {title}",
+    "cancelScheduleBlog": "Cancel the schedule for {title}",
+    "archiveBlog": "Archive {title}",
+    "translationCount": "{count, plural, one {# translation} other {# translations}}",
+    "scheduledFor": "Scheduled for",
+    "publishedOn": "Published on",
+    "lastPublished": "Last published",
+    "notPublished": "Not published",
+    "minutes": "{count, plural, one {# minute} other {# minutes}}",
+    "views": "{count, plural, one {# view} other {# views}}",
+    "results": "{count, plural, one {# article} other {# articles}}",
+    "perPage": "Per page",
+    "pagination": "Blog pages",
+    "loading": "Loading articles",
+    "errorTitle": "Articles could not be loaded",
+    "errorDescription": "Check your connection and try again.",
+    "retry": "Try again",
+    "emptyTitle": "No articles found",
+    "emptyDescription": "Adjust the filters or create the first article.",
+    "noExcerpt": "No excerpt has been added.",
+    "authorValue": "Author: {value}",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirmAction": "Confirm",
+    "actionError": "The article could not be updated. Please try again.",
+    "actionSuccess": {
+      "publish": "The article was published.",
+      "unpublish": "The article returned to draft.",
+      "archive": "The article was archived."
+    },
+    "confirm": {
+      "publish": {
+        "title": "Publish article?",
+        "description": "Publish “{title}” now? It will become publicly available."
+      },
+      "unpublish": {
+        "title": "Return article to draft?",
+        "description": "Return “{title}” to draft? Its public page will no longer be available."
+      },
+      "archive": {
+        "title": "Archive article?",
+        "description": "Archive “{title}”? It will be removed from public listings."
+      }
+    },
+    "statuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "sorts": {
+      "createdAt_desc": "Newest created",
+      "createdAt_asc": "Oldest created",
+      "publishedAt_desc": "Recently published",
+      "publishedAt_asc": "Oldest published",
+      "publishAt_asc": "Schedule: earliest first",
+      "publishAt_desc": "Schedule: latest first",
+      "title_asc": "Title A–Z",
+      "title_desc": "Title Z–A",
+      "viewCount_desc": "Most viewed",
+      "viewCount_asc": "Least viewed",
+      "status_asc": "Status"
+    }
+  },
   "dishes": {
     "title": "Dishes",
     "description": "Manage menu dishes, pricing, availability, translations, and performance.",

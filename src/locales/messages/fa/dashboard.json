@@ -379,6 +379,94 @@
       "upload_failed": "بارگذاری ناموفق بود. فایل را بررسی و دوباره تلاش کنید."
     }
   },
+  "blogs": {
+    "title": "وبلاگ",
+    "description": "مقاله‌های ترجمه‌شده، زمان‌بندی انتشار، نویسندگان و بازدیدها را مدیریت کنید.",
+    "refresh": "تازه‌سازی",
+    "add": "افزودن مقاله",
+    "search": "جستجوی مقاله‌ها",
+    "status": "وضعیت",
+    "allStatuses": "همه وضعیت‌ها",
+    "sort": "مرتب‌سازی بر اساس",
+    "article": "مقاله",
+    "author": "نویسنده",
+    "publication": "انتشار",
+    "readTime": "زمان مطالعه",
+    "viewsHeading": "بازدیدها",
+    "actions": "عملیات",
+    "view": "مشاهده جزئیات",
+    "edit": "ویرایش",
+    "publish": "انتشار",
+    "unpublish": "لغو انتشار",
+    "cancelSchedule": "لغو زمان‌بندی",
+    "archive": "بایگانی",
+    "viewBlog": "مشاهده {title}",
+    "editBlog": "ویرایش {title}",
+    "publishBlog": "انتشار {title}",
+    "unpublishBlog": "لغو انتشار {title}",
+    "cancelScheduleBlog": "لغو زمان‌بندی {title}",
+    "archiveBlog": "بایگانی {title}",
+    "translationCount": "{count} ترجمه",
+    "scheduledFor": "زمان انتشار",
+    "publishedOn": "تاریخ انتشار",
+    "lastPublished": "آخرین انتشار",
+    "notPublished": "منتشر نشده",
+    "minutes": "{count} دقیقه",
+    "views": "{count} بازدید",
+    "results": "{count} مقاله",
+    "perPage": "در هر صفحه",
+    "pagination": "صفحه‌های وبلاگ",
+    "loading": "در حال بارگذاری مقاله‌ها",
+    "errorTitle": "بارگذاری مقاله‌ها ممکن نشد",
+    "errorDescription": "اتصال خود را بررسی و دوباره تلاش کنید.",
+    "retry": "تلاش دوباره",
+    "emptyTitle": "مقاله‌ای پیدا نشد",
+    "emptyDescription": "فیلترها را تغییر دهید یا نخستین مقاله را ایجاد کنید.",
+    "noExcerpt": "خلاصه‌ای افزوده نشده است.",
+    "authorValue": "نویسنده: {value}",
+    "close": "بستن",
+    "cancel": "انصراف",
+    "confirmAction": "تأیید",
+    "actionError": "به‌روزرسانی مقاله ممکن نشد. دوباره تلاش کنید.",
+    "actionSuccess": {
+      "publish": "مقاله منتشر شد.",
+      "unpublish": "مقاله به پیش‌نویس بازگشت.",
+      "archive": "مقاله بایگانی شد."
+    },
+    "confirm": {
+      "publish": {
+        "title": "مقاله منتشر شود؟",
+        "description": "«{title}» اکنون منتشر شود؟ این مقاله در دسترس عموم قرار می‌گیرد."
+      },
+      "unpublish": {
+        "title": "مقاله به پیش‌نویس بازگردد؟",
+        "description": "«{title}» به پیش‌نویس بازگردد؟ صفحه عمومی آن دیگر در دسترس نخواهد بود."
+      },
+      "archive": {
+        "title": "مقاله بایگانی شود؟",
+        "description": "«{title}» بایگانی شود؟ از فهرست‌های عمومی حذف خواهد شد."
+      }
+    },
+    "statuses": {
+      "draft": "پیش‌نویس",
+      "scheduled": "زمان‌بندی‌شده",
+      "published": "منتشرشده",
+      "archived": "بایگانی‌شده"
+    },
+    "sorts": {
+      "createdAt_desc": "جدیدترین ایجاد",
+      "createdAt_asc": "قدیمی‌ترین ایجاد",
+      "publishedAt_desc": "جدیدترین انتشار",
+      "publishedAt_asc": "قدیمی‌ترین انتشار",
+      "publishAt_asc": "زمان‌بندی: نزدیک‌ترین",
+      "publishAt_desc": "زمان‌بندی: دورترین",
+      "title_asc": "عنوان الف تا ی",
+      "title_desc": "عنوان ی تا الف",
+      "viewCount_desc": "پربازدیدترین",
+      "viewCount_asc": "کم‌بازدیدترین",
+      "status_asc": "وضعیت"
+    }
+  },
   "dishes": {
     "title": "غذاها",
     "description": "مدیریت غذاهای منو، قیمت، موجودی، ترجمه‌ها و عملکرد.",

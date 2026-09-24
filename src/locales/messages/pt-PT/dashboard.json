@@ -379,6 +379,94 @@
       "upload_failed": "O carregamento falhou. Verifique o ficheiro e tente novamente."
     }
   },
+  "blogs": {
+    "title": "Blogue",
+    "description": "Gira artigos traduzidos, agendamentos, autores e leituras.",
+    "refresh": "Atualizar",
+    "add": "Adicionar artigo",
+    "search": "Pesquisar artigos",
+    "status": "Estado",
+    "allStatuses": "Todos os estados",
+    "sort": "Ordenar por",
+    "article": "Artigo",
+    "author": "Autor",
+    "publication": "Publicação",
+    "readTime": "Tempo de leitura",
+    "viewsHeading": "Visualizações",
+    "actions": "Ações",
+    "view": "Ver detalhes",
+    "edit": "Editar",
+    "publish": "Publicar",
+    "unpublish": "Retirar publicação",
+    "cancelSchedule": "Cancelar agendamento",
+    "archive": "Arquivar",
+    "viewBlog": "Ver {title}",
+    "editBlog": "Editar {title}",
+    "publishBlog": "Publicar {title}",
+    "unpublishBlog": "Retirar a publicação de {title}",
+    "cancelScheduleBlog": "Cancelar o agendamento de {title}",
+    "archiveBlog": "Arquivar {title}",
+    "translationCount": "{count, plural, one {# tradução} other {# traduções}}",
+    "scheduledFor": "Agendado para",
+    "publishedOn": "Publicado em",
+    "lastPublished": "Última publicação",
+    "notPublished": "Não publicado",
+    "minutes": "{count, plural, one {# minuto} other {# minutos}}",
+    "views": "{count, plural, one {# visualização} other {# visualizações}}",
+    "results": "{count, plural, one {# artigo} other {# artigos}}",
+    "perPage": "Por página",
+    "pagination": "Páginas do blogue",
+    "loading": "A carregar artigos",
+    "errorTitle": "Não foi possível carregar os artigos",
+    "errorDescription": "Verifique a ligação e tente novamente.",
+    "retry": "Tentar novamente",
+    "emptyTitle": "Nenhum artigo encontrado",
+    "emptyDescription": "Ajuste os filtros ou crie o primeiro artigo.",
+    "noExcerpt": "Ainda não foi adicionado um resumo.",
+    "authorValue": "Autor: {value}",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "confirmAction": "Confirmar",
+    "actionError": "Não foi possível atualizar o artigo. Tente novamente.",
+    "actionSuccess": {
+      "publish": "O artigo foi publicado.",
+      "unpublish": "O artigo voltou a rascunho.",
+      "archive": "O artigo foi arquivado."
+    },
+    "confirm": {
+      "publish": {
+        "title": "Publicar artigo?",
+        "description": "Publicar “{title}” agora? Ficará disponível ao público."
+      },
+      "unpublish": {
+        "title": "Voltar o artigo a rascunho?",
+        "description": "Voltar “{title}” a rascunho? A página pública deixará de estar disponível."
+      },
+      "archive": {
+        "title": "Arquivar artigo?",
+        "description": "Arquivar “{title}”? Será removido das listagens públicas."
+      }
+    },
+    "statuses": {
+      "draft": "Rascunho",
+      "scheduled": "Agendado",
+      "published": "Publicado",
+      "archived": "Arquivado"
+    },
+    "sorts": {
+      "createdAt_desc": "Criação mais recente",
+      "createdAt_asc": "Criação mais antiga",
+      "publishedAt_desc": "Publicação mais recente",
+      "publishedAt_asc": "Publicação mais antiga",
+      "publishAt_asc": "Agenda: mais próximo primeiro",
+      "publishAt_desc": "Agenda: mais distante primeiro",
+      "title_asc": "Título A–Z",
+      "title_desc": "Título Z–A",
+      "viewCount_desc": "Mais visualizados",
+      "viewCount_asc": "Menos visualizados",
+      "status_asc": "Estado"
+    }
+  },
   "dishes": {
     "title": "Pratos",
     "description": "Gerir pratos, preços, disponibilidade, traduções e desempenho do menu.",
