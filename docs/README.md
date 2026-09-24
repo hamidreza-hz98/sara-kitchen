@@ -15,6 +15,7 @@ Documentation must describe the implemented system. Update the relevant document
 
 Current records:
 
+- [`about-settings.md`](./about-settings.md) — staged localized About content, structured rich text, kitchen/team/value/story configuration, calls to action, and Media-boundary validation;
 - [`adr/`](./adr/README.md) — accepted architecture decisions, alternatives, consequences, and revisit triggers;
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`api-contract.md`](./api-contract.md) — typed JSON envelopes, public error taxonomy, request IDs, and internal-error safety;

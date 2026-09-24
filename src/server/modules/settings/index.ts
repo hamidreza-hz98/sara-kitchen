@@ -89,6 +89,36 @@ export type {
 } from "./validation/social-settings";
 export { projectPublicSocialSettings } from "./service/social-public";
 export type { PublicSocialLink, PublicSocialSettings } from "./service/social-public";
+export {
+  ABOUT_MAX_CALLS_TO_ACTION,
+  ABOUT_MAX_KITCHEN_MEDIA,
+  ABOUT_MAX_STORY_SECTIONS,
+  ABOUT_MAX_TEAM_MEMBERS,
+  ABOUT_MAX_VALUES,
+  aboutSettingsDataSchema,
+  aboutSettingsPayloadSchema,
+  aboutSettingsTranslationValueSchema,
+  parseAboutSettings,
+} from "./validation/about-settings";
+export type {
+  AboutSettingsData,
+  AboutSettingsPayload,
+  AboutSettingsTranslation,
+  AboutSettingsTranslationValue,
+} from "./validation/about-settings";
+export {
+  ABOUT_REFERENCE_ERROR_CODES,
+  AboutSettingsReferenceError,
+  collectAboutMediaUses,
+  createAboutReferenceDependencies,
+  validateAboutSettingsMediaReferences,
+} from "./service/about-references";
+export type {
+  AboutMediaKind,
+  AboutReferenceDependencies,
+  AboutReferenceErrorCode,
+  AboutReferenceIssue,
+} from "./service/about-references";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,

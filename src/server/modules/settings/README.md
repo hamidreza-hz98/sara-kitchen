@@ -24,3 +24,7 @@ strict codec cannot store provider credentials. See
 Social settings use finite platform and icon registries, strict platform-aware URL or handle destinations,
 translated labels, active state, and unique ordering. The public projection returns sorted safe anchor data,
 never executable markup. See [`social-settings.md`](../../../../../docs/social-settings.md).
+
+About settings use staged revisions, versioned sanitized rich-text documents, stable translated item IDs,
+bounded kitchen/team/value/story/CTA collections, and Media-boundary validation for explicit and embedded
+references. See [`about-settings.md`](../../../../../docs/about-settings.md).
