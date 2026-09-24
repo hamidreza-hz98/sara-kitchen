@@ -13,6 +13,10 @@ import {
 
 const Blog = getBlogModel(createConnection());
 
+function content(nodes: readonly unknown[] = [{ type: "paragraph" }]) {
+  return { schemaVersion: 1, document: { type: "doc", content: nodes } };
+}
+
 function blog(overrides: Record<string, unknown> = {}) {
   return new Blog({
     translations: [
@@ -20,7 +24,7 @@ function blog(overrides: Record<string, unknown> = {}) {
         locale: "en",
         title: "How to serve Fesenjan",
         excerpt: "A guide to a classic Persian walnut stew.",
-        content: { type: "doc", content: [{ type: "paragraph" }] },
+        content: content(),
       },
     ],
     authorAdminId: new Types.ObjectId(),
@@ -44,19 +48,19 @@ describe("Blog schema", () => {
           locale: "en",
           title: "How to serve Fesenjan",
           excerpt: "A guide to a classic Persian walnut stew.",
-          content: { type: "doc", content: [{ type: "paragraph" }] },
+          content: content(),
         },
         {
           locale: "pt-PT",
           title: "Como servir Fesenjan",
           excerpt: "Um guia para o clássico guisado persa de nozes.",
-          content: { type: "doc", content: [{ type: "paragraph" }] },
+          content: content(),
         },
         {
           locale: "fa",
           title: "روش سرو فسنجان",
           excerpt: "راهنمای سرو خورش سنتی گردو.",
-          content: { type: "doc", content: [{ type: "paragraph" }] },
+          content: content(),
         },
       ],
       authorAdminId,
@@ -143,7 +147,7 @@ describe("Blog schema", () => {
               locale: "fa",
               title: "نوشته",
               excerpt: "خلاصه",
-              content: { type: "doc", content: [] },
+              content: content([]),
             },
           ],
         },
@@ -156,13 +160,13 @@ describe("Blog schema", () => {
               locale: "en",
               title: "Article",
               excerpt: "Excerpt",
-              content: { type: "doc", content: [] },
+              content: content([]),
             },
             {
               locale: "en",
               title: "Duplicate",
               excerpt: "Excerpt",
-              content: { type: "doc", content: [] },
+              content: content([]),
             },
           ],
         },
@@ -181,7 +185,9 @@ describe("Blog schema", () => {
               locale: "en",
               title: "Article",
               excerpt: "Excerpt",
-              content: { type: "doc", content: [{ text: "x".repeat(500_001) }] },
+              content: content([
+                { type: "paragraph", content: [{ type: "text", text: "x".repeat(500_001) }] },
+              ]),
             },
           ],
         },

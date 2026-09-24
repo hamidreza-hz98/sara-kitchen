@@ -192,7 +192,7 @@ describe("RichContent", () => {
             },
             {
               type: "text",
-              text: " or protocol-relative content",
+              text: " or protocol-relative content <img src=x onerror=alert(1)>",
               marks: [{ type: "link", attrs: { href: "//untrusted.example" } }],
             },
           ],
@@ -211,6 +211,24 @@ describe("RichContent", () => {
     expect(
       screen.queryByRole("link", { name: /protocol-relative content/ }),
     ).not.toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(screen.getByText(/<img src=x onerror=alert\(1\)>/u)).toBeVisible();
     expect(screen.getByText("and blocked").tagName).toBe("STRONG");
+  });
+
+  it("renders a valid versioned storage envelope", () => {
+    renderUi(
+      <RichContent
+        content={{
+          schemaVersion: 1,
+          document: {
+            type: "doc",
+            content: [{ type: "paragraph", content: [{ type: "text", text: "Stored safely" }] }],
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Stored safely")).toBeVisible();
   });
 });

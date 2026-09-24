@@ -27,10 +27,10 @@ outside this layer.
 | `ErrorState`        | Announces failure as an alert, supports recovery action, and provides an overridable decorative icon                                                                          |
 | `AppPagination`     | Requires a localized navigation label and retains MUI's keyboard-operable page controls                                                                                       |
 | `AppImage`          | Requires explicit informative or decorative alt intent and applies tokenized radius/object-fit defaults to optimized Next.js images                                           |
-| `RichContent`       | Renders a typed TipTap-compatible subset as semantic React nodes; raw HTML and unsafe link schemes are never injected                                                         |
+| `RichContent`       | Defensively sanitizes and renders the versioned TipTap-compatible allow-list as semantic React nodes; raw HTML and unsafe link schemes are never injected                     |
 
 `RichContent` supports documents, paragraphs, headings levels 2–4, ordered and unordered lists, list
-items, blockquotes, hard breaks, text, bold, italic, underline, code, and safe `http`, `https`,
+items, blockquotes, hard breaks, text, bold, italic, underline, strike, code, and safe `https`,
 `mailto`, `tel`, root-relative, and fragment links. Persistence-boundary validation must reject nodes
 outside this schema. The renderer provides a second fail-closed layer by turning unsafe links into
 plain text.

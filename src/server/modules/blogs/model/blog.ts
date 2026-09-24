@@ -4,6 +4,7 @@ import { isValidObjectId, Schema } from "mongoose";
 import type { Connection, Model, Types } from "mongoose";
 
 import type { SupportedLocale } from "@/constants";
+import { RICH_TEXT_MAX_BYTES, isStoredRichText, type StoredRichText } from "@/lib/rich-text";
 import {
   createBaseSchema,
   createTranslationsField,
@@ -21,15 +22,11 @@ export const BLOG_STATUSES = ["draft", "scheduled", "published", "archived"] as 
 export const BLOG_MAX_READ_TIME_MINUTES = 1_440;
 export const BLOG_MAX_TAGS = 20;
 export const BLOG_MAX_RELATIONS = 30;
-export const BLOG_CONTENT_MAX_BYTES = 500_000;
+export const BLOG_CONTENT_MAX_BYTES = RICH_TEXT_MAX_BYTES;
 
 export type BlogStatus = (typeof BLOG_STATUSES)[number];
 
-/** Provisional structural envelope; SK-0103 owns the final rich-text node/mark allow-list. */
-export type BlogRichTextDocument = {
-  content?: unknown[];
-  type: "doc";
-};
+export type BlogRichTextDocument = StoredRichText;
 
 export type BlogTranslation = {
   content: BlogRichTextDocument;
@@ -92,17 +89,6 @@ const safeInteger = (minimum: number, maximum = Number.MAX_SAFE_INTEGER) => ({
   message: `Value must be a safe integer from ${minimum} through ${maximum}.`,
 });
 
-function isRichTextDocument(value: unknown): boolean {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-  const document = value as Record<string, unknown>;
-  if (document.type !== "doc" || !Array.isArray(document.content)) return false;
-  try {
-    return Buffer.byteLength(JSON.stringify(document), "utf8") <= BLOG_CONTENT_MAX_BYTES;
-  } catch {
-    return false;
-  }
-}
-
 const authorSnapshotSchema = new Schema<BlogAuthorSnapshot>(
   {
     displayName: {
@@ -127,8 +113,8 @@ export const blogSchema = createBaseSchema<BlogRecord>(
           type: Schema.Types.Mixed,
           required: true,
           validate: {
-            validator: isRichTextDocument,
-            message: "Blog content must be a bounded rich-text document.",
+            validator: isStoredRichText,
+            message: "Blog content must satisfy the current versioned rich-text policy.",
           },
         },
       },

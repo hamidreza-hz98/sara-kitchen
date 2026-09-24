@@ -4,53 +4,23 @@ import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { Fragment } from "react";
 
-type RichTextMark =
-  | { type: "bold" }
-  | { type: "code" }
-  | { type: "italic" }
-  | { type: "underline" }
-  | { attrs: { href: string }; type: "link" };
+import {
+  isStoredRichText,
+  normalizeRichTextHref,
+  sanitizeRichTextDocument,
+  type RichTextDocument,
+  type RichTextMark,
+  type RichTextMediaNode,
+  type RichTextNode,
+  type StoredRichText,
+} from "@/lib/rich-text";
 
-type RichTextTextNode = {
-  marks?: readonly RichTextMark[];
-  text: string;
-  type: "text";
-};
-
-type RichTextContainerNode = {
-  content?: readonly RichTextNode[];
-  type: "blockquote" | "bulletList" | "doc" | "listItem" | "orderedList" | "paragraph";
-};
-
-type RichTextHeadingNode = {
-  attrs: { level: 2 | 3 | 4 };
-  content?: readonly RichTextNode[];
-  type: "heading";
-};
-
-type RichTextHardBreakNode = { type: "hardBreak" };
-
-export type RichTextNode =
-  RichTextContainerNode | RichTextHardBreakNode | RichTextHeadingNode | RichTextTextNode;
-
-export type RichTextDocument = RichTextContainerNode & { type: "doc" };
+export type { RichTextDocument, RichTextNode } from "@/lib/rich-text";
 
 export type RichContentProps = {
-  content: RichTextDocument;
+  content: RichTextDocument | StoredRichText;
+  renderMedia?: (media: RichTextMediaNode) => ReactNode;
 };
-
-function safeHref(href: string): string | undefined {
-  if ((href.startsWith("/") && !href.startsWith("//")) || href.startsWith("#")) {
-    return href;
-  }
-
-  try {
-    const url = new URL(href);
-    return ["http:", "https:", "mailto:", "tel:"].includes(url.protocol) ? href : undefined;
-  } catch {
-    return undefined;
-  }
-}
 
 function renderMarks(text: string, marks: readonly RichTextMark[] = []): ReactNode {
   return marks.reduce<ReactNode>((content, mark, index) => {
@@ -63,10 +33,18 @@ function renderMarks(text: string, marks: readonly RichTextMark[] = []): ReactNo
         return <em key={index}>{content}</em>;
       case "underline":
         return <u key={index}>{content}</u>;
+      case "strike":
+        return <s key={index}>{content}</s>;
       case "link": {
-        const href = safeHref(mark.attrs.href);
+        const href = normalizeRichTextHref(mark.attrs.href);
+        const external = href?.startsWith("https://") ?? false;
         return href ? (
-          <Link href={href} key={index} underline="hover">
+          <Link
+            href={href}
+            key={index}
+            underline="hover"
+            {...(external ? { rel: "noopener noreferrer", target: "_blank" } : {})}
+          >
             {content}
           </Link>
         ) : (
@@ -77,20 +55,30 @@ function renderMarks(text: string, marks: readonly RichTextMark[] = []): ReactNo
   }, text);
 }
 
-function renderChildren(content: readonly RichTextNode[] | undefined, path: string): ReactNode {
+function renderChildren(
+  content: readonly RichTextNode[] | undefined,
+  path: string,
+  renderMedia: RichContentProps["renderMedia"],
+): ReactNode {
   return content?.map((node, index) => (
-    <Fragment key={`${path}-${index}`}>{renderNode(node, `${path}-${index}`)}</Fragment>
+    <Fragment key={`${path}-${index}`}>
+      {renderNode(node, `${path}-${index}`, renderMedia)}
+    </Fragment>
   ));
 }
 
-function renderNode(node: RichTextNode, path: string): ReactNode {
+function renderNode(
+  node: RichTextNode,
+  path: string,
+  renderMedia: RichContentProps["renderMedia"],
+): ReactNode {
   switch (node.type) {
     case "doc":
-      return renderChildren(node.content, path);
+      return renderChildren(node.content, path, renderMedia);
     case "paragraph":
       return (
         <Typography component="p" sx={{ mb: 3 }}>
-          {renderChildren(node.content, path)}
+          {renderChildren(node.content, path, renderMedia)}
         </Typography>
       );
     case "heading": {
@@ -98,24 +86,24 @@ function renderNode(node: RichTextNode, path: string): ReactNode {
       const variant = node.attrs.level === 2 ? "h2" : node.attrs.level === 3 ? "h3" : "h4";
       return (
         <Typography component={component} sx={{ mb: 3, mt: 6 }} variant={variant}>
-          {renderChildren(node.content, path)}
+          {renderChildren(node.content, path, renderMedia)}
         </Typography>
       );
     }
     case "bulletList":
       return (
         <Box component="ul" sx={{ my: 3, paddingInlineStart: 6 }}>
-          {renderChildren(node.content, path)}
+          {renderChildren(node.content, path, renderMedia)}
         </Box>
       );
     case "orderedList":
       return (
         <Box component="ol" sx={{ my: 3, paddingInlineStart: 6 }}>
-          {renderChildren(node.content, path)}
+          {renderChildren(node.content, path, renderMedia)}
         </Box>
       );
     case "listItem":
-      return <Box component="li">{renderChildren(node.content, path)}</Box>;
+      return <Box component="li">{renderChildren(node.content, path, renderMedia)}</Box>;
     case "blockquote":
       return (
         <Box
@@ -128,17 +116,22 @@ function renderNode(node: RichTextNode, path: string): ReactNode {
             borderColor: "primary.main",
           }}
         >
-          {renderChildren(node.content, path)}
+          {renderChildren(node.content, path, renderMedia)}
         </Box>
       );
     case "hardBreak":
       return <br />;
     case "text":
       return renderMarks(node.text, node.marks);
+    case "media":
+      return renderMedia?.(node) ?? null;
   }
 }
 
-export function RichContent({ content }: RichContentProps) {
+export function RichContent({ content, renderMedia }: RichContentProps) {
+  const sanitized = sanitizeRichTextDocument(
+    isStoredRichText(content) ? content.document : content,
+  );
   return (
     <Box
       component="article"
@@ -156,7 +149,7 @@ export function RichContent({ content }: RichContentProps) {
         },
       }}
     >
-      {renderNode(content, "root")}
+      {renderNode(sanitized, "root", renderMedia)}
     </Box>
   );
 }

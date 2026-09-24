@@ -12,7 +12,7 @@ whenever a direct dependency is added, removed, or materially repurposed.
   use Node.js `crypto`; `jose` is reserved for data that genuinely requires a signed JWT/JWE.
 - Database, password hashing, object storage, and image processing run only in the Next.js Node.js
   runtime. They must not be imported into client components or Edge handlers.
-- Rich text is stored as validated Tiptap JSON, rendered to HTML on the server, and sanitized before
+- Rich text is stored as versioned, validated TipTap JSON, rendered as semantic React nodes, and sanitized before
   it crosses a trust boundary. Sanitization is still required for imported or legacy HTML.
 - Browser-heavy features such as the editor and maps should be loaded only on routes that use them.
 - TanStack Query and Table are for interactive dashboard workflows. Public server-rendered pages
