@@ -61,6 +61,7 @@ const detail = {
   isFeatured: false,
   featuredOrder: 0,
   relatedDishIds: [],
+  relatedBlogIds: [],
   status: "draft",
 };
 

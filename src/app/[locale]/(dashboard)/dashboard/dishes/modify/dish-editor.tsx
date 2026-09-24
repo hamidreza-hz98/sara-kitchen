@@ -13,7 +13,6 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormHelperText from "@mui/material/FormHelperText";
 import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
 import ListItemText from "@mui/material/ListItemText";
@@ -32,6 +31,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MediaPicker } from "@/components/media";
+import { RemoteRelationSelector, type RemoteRelationOption } from "@/components/relations";
 import { ErrorState } from "@/components/ui";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { useRouter } from "@/locales/navigation";
@@ -87,6 +87,7 @@ type FormValues = Readonly<{
   dietaryTags: readonly (typeof DISH_FORM_DIETARY_TAGS)[number][];
   allergenTags: readonly (typeof DISH_FORM_ALLERGEN_TAGS)[number][];
   relatedDishIds: readonly string[];
+  relatedBlogIds: readonly string[];
   status: "draft" | "published";
 }>;
 type DishDetail = Readonly<{
@@ -129,6 +130,7 @@ type DishDetail = Readonly<{
   isFeatured: boolean;
   featuredOrder: number;
   relatedDishIds: readonly string[];
+  relatedBlogIds: readonly string[];
   status: "draft" | "published" | "archived";
 }>;
 type Envelope<T> = Readonly<{ data?: T }>;
@@ -164,6 +166,7 @@ const EMPTY: FormValues = {
   dietaryTags: [],
   allergenTags: [],
   relatedDishIds: [],
+  relatedBlogIds: [],
   status: "draft",
 };
 
@@ -196,6 +199,47 @@ function localName(option: Option): string {
   return (
     option.translations.find((value) => value.locale === "en")?.name ?? option.slug ?? option.id
   );
+}
+
+function mapDishRelation(value: unknown): RemoteRelationOption | null {
+  if (!value || typeof value !== "object") return null;
+  const source = value as Partial<Option> & {
+    status?: RemoteRelationOption["status"];
+    availability?: Readonly<{ mode?: RemoteRelationOption["availability"] }>;
+  };
+  if (typeof source.id !== "string" || !Array.isArray(source.translations)) return null;
+  return {
+    id: source.id,
+    label: localName(source as Option),
+    ...(typeof source.slug === "string" ? { secondary: source.slug } : {}),
+    ...(source.status ? { status: source.status } : {}),
+    ...(source.availability?.mode ? { availability: source.availability.mode } : {}),
+  };
+}
+
+function mapBlogRelation(value: unknown): RemoteRelationOption | null {
+  if (!value || typeof value !== "object") return null;
+  const source = value as {
+    id?: unknown;
+    slug?: unknown;
+    status?: RemoteRelationOption["status"];
+    translations?: readonly Readonly<{ locale?: unknown; title?: unknown }>[];
+  };
+  if (typeof source.id !== "string" || !Array.isArray(source.translations)) return null;
+  const englishTitle = source.translations.find(
+    (translation) => translation.locale === "en" && typeof translation.title === "string",
+  )?.title;
+  return {
+    id: source.id,
+    label:
+      typeof englishTitle === "string"
+        ? englishTitle
+        : typeof source.slug === "string"
+          ? source.slug
+          : source.id,
+    ...(typeof source.slug === "string" ? { secondary: source.slug } : {}),
+    ...(source.status ? { status: source.status } : {}),
+  };
 }
 
 function fromDetail(item: DishDetail): FormValues {
@@ -242,6 +286,7 @@ function fromDetail(item: DishDetail): FormValues {
     dietaryTags: item.dietaryTags,
     allergenTags: item.mayContainAllergenTags,
     relatedDishIds: item.relatedDishIds,
+    relatedBlogIds: item.relatedBlogIds ?? [],
     status: item.status === "archived" ? "draft" : item.status,
   };
 }
@@ -268,7 +313,6 @@ export function DishEditor({
   const [tab, setTab] = useState<Language>("en");
   const [categories, setCategories] = useState<readonly Option[]>([]);
   const [ingredientOptions, setIngredientOptions] = useState<readonly Option[]>([]);
-  const [dishOptions, setDishOptions] = useState<readonly Option[]>([]);
   const [ingredientToAdd, setIngredientToAdd] = useState("");
   const [loading, setLoading] = useState(editing);
   const [loadError, setLoadError] = useState(false);
@@ -314,13 +358,11 @@ export function DishEditor({
     void Promise.all([
       list<Option>("/api/categories?page=1&pageSize=100&sortBy=sortOrder&sortDirection=asc"),
       list<Option>("/api/ingredients?page=1&pageSize=100&sortBy=name&sortDirection=asc"),
-      list<Option>("/api/dishes/manage?page=1&pageSize=100&sortBy=name&sortDirection=asc"),
     ])
-      .then(([nextCategories, nextIngredients, nextDishes]) => {
+      .then(([nextCategories, nextIngredients]) => {
         if (controller.signal.aborted) return;
         setCategories(nextCategories);
         setIngredientOptions(nextIngredients);
-        setDishOptions(nextDishes.filter((dish) => dish.id !== id));
       })
       .catch(() => undefined);
     return () => controller.abort();
@@ -477,7 +519,7 @@ export function DishEditor({
       isFeatured: values.isFeatured,
       featuredOrder: Number(values.featuredOrder),
       relatedDishIds: values.relatedDishIds,
-      relatedBlogIds: [],
+      relatedBlogIds: values.relatedBlogIds,
       status,
     };
   };
@@ -945,43 +987,74 @@ export function DishEditor({
             <Typography variant="h6" sx={{ mb: 2 }}>
               {t("relations")}
             </Typography>
-            <FormControl fullWidth>
-              <InputLabel id="related-dishes">{t("relatedDishes")}</InputLabel>
-              <Select
-                multiple
-                labelId="related-dishes"
-                label={t("relatedDishes")}
+            <Stack spacing={3}>
+              <RemoteRelationSelector
+                endpoint="/api/dishes/manage"
+                excludedIds={id ? [id] : []}
+                labels={{
+                  add: t("relationBrowse"),
+                  close: t("relationClose"),
+                  empty: t("relationEmpty"),
+                  error: t("relationError"),
+                  loading: t("relationLoading"),
+                  remove: t("relationRemove"),
+                  retry: t("relationRetry"),
+                  search: t("relationSearch"),
+                  selectedCount: t("relationSelectedCount", {
+                    count: values.relatedDishIds.length,
+                  }),
+                  self: t("relationSelf"),
+                  statuses: {
+                    draft: t("relationStatuses.draft"),
+                    scheduled: t("relationStatuses.scheduled"),
+                    published: t("relationStatuses.published"),
+                    archived: t("relationStatuses.archived"),
+                  },
+                  availability: {
+                    available: t("relationAvailability.available"),
+                    unavailable: t("relationAvailability.unavailable"),
+                    scheduled: t("relationAvailability.scheduled"),
+                  },
+                }}
+                mapOption={mapDishRelation}
+                title={t("relatedDishes")}
                 value={values.relatedDishIds}
-                onChange={(event) =>
-                  update({
-                    relatedDishIds:
-                      typeof event.target.value === "string"
-                        ? event.target.value.split(",")
-                        : event.target.value,
-                  })
-                }
-                renderValue={(selected) =>
-                  selected
-                    .map((selectedId) =>
-                      localName(
-                        dishOptions.find((option) => option.id === selectedId) ?? {
-                          id: selectedId,
-                          translations: [],
-                        },
-                      ),
-                    )
-                    .join(", ")
-                }
-              >
-                {dishOptions.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    <Checkbox checked={values.relatedDishIds.includes(option.id)} />
-                    <ListItemText primary={localName(option)} />
-                  </MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>{t("blogRelationsPending")}</FormHelperText>
-            </FormControl>
+                onChange={(relatedDishIds) => update({ relatedDishIds })}
+              />
+              <RemoteRelationSelector
+                endpoint="/api/blogs/manage"
+                labels={{
+                  add: t("relationBrowse"),
+                  close: t("relationClose"),
+                  empty: t("relationEmpty"),
+                  error: t("relationError"),
+                  loading: t("relationLoading"),
+                  remove: t("relationRemove"),
+                  retry: t("relationRetry"),
+                  search: t("relationSearch"),
+                  selectedCount: t("relationSelectedCount", {
+                    count: values.relatedBlogIds.length,
+                  }),
+                  self: t("relationSelf"),
+                  statuses: {
+                    draft: t("relationStatuses.draft"),
+                    scheduled: t("relationStatuses.scheduled"),
+                    published: t("relationStatuses.published"),
+                    archived: t("relationStatuses.archived"),
+                  },
+                  availability: {
+                    available: t("relationAvailability.available"),
+                    unavailable: t("relationAvailability.unavailable"),
+                    scheduled: t("relationAvailability.scheduled"),
+                  },
+                }}
+                mapOption={mapBlogRelation}
+                title={t("relatedBlogs")}
+                unavailableReason={t("blogRelationsPending")}
+                value={values.relatedBlogIds}
+                onChange={(relatedBlogIds) => update({ relatedBlogIds })}
+              />
+            </Stack>
           </Paper>
         </Stack>
 
