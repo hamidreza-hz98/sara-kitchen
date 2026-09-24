@@ -119,6 +119,7 @@ describe("remote relation selector", () => {
       expect.stringContaining("pageSize=2"),
       expect.objectContaining({ cache: "no-store" }),
     );
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining("sortBy=name"), expect.any(Object));
     expect(screen.getByText("Current item").closest('[role="button"]')).toHaveAttribute(
       "aria-disabled",
       "true",
@@ -164,5 +165,25 @@ describe("remote relation selector", () => {
         expect.any(Object),
       ),
     );
+  });
+
+  it("allows domain-specific server sorting for blog relations", async () => {
+    render(
+      <ThemeProvider theme={appTheme} defaultMode="light">
+        <RemoteRelationSelector
+          endpoint="/api/blogs/manage"
+          labels={labels}
+          mapOption={mapOption}
+          sortBy="title"
+          title="Related articles"
+          value={[]}
+          onChange={vi.fn()}
+        />
+      </ThemeProvider>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Browse catalog" }));
+    await screen.findByText("Fesenjan");
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining("sortBy=title"), expect.any(Object));
   });
 });

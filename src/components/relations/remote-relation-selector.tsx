@@ -62,6 +62,7 @@ export type RemoteRelationSelectorProps = Readonly<{
   value: readonly string[];
   onChange: (ids: readonly string[]) => void;
   mapOption: (value: unknown) => RemoteRelationOption | null;
+  sortBy?: string;
 }>;
 
 type Envelope = Readonly<{
@@ -71,11 +72,17 @@ type Envelope = Readonly<{
 
 const FALLBACK_PAGE: PageMetadata = { page: 1, pageSize: 12, totalItems: 0, totalPages: 1 };
 
-function endpointUrl(endpoint: string, page: number, pageSize: number, search: string): string {
+function endpointUrl(
+  endpoint: string,
+  page: number,
+  pageSize: number,
+  search: string,
+  sortBy: string,
+): string {
   const query = new URLSearchParams({
     page: String(page),
     pageSize: String(pageSize),
-    sortBy: "name",
+    sortBy,
     sortDirection: "asc",
   });
   if (search.trim().length >= 2) query.set("search", search.trim());
@@ -93,6 +100,7 @@ export function RemoteRelationSelector({
   value,
   onChange,
   mapOption,
+  sortBy = "name",
 }: RemoteRelationSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -117,7 +125,7 @@ export function RemoteRelationSelector({
         if (controller.signal.aborted) return null;
         setLoading(true);
         setError(false);
-        return fetch(endpointUrl(endpoint, page, pageSize, search), {
+        return fetch(endpointUrl(endpoint, page, pageSize, search, sortBy), {
           cache: "no-store",
           credentials: "same-origin",
           signal: controller.signal,
@@ -149,7 +157,7 @@ export function RemoteRelationSelector({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [endpoint, mapOption, open, page, pageSize, revision, search, unavailableReason]);
+  }, [endpoint, mapOption, open, page, pageSize, revision, search, sortBy, unavailableReason]);
 
   useEffect(() => {
     if (!open || unavailableReason) return;
