@@ -112,6 +112,18 @@ describe("Blog schema", () => {
     ["scheduled", { status: "scheduled", publishAt: new Date("2099-01-01T00:00:00.000Z") }],
     ["published", { status: "published", publishedAt: new Date("2026-09-24T08:00:00.000Z") }],
     [
+      "unpublished draft retaining first publication",
+      { status: "draft", publishedAt: new Date("2026-09-24T08:00:00.000Z") },
+    ],
+    [
+      "re-scheduled publication retaining first publication",
+      {
+        status: "scheduled",
+        publishAt: new Date("2099-01-01T00:00:00.000Z"),
+        publishedAt: new Date("2026-09-24T08:00:00.000Z"),
+      },
+    ],
+    [
       "archived publication",
       { status: "archived", publishedAt: new Date("2026-09-24T08:00:00.000Z") },
     ],
@@ -121,17 +133,8 @@ describe("Blog schema", () => {
 
   it.each([
     [{ status: "scheduled" }, /publishAt/u],
-    [
-      {
-        status: "scheduled",
-        publishAt: new Date("2099-01-01T00:00:00.000Z"),
-        publishedAt: new Date("2026-01-01T00:00:00.000Z"),
-      },
-      /publishedAt/u,
-    ],
     [{ status: "published" }, /publishedAt/u],
     [{ status: "draft", publishAt: new Date("2099-01-01T00:00:00.000Z") }, /publishAt/u],
-    [{ status: "draft", publishedAt: new Date("2026-01-01T00:00:00.000Z") }, /publishedAt/u],
     [{ status: "hidden" }, /status/u],
   ])("rejects an invalid publishing lifecycle: %j", async (values, expected) => {
     await expect(blog(values).validate()).rejects.toThrow(expected);
@@ -257,6 +260,6 @@ describe("Blog schema", () => {
         "blog_seo_ref",
       ]),
     );
-    expect(blogSchema.path("publishedAt").options).toMatchObject({ immutable: true });
+    expect(blogSchema.path("publishedAt").options).toMatchObject({ default: null });
   });
 });

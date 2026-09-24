@@ -16,6 +16,7 @@ import {
   isProtectedMutation,
   requireAdminActor,
 } from "@/server/modules/auth";
+import { createBlogRepository } from "@/server/modules/blogs";
 import { createCategoryRepository } from "@/server/modules/categories";
 import {
   DishCatalogQueryError,
@@ -100,10 +101,12 @@ async function inspectDishReferences(
   const mediaById = new Map(mediaFacts.map((fact) => [fact.id, fact]));
   const categories = createCategoryRepository(connection);
   const ingredients = createIngredientRepository(connection);
-  const [categoryValues, ingredientValues, dishValues] = await Promise.all([
+  const blogs = createBlogRepository(connection);
+  const [categoryValues, ingredientValues, dishValues, blogValues] = await Promise.all([
     Promise.all(references.categoryIds.map((id) => categories.findById(id))),
     Promise.all(references.ingredientIds.map((id) => ingredients.findById(id))),
     Promise.all(references.relatedDishIds.map((id) => repository.findById(id))),
+    Promise.all(references.relatedBlogIds.map((id) => blogs.findById(id))),
   ]);
   const missing: DishReferenceIssue[] = [];
   const archived: DishReferenceIssue[] = [];
@@ -115,7 +118,7 @@ async function inspectDishReferences(
     }
   }
   const inspect = (
-    kind: "category" | "ingredient" | "dish",
+    kind: "category" | "ingredient" | "dish" | "blog",
     ids: readonly string[],
     values: readonly ({ status: string } | null)[],
   ) => {
@@ -129,8 +132,7 @@ async function inspectDishReferences(
   inspect("category", references.categoryIds, categoryValues);
   inspect("ingredient", references.ingredientIds, ingredientValues);
   inspect("dish", references.relatedDishIds, dishValues);
-  // Blog persistence is introduced in its own phase. Fail closed rather than accepting dangling IDs.
-  references.relatedBlogIds.forEach((id) => missing.push({ kind: "blog", id }));
+  inspect("blog", references.relatedBlogIds, blogValues);
   return { missing, archived };
 }
 

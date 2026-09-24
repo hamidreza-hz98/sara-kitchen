@@ -141,7 +141,9 @@ export const blogSchema = createBaseSchema<BlogRecord>(
     authorSnapshot: { type: authorSnapshotSchema, required: true },
     status: { type: String, enum: BLOG_STATUSES, required: true, default: "draft" },
     publishAt: { type: Date, default: null },
-    publishedAt: { type: Date, default: null, immutable: true },
+    // The repository permits only the one-way null -> first publication transition and preserves
+    // this timestamp through later lifecycle changes.
+    publishedAt: { type: Date, default: null },
     tags: {
       type: [
         {
@@ -194,9 +196,6 @@ blogSchema.pre("validate", function validateBlogInvariants() {
     if (!(this.publishAt instanceof Date) || Number.isNaN(this.publishAt.getTime())) {
       this.invalidate("publishAt", "Scheduled blogs require a valid publication time.");
     }
-    if (this.publishedAt) {
-      this.invalidate("publishedAt", "A scheduled blog cannot already be published.");
-    }
   } else if (this.publishAt) {
     this.invalidate("publishAt", "Only scheduled blogs can contain a publication time.");
   }
@@ -204,9 +203,8 @@ blogSchema.pre("validate", function validateBlogInvariants() {
   if (this.status === "published" && !this.publishedAt) {
     this.invalidate("publishedAt", "Published blogs require a publication timestamp.");
   }
-  if (this.status === "draft" && this.publishedAt) {
-    this.invalidate("publishedAt", "Draft blogs cannot contain a publication timestamp.");
-  }
+  // `publishedAt` is the immutable first-publication timestamp. Unpublished and re-scheduled
+  // records retain it for attribution; current public visibility is determined only by status.
 
   if (this.relatedBlogIds.some((id) => id.equals(this._id))) {
     this.invalidate("relatedBlogIds", "A blog cannot relate to itself.");
