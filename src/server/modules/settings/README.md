@@ -10,3 +10,8 @@ add exact payload codecs on top of the bounded safe-JSON envelope.
 Stored schema changes use ordered, idempotent migrations and optimistic version replacement. Unknown keys,
 future versions, and missing migration steps fail closed. See
 [`settings-storage.md`](../../../../../docs/settings-storage.md) for the persistence and migration contract.
+
+Homepage settings add an exact strict codec for hero slides, linked banners, featured dishes, benefits,
+testimonials, category banners, discounted dishes, and blog selections. The public reference validator allows
+valid unpublished work in drafts but requires ready image media and public, non-archived content at publish
+time. See [`homepage-settings.md`](../../../../../docs/homepage-settings.md).

@@ -45,6 +45,7 @@ Current records:
 - [`formatting-and-hooks.md`](./formatting-and-hooks.md) — deterministic formatting and staged-commit safeguards.
 - [`fonts.md`](./fonts.md) — local licensed font assets, script-aware fallback selection, provenance, and layout-shift verification.
 - [`health-readiness.md`](./health-readiness.md) — process liveness, MongoDB/MinIO dependency checks, safe 503 responses, and deployment gates.
+- [`homepage-settings.md`](./homepage-settings.md) — staged homepage merchandising, localization, ordering, limits, and cross-module reference policy.
 - [`idempotency.md`](./idempotency.md) — checkout/payment/webhook keys, fingerprints, replay, conflicts, retention, and concurrent delivery.
 - [`request-security.md`](./request-security.md) — browser CSRF/origin policy, Server Action checks, and signed payment webhook boundary.
 - [`security-headers.md`](./security-headers.md) — production response headers, narrowly allowed browser origins, secure cookies, and CSP tradeoffs.

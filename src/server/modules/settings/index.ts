@@ -26,6 +26,39 @@ export {
   migrateSettingsSectionDocument,
   migrateSettingsSectionDocuments,
 } from "./migration/settings-migrations";
+export {
+  HOMEPAGE_MAX_BANNERS,
+  HOMEPAGE_MAX_BENEFITS,
+  HOMEPAGE_MAX_BLOGS,
+  HOMEPAGE_MAX_CATEGORY_BANNERS,
+  HOMEPAGE_MAX_DISCOUNTED_DISHES,
+  HOMEPAGE_MAX_FEATURED_DISHES,
+  HOMEPAGE_MAX_HERO_SLIDES,
+  HOMEPAGE_MAX_TESTIMONIALS,
+  homepageSettingsDataSchema,
+  homepageSettingsPayloadSchema,
+  homepageSettingsTranslationValueSchema,
+  parseHomepageSettings,
+} from "./validation/homepage-settings";
+export type {
+  HomepageSettingsData,
+  HomepageSettingsPayload,
+  HomepageSettingsTranslation,
+  HomepageSettingsTranslationValue,
+} from "./validation/homepage-settings";
+export {
+  HOMEPAGE_REFERENCE_ERROR_CODES,
+  HomepageSettingsReferenceError,
+  createHomepageReferenceDependencies,
+  validateHomepageSettingsReferences,
+} from "./service/homepage-references";
+export type {
+  HomepageReferenceDependencies,
+  HomepageReferenceErrorCode,
+  HomepageReferenceIssue,
+  HomepageReferenceKind,
+  HomepageReferenceValidationMode,
+} from "./service/homepage-references";
 export type {
   SettingsMigrationErrorCode,
   SettingsMigrationResult,
