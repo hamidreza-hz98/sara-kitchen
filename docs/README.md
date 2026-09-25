@@ -67,6 +67,7 @@ Current records:
 - [`request-validation.md`](./request-validation.md) — transport parsing, strict Zod schemas, localized field-safe issues, and file-metadata limits.
 - [`schema-conventions.md`](./schema-conventions.md) — ObjectId, timestamps, actor provenance, soft deletion, normalized search, versions, and JSON rules.
 - [`settings-storage.md`](./settings-storage.md) — singleton section registry, staged/direct revisions, editor provenance, safe payload envelope, and sequential migrations.
+- [`settings-service.md`](./settings-service.md) — typed Settings reads/writes, authorization, staged publication, path-only audit diffs, and precise public-cache revalidation.
 - [`social-settings.md`](./social-settings.md) — allow-listed platforms/icons, safe URL-or-handle destinations, localized labels, ordering, and render-ready public links.
 - [`slugs.md`](./slugs.md) — canonical generation, admin overrides, reserved routes, deterministic collisions, and unique-index concurrency rules.
 - [`storefront-shell.md`](./storefront-shell.md) — supplied-layout mapping, responsive public navigation, locale/cart/account controls, footer, and keyboard behavior.

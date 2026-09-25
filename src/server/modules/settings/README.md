@@ -42,3 +42,8 @@ Language settings retain every statically supported locale while controlling act
 runtime visibility, an active default, complete active-only fallback order, and translated selector labels.
 Flags are intentionally excluded because language and nationality are not interchangeable. See
 [`language-settings.md`](../../../../../docs/language-settings.md).
+
+The Settings application service dispatches each mutable singleton to its exact codec, enforces content or
+operations permissions, uses optimistic repository writes, preserves staged publication, records bounded
+path-only audit summaries, and caches only public projections under exact section tags. Legal Terms remain on
+the immutable policy lifecycle. See [`settings-service.md`](../../../../../docs/settings-service.md).

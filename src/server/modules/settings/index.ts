@@ -22,6 +22,17 @@ export type {
   SettingsTranslation,
 } from "./model/settings-section";
 export {
+  SettingsRepositoryConflictError,
+  createSettingsSectionRepository,
+} from "./repository/settings-section";
+export type {
+  MutableSettingsSectionKey,
+  SettingsPayloadEnvelope,
+  SettingsRevisionSnapshot,
+  SettingsSectionRepository,
+  SettingsSectionSnapshot,
+} from "./repository/settings-section";
+export {
   SettingsMigrationError,
   migrateSettingsSectionDocument,
   migrateSettingsSectionDocuments,
@@ -109,6 +120,26 @@ export {
   resolveConfiguredLocale,
 } from "./service/language-settings";
 export type { PublicLanguageOption, PublicLanguageSettings } from "./service/language-settings";
+export {
+  MUTABLE_SETTINGS_SECTION_KEYS,
+  SettingsServiceError,
+  createSettingsServices,
+  parseSettingsPayload,
+  summarizeSettingsDiff,
+} from "./service/settings-service";
+export type {
+  SettingsAction,
+  SettingsActor,
+  SettingsAuditEvent,
+  SettingsDiffSummary,
+  SettingsPayloadByKey,
+  PublicSettingsByKey,
+  SettingsPublicCache,
+  SettingsServiceDependencies,
+} from "./service/settings-service";
+export { createNextSettingsPublicCache } from "./service/settings-cache";
+export { createSettingsAuditSink } from "./service/settings-audit";
+export { createSettingsRuntime } from "./service/settings-runtime";
 export {
   ABOUT_MAX_CALLS_TO_ACTION,
   ABOUT_MAX_KITCHEN_MEDIA,
