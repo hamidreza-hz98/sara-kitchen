@@ -80,7 +80,7 @@ Dependencies point from consumer to provider. “None” means the module accept
 | ------------ | ------------------------------------------------------------------- | ------------------------------------------------------- |
 | Auth         | Authentication orchestration and password/account flows             | Admins, Customers, Logs, Sessions                       |
 | Admins       | Administrator identity, credentials, roles, status                  | Logs                                                    |
-| Customers    | Customer identity, profile, credentials, consent/privacy state      | Logs                                                    |
+| Customers    | Customer identity, profile, credentials, and consent preferences    | Logs                                                    |
 | Sessions     | Hashed sessions, device metadata, expiry/revocation                 | Logs                                                    |
 | Media        | Upload metadata, storage coordination, variants, usage/deletion     | Logs                                                    |
 | Categories   | Category content, slug, status, ordering                            | Logs, Media                                             |
@@ -93,9 +93,13 @@ Dependencies point from consumer to provider. “None” means the module accept
 | Contacts     | Contact submissions, workflow and retention                         | Logs                                                    |
 | Blogs        | Articles, publishing, relations and views                           | Admins, Dishes, Logs, Media                             |
 | SEO          | Static/entity metadata, sitemap and structured-data inputs          | Blogs, Categories, Dishes, Logs, Media                  |
-| Settings     | Versioned site, content, delivery and notification configuration    | Blogs, Categories, Dishes, Logs, Media                  |
+| Settings     | Versioned site/content/policy configuration and consent evidence    | Blogs, Categories, Dishes, Logs, Media                  |
 | Logs         | Append-only audit events and authorized reads                       | None                                                    |
 | Analytics    | Derived dashboard/report queries and rollups                        | Customers, Dishes, Logs, Orders                         |
+
+Legal-policy consent evidence is owned by Settings. Account and order workflows record consent
+through the Settings public API using opaque subject identifiers and immutable policy snapshots;
+Settings does not import Customer or Order models.
 
 ## Authorization boundary
 

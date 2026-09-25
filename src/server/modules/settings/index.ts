@@ -143,6 +143,55 @@ export type {
   PublicFaqEntry,
   PublicFaqSettings,
 } from "./service/faq-settings";
+export {
+  POLICY_DOCUMENT_TYPES,
+  POLICY_MAX_SECTIONS,
+  POLICY_PUBLICATION_STATES,
+  parsePolicyVersionContent,
+  policyVersionContentSchema,
+  policyVersionTranslationSchema,
+} from "./validation/policy-version";
+export type {
+  PolicyDocumentType,
+  PolicyLocalizedTranslation,
+  PolicyPublicationState,
+  PolicySectionTranslation,
+  PolicyVersionContent,
+  PolicyVersionTranslation,
+} from "./validation/policy-version";
+export {
+  POLICY_VERSIONS_COLLECTION,
+  POLICY_VERSION_QUERY_MUTATION_ERROR,
+  getPolicyVersionModel,
+  policyVersionSchema,
+} from "./model/policy-version";
+export type { PolicyVersionRecord } from "./model/policy-version";
+export {
+  POLICY_CONSENT_APPEND_ONLY_ERROR,
+  POLICY_CONSENT_SOURCES,
+  POLICY_CONSENT_SUBJECT_KINDS,
+  getPolicyConsentModel,
+  policyConsentSchema,
+} from "./model/policy-consent";
+export type {
+  PolicyConsentRecord,
+  PolicyConsentSnapshot,
+  PolicyConsentSource,
+  PolicyConsentSubjectKind,
+} from "./model/policy-consent";
+export {
+  PolicyLifecycleError,
+  calculatePolicyContentDigest,
+  createPolicyVersionDraft,
+  getPolicyConsentTrace,
+  recordPolicyConsent,
+  releasePolicyVersion,
+} from "./service/policy-lifecycle";
+export type {
+  PolicyConsentTraceEntry,
+  PolicyLifecycleErrorCode,
+  RecordPolicyConsentInput,
+} from "./service/policy-lifecycle";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,

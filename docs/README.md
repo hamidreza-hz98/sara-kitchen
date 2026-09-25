@@ -70,5 +70,6 @@ Current records:
 - [`slugs.md`](./slugs.md) — canonical generation, admin overrides, reserved routes, deterministic collisions, and unique-index concurrency rules.
 - [`storefront-shell.md`](./storefront-shell.md) — supplied-layout mapping, responsive public navigation, locale/cart/account controls, footer, and keyboard behavior.
 - [`theme.md`](./theme.md) — executable palette, typography, shape, elevation, motion, component overrides, and responsive showcase verification.
+- [`terms-policy-settings.md`](./terms-policy-settings.md) — immutable translated policy versions, transactional publication, append-only account/order consent receipts, and historical integrity traces.
 - [`translation-values.md`](./translation-values.md) — embedded translation validation, localized selection, fallback order, and direction metadata.
 - [`ui-primitives.md`](./ui-primitives.md) — shared component contracts, accessibility/localization rules, rich-content safety, and showcase coverage.

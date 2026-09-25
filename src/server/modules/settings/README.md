@@ -32,3 +32,8 @@ references. See [`about-settings.md`](../../../../../docs/about-settings.md).
 FAQ settings use stable IDs, active state, unique order, canonical English coverage, item-level locale fallback,
 immutable add/edit/remove/reorder operations, and an active-only projection for the existing FAQPage SEO
 generator. See [`faq-settings.md`](../../../../../docs/faq-settings.md).
+
+Terms and policies use dedicated immutable version records with effective/publication state, translated
+versioned rich-text sections, and a content digest. Append-only consent receipts snapshot the exact accepted
+version for account/order subjects; chronological traces verify retained-policy integrity. See
+[`terms-policy-settings.md`](../../../../../docs/terms-policy-settings.md).
