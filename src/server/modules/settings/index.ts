@@ -90,6 +90,26 @@ export type {
 export { projectPublicSocialSettings } from "./service/social-public";
 export type { PublicSocialLink, PublicSocialSettings } from "./service/social-public";
 export {
+  LANGUAGE_VISIBILITIES,
+  languageSettingsDataSchema,
+  languageSettingsPayloadSchema,
+  languageSettingsTranslationValueSchema,
+  parseLanguageSettings,
+} from "./validation/language-settings";
+export type {
+  LanguageSettingsData,
+  LanguageSettingsPayload,
+  LanguageSettingsTranslation,
+  LanguageSettingsTranslationValue,
+  LanguageVisibility,
+} from "./validation/language-settings";
+export {
+  configuredFallbackOrder,
+  projectPublicLanguageSettings,
+  resolveConfiguredLocale,
+} from "./service/language-settings";
+export type { PublicLanguageOption, PublicLanguageSettings } from "./service/language-settings";
+export {
   ABOUT_MAX_CALLS_TO_ACTION,
   ABOUT_MAX_KITCHEN_MEDIA,
   ABOUT_MAX_STORY_SECTIONS,

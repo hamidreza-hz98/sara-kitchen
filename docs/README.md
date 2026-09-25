@@ -58,6 +58,7 @@ Current records:
 - [`structured-logging.md`](./structured-logging.md) — typed operational events, local/production formatter parity, deployment correlation, and recursive redaction.
 - [`local-infrastructure.md`](./local-infrastructure.md) — healthy MongoDB/MinIO startup, persistence, credentials, and operations.
 - [`localization.md`](./localization.md) — locale routing, cookie persistence, catalogs, authoring rules, and acceptance coverage.
+- [`language-settings.md`](./language-settings.md) — runtime locale availability, defaults, fallback order, localized selector labels, and maintenance visibility.
 - [`media-deletion.md`](./media-deletion.md) — reference-safe soft deletion, recycle retention, force-delete prohibition, and future purge constraints.
 - [`media-library.md`](./media-library.md) — responsive dashboard media list, URL state, filtering, preview, editing, selection, and safe-delete behavior.
 - [`localized-formatting.md`](./localized-formatting.md) — EUR, numeric, unit, relative-time, date/time defaults, input contracts, and locale examples.

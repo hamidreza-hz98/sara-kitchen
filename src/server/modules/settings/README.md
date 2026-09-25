@@ -37,3 +37,8 @@ Terms and policies use dedicated immutable version records with effective/public
 versioned rich-text sections, and a content digest. Append-only consent receipts snapshot the exact accepted
 version for account/order subjects; chronological traces verify retained-policy integrity. See
 [`terms-policy-settings.md`](../../../../../docs/terms-policy-settings.md).
+
+Language settings retain every statically supported locale while controlling active, maintenance, or hidden
+runtime visibility, an active default, complete active-only fallback order, and translated selector labels.
+Flags are intentionally excluded because language and nationality are not interchangeable. See
+[`language-settings.md`](../../../../../docs/language-settings.md).
