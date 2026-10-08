@@ -20,6 +20,8 @@ export {
   type CustomerPasswordChangeOutcome,
 } from "./service/customer-change-password";
 export {
+  isValidCustomerMobile,
+  isValidCustomerName,
   normalizeCustomerEmail,
   normalizeCustomerMobile,
   normalizeCustomerName,
