@@ -27,6 +27,7 @@ Current records:
 - [`cache-revalidation.md`](./cache-revalidation.md) — public content tags, dependency-aware reads, targeted mutation expiry, and visibility timing;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`contact-settings.md`](./contact-settings.md) — validated multilingual contact details, Porto location/service area, business hours, safe map configuration, and public projection.
+- [`contact-submission-model.md`](./contact-submission-model.md) — normalized contact identity, inbox workflow, consent evidence, bounded spam metadata, and TTL retention policy.
 - [`customer-privacy.md`](./customer-privacy.md) — customer management authorization, PII projection, self-service export, anonymization, and historical-order retention.
 - [`customer-management-ui.md`](./customer-management-ui.md) — responsive customer list/details, order/spend summaries, URL state, sensitive-data minimization, and permission-gated actions.
 - [`dashboard-shell.md`](./dashboard-shell.md) — protected management route, responsive shell, permission-filtered navigation, and admin-session handoff;
