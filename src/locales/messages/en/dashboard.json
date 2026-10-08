@@ -1119,6 +1119,71 @@
       "archived": "Archived"
     }
   },
+  "activity": {
+    "title": "Activity log",
+    "description": "Review sanitized security, account, content, order, and payment events.",
+    "refresh": "Refresh",
+    "all": "All",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "actorKind": "Actor type",
+    "actorRef": "Actor ID",
+    "action": "Action code",
+    "resourceKind": "Resource type",
+    "resourceRef": "Resource ID",
+    "type": "Event type",
+    "severity": "Severity",
+    "outcome": "Outcome",
+    "requestId": "Request ID",
+    "apply": "Apply filters",
+    "clear": "Clear filters",
+    "occurred": "Occurred",
+    "event": "Event",
+    "actor": "Actor",
+    "resource": "Resource",
+    "classification": "Classification",
+    "results": "{count, plural, one {# event} other {# events}}",
+    "perPage": "Per page",
+    "pagination": "Activity-log pages",
+    "errorTitle": "Activity could not be loaded",
+    "errorDescription": "Check your connection and filter values, then try again.",
+    "retry": "Try again",
+    "emptyTitle": "No activity found",
+    "emptyDescription": "Adjust the filters or check again after activity occurs.",
+    "detailTitle": "Activity details",
+    "close": "Close",
+    "none": "None",
+    "networkPolicy": "Network-data policy",
+    "userAgent": "User agent",
+    "context": "Sanitized context",
+    "noContext": "No additional context was recorded.",
+    "actorKinds": {
+      "admin": "Administrator",
+      "customer": "Customer",
+      "system": "System",
+      "anonymous": "Anonymous"
+    },
+    "outcomes": { "success": "Success", "failure": "Failure", "denied": "Denied" },
+    "severities": {
+      "info": "Information",
+      "warning": "Warning",
+      "error": "Error",
+      "critical": "Critical"
+    },
+    "types": {
+      "authentication": "Authentication",
+      "authorization": "Authorization",
+      "data": "Data",
+      "business": "Business",
+      "security": "Security",
+      "system": "System"
+    },
+    "networkPolicies": {
+      "hashed": "Hashed",
+      "retained": "Retained by policy",
+      "omitted": "Omitted"
+    }
+  },
   "metrics": {
     "sales": "Sales",
     "orders": "Orders",

@@ -40,3 +40,4 @@ export {
 } from "./service/read-audit-logs";
 export { AuditLogReadForbiddenError, type AuditLogReadPrincipal } from "./policy/audit-log-read";
 export type { AuditLogListItem } from "./mapper/audit-log";
+export { auditLogReadQuerySchema, type AuditLogReadQuery } from "./validation/audit-log-read";

@@ -86,6 +86,8 @@ export async function readAuditLogs(
           query.requestId,
           query.resourceKind,
           query.resourceRef,
+          query.severity,
+          query.type,
         ].filter((value) => value !== undefined).length,
         page: query.page,
         pageSize: query.pageSize,

@@ -37,6 +37,7 @@ export const AUDIT_LOG_APPEND_ONLY_ERROR = "Audit records are append-only.";
 export const AUDIT_LOG_INDEX_NAMES = Object.freeze({
   action: "audit_logs_action_outcome",
   actor: "audit_logs_actor_timeline",
+  classification: "audit_logs_classification_timeline",
   request: "audit_logs_request",
   resource: "audit_logs_resource_timeline",
   timeline: "audit_logs_timeline",
@@ -224,6 +225,10 @@ auditLogSchema.index(
 auditLogSchema.index(
   { actionCode: 1, outcome: 1, occurredAt: -1, _id: -1 },
   { name: AUDIT_LOG_INDEX_NAMES.action },
+);
+auditLogSchema.index(
+  { type: 1, severity: 1, outcome: 1, occurredAt: -1, _id: -1 },
+  { name: AUDIT_LOG_INDEX_NAMES.classification },
 );
 auditLogSchema.index(
   { requestId: 1, occurredAt: -1, _id: -1 },

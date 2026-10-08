@@ -84,6 +84,8 @@ describe("audit-log reads", () => {
       requestId: "request.read:0001",
       resourceKind: "dish",
       resourceRef: "dish-1",
+      severity: "warning",
+      type: "security",
     });
 
     expect(query).toMatchObject({ actorRef, page: 1, pageSize: 25 });
@@ -98,6 +100,8 @@ describe("audit-log reads", () => {
       requestId: "request.read:0001",
       "resource.kind": "dish",
       "resource.ref": "dish-1",
+      severity: "warning",
+      type: "security",
     });
   });
 
@@ -125,6 +129,9 @@ describe("audit-log reads", () => {
     expect(
       selectAuditLogReadIndex(parseAuditLogReadQuery({ action: "crud.resource.create" })),
     ).toBe("audit_logs_action_outcome");
+    expect(selectAuditLogReadIndex(parseAuditLogReadQuery({ severity: "critical" }))).toBe(
+      "audit_logs_classification_timeline",
+    );
     expect(selectAuditLogReadIndex(parseAuditLogReadQuery({}))).toBe("audit_logs_timeline");
   });
 

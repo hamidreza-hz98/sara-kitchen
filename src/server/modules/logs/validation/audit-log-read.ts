@@ -2,7 +2,12 @@ import { isValidObjectId } from "mongoose";
 import { z } from "zod";
 
 import { AUDIT_ACTION_DEFINITIONS } from "../types/audit-actions";
-import { AUDIT_ACTOR_KINDS, AUDIT_OUTCOMES } from "../types/audit-event";
+import {
+  AUDIT_ACTOR_KINDS,
+  AUDIT_OUTCOMES,
+  AUDIT_SEVERITIES,
+  AUDIT_TYPES,
+} from "../types/audit-event";
 import {
   AUDIT_ENTITY_KIND_PATTERN,
   AUDIT_REQUEST_ID_PATTERN,
@@ -52,6 +57,8 @@ export const auditLogReadQuerySchema = z
       .trim()
       .refine((value) => isSafeAuditText(value, 128), "resourceRef is invalid.")
       .optional(),
+    severity: z.enum(AUDIT_SEVERITIES).optional(),
+    type: z.enum(AUDIT_TYPES).optional(),
   })
   .superRefine((value, context) => {
     if (value.dateFrom && value.dateTo && value.dateFrom > value.dateTo) {

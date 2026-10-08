@@ -61,6 +61,7 @@ export function selectAuditLogReadIndex(query: AuditLogReadQuery): AuditLogReadP
   if (query.actorKind) return AUDIT_LOG_INDEX_NAMES.actor;
   if (query.resourceKind) return AUDIT_LOG_INDEX_NAMES.resource;
   if (query.action) return AUDIT_LOG_INDEX_NAMES.action;
+  if (query.type || query.severity || query.outcome) return AUDIT_LOG_INDEX_NAMES.classification;
   return AUDIT_LOG_INDEX_NAMES.timeline;
 }
 
@@ -73,6 +74,8 @@ export function buildAuditLogReadFilter(query: AuditLogReadQuery): QueryFilter<A
   if (query.requestId) filter.requestId = query.requestId;
   if (query.resourceKind) filter["resource.kind"] = query.resourceKind;
   if (query.resourceRef) filter["resource.ref"] = query.resourceRef;
+  if (query.severity) filter.severity = query.severity;
+  if (query.type) filter.type = query.type;
   if (query.dateFrom || query.dateTo) {
     filter.occurredAt = {
       ...(query.dateFrom ? { $gte: query.dateFrom } : {}),

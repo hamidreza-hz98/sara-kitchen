@@ -14,3 +14,7 @@ cross-module API. Other modules must not import it or write audit records direct
 Audit reads go through `readAuditLogs()`. The service requires a resolved active administrator with
 `logs:read`, validates bounded filters/pagination, selects an explicit matching index, and maps only a
 safe projection. Raw/hashed IP data and retention internals never cross the public API.
+
+The dashboard adapter at `/dashboard/activity` exposes the safe projection with validated URL-backed
+filters and a read-only details drawer. Event type, severity, and outcome use the classification index;
+the UI never receives or renders retained network identifiers.

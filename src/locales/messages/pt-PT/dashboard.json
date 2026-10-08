@@ -1119,6 +1119,71 @@
       "archived": "Arquivada"
     }
   },
+  "activity": {
+    "title": "Registo de atividade",
+    "description": "Consulte eventos sanitizados de segurança, contas, conteúdos, encomendas e pagamentos.",
+    "refresh": "Atualizar",
+    "all": "Todos",
+    "dateFrom": "Data inicial",
+    "dateTo": "Data final",
+    "actorKind": "Tipo de interveniente",
+    "actorRef": "ID do interveniente",
+    "action": "Código da ação",
+    "resourceKind": "Tipo de recurso",
+    "resourceRef": "ID do recurso",
+    "type": "Tipo de evento",
+    "severity": "Gravidade",
+    "outcome": "Resultado",
+    "requestId": "ID do pedido",
+    "apply": "Aplicar filtros",
+    "clear": "Limpar filtros",
+    "occurred": "Data e hora",
+    "event": "Evento",
+    "actor": "Interveniente",
+    "resource": "Recurso",
+    "classification": "Classificação",
+    "results": "{count, plural, one {# evento} other {# eventos}}",
+    "perPage": "Por página",
+    "pagination": "Páginas do registo de atividade",
+    "errorTitle": "Não foi possível carregar a atividade",
+    "errorDescription": "Verifique a ligação e os filtros e tente novamente.",
+    "retry": "Tentar novamente",
+    "emptyTitle": "Nenhuma atividade encontrada",
+    "emptyDescription": "Altere os filtros ou volte a consultar depois de ocorrer atividade.",
+    "detailTitle": "Detalhes da atividade",
+    "close": "Fechar",
+    "none": "Nenhum",
+    "networkPolicy": "Política de dados de rede",
+    "userAgent": "Agente do utilizador",
+    "context": "Contexto sanitizado",
+    "noContext": "Não foi registado contexto adicional.",
+    "actorKinds": {
+      "admin": "Administrador",
+      "customer": "Cliente",
+      "system": "Sistema",
+      "anonymous": "Anónimo"
+    },
+    "outcomes": { "success": "Sucesso", "failure": "Falha", "denied": "Negado" },
+    "severities": {
+      "info": "Informação",
+      "warning": "Aviso",
+      "error": "Erro",
+      "critical": "Crítico"
+    },
+    "types": {
+      "authentication": "Autenticação",
+      "authorization": "Autorização",
+      "data": "Dados",
+      "business": "Negócio",
+      "security": "Segurança",
+      "system": "Sistema"
+    },
+    "networkPolicies": {
+      "hashed": "Com hash",
+      "retained": "Retido por política",
+      "omitted": "Omitido"
+    }
+  },
   "metrics": {
     "sales": "Vendas",
     "orders": "Encomendas",
