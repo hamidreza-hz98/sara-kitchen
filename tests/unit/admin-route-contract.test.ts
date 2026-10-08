@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
   disable: vi.fn(),
   reactivate: vi.fn(),
   resetCredential: vi.fn(),
+  revokeAllSessions: vi.fn(),
   delete: vi.fn(),
 }));
 
@@ -29,6 +30,7 @@ vi.mock("@/app/api/admins/route-helper", async () => {
       disable: state.disable,
       reactivate: state.reactivate,
       resetCredential: state.resetCredential,
+      revokeAllSessions: state.revokeAllSessions,
       delete: state.delete,
     }),
     translateAdminCrudError(error: unknown): never {
@@ -45,6 +47,7 @@ vi.mock("@/app/api/admins/route-helper", async () => {
 import { POST as disable } from "@/app/api/admins/[adminId]/disable/route";
 import { POST as reactivate } from "@/app/api/admins/[adminId]/reactivate/route";
 import { POST as resetCredential } from "@/app/api/admins/[adminId]/reset-credential/route";
+import { POST as revokeSessions } from "@/app/api/admins/[adminId]/sessions/route";
 import { DELETE as remove, GET as detail, PATCH as update } from "@/app/api/admins/[adminId]/route";
 import { GET as list, POST as create } from "@/app/api/admins/route";
 import { ApiError } from "@/server/http";
@@ -83,6 +86,7 @@ beforeEach(() => {
     state.disable,
     state.reactivate,
     state.resetCredential,
+    state.revokeAllSessions,
     state.delete,
   ])
     operation.mockResolvedValue({ id });
@@ -143,6 +147,9 @@ describe("administrator Route Handler contracts", () => {
       (await reactivate(request(`/api/admins/${id}/reactivate`, "POST", {}), context)).status,
     ).toBe(200);
     expect((await remove(request(`/api/admins/${id}`, "DELETE"), context)).status).toBe(200);
+    expect(
+      (await revokeSessions(request(`/api/admins/${id}/sessions`, "POST", {}), context)).status,
+    ).toBe(200);
   });
 
   it("maps domain conflicts and preserves authentication failures", async () => {

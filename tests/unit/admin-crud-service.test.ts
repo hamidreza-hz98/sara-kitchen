@@ -181,6 +181,10 @@ describe("administrator CRUD services", () => {
 
     await test.services.update(owner, target.id, { role: "viewer" });
     await test.services.resetCredential(owner, target.id, "Another secure password 2026");
+    await expect(test.services.revokeAllSessions(owner, target.id)).resolves.toMatchObject({
+      admin: { id: target.id },
+      revokedSessions: 2,
+    });
     await test.services.disable(owner, target.id);
     await test.services.reactivate(owner, target.id);
     const deleted = await test.services.delete(owner, target.id);
@@ -189,6 +193,7 @@ describe("administrator CRUD services", () => {
     expect(test.revokeSessions.mock.calls).toEqual([
       [target.id, "role-change"],
       [target.id, "password-reset"],
+      [target.id, "security"],
       [target.id, "account-disabled"],
       [target.id, "account-disabled"],
     ]);

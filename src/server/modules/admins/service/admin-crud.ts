@@ -22,7 +22,14 @@ import {
 } from "../validation/admin-identity";
 
 export type AdminCrudAction =
-  "create" | "read" | "update" | "disable" | "reactivate" | "reset-credential" | "delete";
+  | "create"
+  | "read"
+  | "update"
+  | "disable"
+  | "reactivate"
+  | "reset-credential"
+  | "revoke-sessions"
+  | "delete";
 export type AdminCrudActor = Readonly<{ id: string; role: AdminRole }>;
 export type AdminCreateInput = Readonly<{
   firstName: string;
@@ -45,7 +52,7 @@ export type AdminCrudDependencies = Readonly<{
   audit(event: AdminCrudAuditEvent): Promise<void>;
   revokeSessions(
     adminId: string,
-    reason: "account-disabled" | "password-reset" | "role-change",
+    reason: "account-disabled" | "password-reset" | "role-change" | "security",
   ): Promise<number>;
 }>;
 export type AdminManagementView = Omit<AdminSnapshot, "identifier"> & {
@@ -69,6 +76,7 @@ const actionPermissions = {
   disable: "admins:disable",
   reactivate: "admins:disable",
   "reset-credential": "admins:update",
+  "revoke-sessions": "admins:update",
   delete: "admins:delete",
 } as const satisfies Record<AdminCrudAction, AdminPermission>;
 
@@ -282,6 +290,16 @@ export function createAdminCrudServices(deps: AdminCrudDependencies) {
         );
         await deps.revokeSessions(id, "password-reset");
         return toView(actor, saved);
+      });
+    },
+    async revokeAllSessions(
+      actor: AdminCrudActor,
+      id: string,
+    ): Promise<Readonly<{ admin: AdminManagementView; revokedSessions: number }>> {
+      return execute(deps, actor, "revoke-sessions", id, async () => {
+        const current = await find(id);
+        const revokedSessions = await deps.revokeSessions(id, "security");
+        return { admin: toView(actor, current), revokedSessions };
       });
     },
     async delete(actor: AdminCrudActor, id: string): Promise<AdminManagementView> {

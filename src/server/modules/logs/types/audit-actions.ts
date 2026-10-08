@@ -59,6 +59,11 @@ export const AUDIT_ACTION_DEFINITIONS = Object.freeze({
     failure: "Rate-limit enforcement failed.",
     success: "Rate limit was enforced successfully.",
   }),
+  "security.session.revoke": defineAction("security", {
+    denied: "Session revocation was denied.",
+    failure: "Session revocation failed.",
+    success: "Active sessions were revoked successfully.",
+  }),
   "crud.resource.create": defineAction("data", {
     denied: "Resource creation was denied.",
     failure: "Resource creation failed.",

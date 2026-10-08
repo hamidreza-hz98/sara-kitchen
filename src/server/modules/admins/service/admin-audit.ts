@@ -13,6 +13,7 @@ const ACTION_CODES = {
   disable: "crud.resource.update",
   reactivate: "crud.resource.update",
   "reset-credential": "crud.resource.update",
+  "revoke-sessions": "security.session.revoke",
   delete: "crud.resource.delete",
 } as const;
 

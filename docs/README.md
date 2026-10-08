@@ -19,6 +19,7 @@ Current records:
 - [`adr/`](./adr/README.md) — accepted architecture decisions, alternatives, consequences, and revisit triggers;
 - [`architecture.md`](./architecture.md) — modular-monolith dependency rules and module contracts;
 - [`admin-management.md`](./admin-management.md) — administrator CRUD, permission, last-owner, session-revocation, and audit invariants;
+- [`admin-management-ui.md`](./admin-management-ui.md) — responsive administrator list/edit controls, URL query state, permissions, confirmations, and session management;
 - [`api-contract.md`](./api-contract.md) — typed JSON envelopes, public error taxonomy, request IDs, and internal-error safety;
 - [`cache-revalidation.md`](./cache-revalidation.md) — public content tags, dependency-aware reads, targeted mutation expiry, and visibility timing;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
