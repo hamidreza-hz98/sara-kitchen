@@ -59,6 +59,7 @@ The six persisted role codes are `owner`, `manager`, `catalog_editor`, `order_op
 | `transactions:refund`         | ✓   | —   | —   | —   | —   | —   | Record/execute refund (phone-led MVP)                          |
 | `contacts:read`               | ✓   | ✓   | —   | ✓   | —   | —   | List contact summaries                                         |
 | `contacts:read-sensitive`     | ✓   | ✓   | —   | ✓   | —   | —   | Read message, mobile and name                                  |
+| `contacts:update`             | ✓   | ✓   | —   | ✓   | —   | —   | Assign, annotate, resolve, mark spam or archive submissions    |
 | `contacts:delete`             | ✓   | ✓   | —   | —   | —   | —   | Delete contact submission                                      |
 | `logs:read`                   | ✓   | ✓   | —   | —   | —   | —   | Read audit activity and actor identifiers                      |
 | `settings:read`               | ✓   | ✓   | —   | —   | ✓   | ✓   | Read public-facing settings                                    |

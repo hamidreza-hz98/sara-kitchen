@@ -67,6 +67,7 @@ export const ADMIN_PERMISSIONS = [
   "transactions:refund",
   "contacts:read",
   "contacts:read-sensitive",
+  "contacts:update",
   "contacts:delete",
   "logs:read",
   "settings:read",
@@ -127,6 +128,7 @@ export const ROLE_PERMISSIONS = {
     "transactions:reconcile",
     "contacts:read",
     "contacts:read-sensitive",
+    "contacts:update",
     "contacts:delete",
     "logs:read",
     "settings:read",
@@ -174,6 +176,7 @@ export const ROLE_PERMISSIONS = {
     "transactions:reconcile",
     "contacts:read",
     "contacts:read-sensitive",
+    "contacts:update",
     "dishes:read",
   ],
   content_editor: [

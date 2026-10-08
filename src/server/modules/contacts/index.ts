@@ -24,8 +24,14 @@ export {
   type ContactSubmissionStatus,
 } from "./model/contact-submission";
 export {
+  contactEmptyMutationSchema,
+  contactIdParametersSchema,
+  contactListQuerySchema,
   contactSubmissionInputSchema,
+  contactWorkflowUpdateSchema,
+  type ContactListQuery,
   type ContactSubmissionInput,
+  type ContactWorkflowUpdateInput,
 } from "./validation/contact-submission";
 export {
   isValidContactEmail,
@@ -35,3 +41,23 @@ export {
   normalizeContactMobile,
   normalizeContactName,
 } from "./validation/contact-identity";
+export {
+  ContactRepositoryConflictError,
+  createContactSubmissionRepository,
+  type ContactListOptions,
+  type ContactSubmissionCreate,
+  type ContactSubmissionRepository,
+  type ContactSubmissionSnapshot,
+  type ContactWorkflowUpdate,
+} from "./repository/contact-submission";
+export {
+  ContactFlowError,
+  createContactFlow,
+  type ContactActor,
+  type ContactAdminView,
+  type ContactAuditEvent,
+  type ContactFlowAction,
+  type ContactFlowDependencies,
+  type ContactNotification,
+} from "./service/contact-flow";
+export { createContactAuditSink } from "./service/contact-audit";
