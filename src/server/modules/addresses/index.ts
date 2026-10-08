@@ -19,11 +19,37 @@ export {
   type AddressDefaultCreatePlan,
 } from "./policy/default-address";
 export {
+  AddressRepositoryConflictError,
+  createAddressRepository,
+  type AddressRepository,
+  type AddressSnapshot,
+} from "./repository/address";
+export {
+  AddressCrudError,
+  createAddressCrudServices,
+  type AddressCrudAction,
+  type AddressCrudActor,
+  type AddressCrudAuditEvent,
+  type AddressCrudDependencies,
+} from "./service/address-crud";
+export { createAddressAuditSink } from "./service/address-audit";
+export {
+  CheckoutAddressError,
+  resolveAddressForCheckout,
+  verifyOwnedAddressForCheckout,
+  type DeliveryZoneDecision,
+} from "./service/address-checkout";
+export {
   PORTUGUESE_POSTAL_CODE_PATTERN,
+  addressEmptyMutationSchema,
+  addressIdParametersSchema,
   addressPointSchema,
+  addressUpdateSchema,
   addressWriteSchema,
+  customerAddressParametersSchema,
   isPortuguesePostalCode,
   normalizePortuguesePostalCode,
   type AddressPointInput,
+  type AddressUpdateInput,
   type AddressWriteInput,
 } from "./validation/address";

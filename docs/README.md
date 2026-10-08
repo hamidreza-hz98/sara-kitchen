@@ -21,6 +21,7 @@ Current records:
 - [`admin-management.md`](./admin-management.md) — administrator CRUD, permission, last-owner, session-revocation, and audit invariants;
 - [`admin-management-ui.md`](./admin-management-ui.md) — responsive administrator list/edit controls, URL query state, permissions, confirmations, and session management;
 - [`address-model.md`](./address-model.md) — address ownership, locale-neutral delivery data, GeoJSON/postal validation, provider metadata, and one-default invariants;
+- [`address-crud.md`](./address-crud.md) — owner-scoped customer operations, read-only admin access, default-address consistency, audit privacy, and checkout-time delivery-zone verification;
 - [`api-contract.md`](./api-contract.md) — typed JSON envelopes, public error taxonomy, request IDs, and internal-error safety;
 - [`cache-revalidation.md`](./cache-revalidation.md) — public content tags, dependency-aware reads, targeted mutation expiry, and visibility timing;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;

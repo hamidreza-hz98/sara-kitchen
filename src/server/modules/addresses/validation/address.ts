@@ -79,5 +79,21 @@ export const addressWriteSchema = z.strictObject({
   isDefault: z.boolean().default(false),
 });
 
+export const addressUpdateSchema = addressWriteSchema
+  .omit({ isDefault: true })
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "At least one address field must be supplied.",
+  });
+
+const objectId = z.string().regex(/^[a-f\d]{24}$/iu);
+export const addressIdParametersSchema = z.strictObject({ addressId: objectId });
+export const customerAddressParametersSchema = z.strictObject({
+  customerId: objectId,
+  addressId: objectId.optional(),
+});
+export const addressEmptyMutationSchema = z.strictObject({});
+
 export type AddressPointInput = z.output<typeof addressPointSchema>;
 export type AddressWriteInput = z.output<typeof addressWriteSchema>;
+export type AddressUpdateInput = z.output<typeof addressUpdateSchema>;
