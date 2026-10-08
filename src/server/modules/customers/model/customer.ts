@@ -2,7 +2,11 @@ import "server-only";
 
 import type { Connection, Model } from "mongoose";
 
-import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
+import {
+  createBaseSchema,
+  type BaseDocumentFields,
+  type SoftDeleteFields,
+} from "@/server/database/schema";
 import { isPasswordHash } from "@/server/security/password";
 
 import {
@@ -14,23 +18,29 @@ import {
   normalizeCustomerName,
 } from "../validation/customer-identity";
 
-export const CUSTOMER_STATUSES = ["active", "disabled"] as const;
+export const CUSTOMER_STATUSES = ["active", "disabled", "anonymized"] as const;
 export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number];
 
-export type CustomerRecord = BaseDocumentFields & {
-  firstName: string;
-  lastName: string;
-  mobile: string;
-  email: string | null;
-  passwordHash: string;
-  mobileVerifiedAt: Date | null;
-  emailVerifiedAt: Date | null;
-  passwordVersion: number;
-  marketingConsent: boolean;
-  marketingConsentAt: Date | null;
-  termsAcceptedAt: Date | null;
-  status: CustomerStatus;
-};
+export type CustomerRecord = BaseDocumentFields &
+  SoftDeleteFields & {
+    firstName: string;
+    lastName: string;
+    mobile: string;
+    email: string | null;
+    passwordHash: string;
+    mobileVerifiedAt: Date | null;
+    emailVerifiedAt: Date | null;
+    passwordVersion: number;
+    marketingConsent: boolean;
+    marketingConsentAt: Date | null;
+    termsAcceptedAt: Date | null;
+    status: CustomerStatus;
+    deletionRequestedAt: Date | null;
+    anonymizedAt: Date | null;
+    privacyRetentionReason: "historical_orders" | "privacy_request" | null;
+  };
+
+const ANONYMIZED_MOBILE_PATTERN = /^anon_[a-f\d]{24}$/u;
 
 const customerSchema = createBaseSchema<CustomerRecord>(
   {
@@ -50,7 +60,11 @@ const customerSchema = createBaseSchema<CustomerRecord>(
       type: String,
       required: true,
       set: normalizeCustomerMobile,
-      validate: { validator: isValidCustomerMobile, message: "Enter a valid mobile number." },
+      validate: {
+        validator: (value: string) =>
+          isValidCustomerMobile(value) || ANONYMIZED_MOBILE_PATTERN.test(value),
+        message: "Enter a valid mobile number.",
+      },
     },
     email: {
       type: String,
@@ -79,8 +93,19 @@ const customerSchema = createBaseSchema<CustomerRecord>(
     marketingConsentAt: { type: Date, default: null },
     termsAcceptedAt: { type: Date, default: null },
     status: { type: String, enum: CUSTOMER_STATUSES, required: true, default: "active" },
+    deletionRequestedAt: { type: Date, default: null },
+    anonymizedAt: { type: Date, default: null },
+    privacyRetentionReason: {
+      type: String,
+      enum: ["historical_orders", "privacy_request"],
+      default: null,
+    },
   },
-  { collection: "customers", searchSourcePaths: ["firstName", "lastName", "mobile", "email"] },
+  {
+    collection: "customers",
+    searchSourcePaths: ["firstName", "lastName", "mobile", "email"],
+    softDelete: true,
+  },
 );
 
 customerSchema.index({ mobile: 1 }, { unique: true, name: "customers_mobile_unique" });
@@ -100,6 +125,23 @@ customerSchema.pre("validate", function validateCustomerState() {
   }
   if (this.marketingConsent !== Boolean(this.marketingConsentAt)) {
     this.invalidate("marketingConsentAt", "Consent and its timestamp must agree.");
+  }
+  const anonymized = this.status === "anonymized";
+  if (
+    anonymized !==
+    Boolean(this.anonymizedAt && this.deletionRequestedAt && this.privacyRetentionReason)
+  ) {
+    this.invalidate("anonymizedAt", "Anonymized accounts require complete privacy metadata.");
+  }
+  if (
+    anonymized &&
+    (this.email !== null ||
+      !ANONYMIZED_MOBILE_PATTERN.test(this.mobile) ||
+      this.marketingConsent ||
+      this.emailVerifiedAt ||
+      this.mobileVerifiedAt)
+  ) {
+    this.invalidate("status", "Anonymized accounts cannot retain direct identifiers.");
   }
 });
 

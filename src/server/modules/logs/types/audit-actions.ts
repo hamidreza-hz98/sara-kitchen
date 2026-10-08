@@ -94,6 +94,16 @@ export const AUDIT_ACTION_DEFINITIONS = Object.freeze({
     failure: "Payment processing failed.",
     success: "Payment was processed successfully.",
   }),
+  "privacy.customer.export": defineAction("security", {
+    denied: "Customer data export was denied.",
+    failure: "Customer data export failed.",
+    success: "Customer data was exported successfully.",
+  }),
+  "privacy.customer.anonymize": defineAction("security", {
+    denied: "Customer anonymization was denied.",
+    failure: "Customer anonymization failed.",
+    success: "Customer data was anonymized successfully.",
+  }),
   "settings.section.update": defineAction("data", {
     denied: "Settings update was denied.",
     failure: "Settings update failed.",

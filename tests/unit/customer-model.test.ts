@@ -48,6 +48,8 @@ describe("customer model", () => {
     expect(customer.marketingConsent).toBe(false);
     expect(customer.marketingConsentAt).toBeNull();
     expect(customer.passwordVersion).toBe(1);
+    expect(customer.anonymizedAt).toBeNull();
+    expect(customer.deletionRequestedAt).toBeNull();
     expect(Customer.schema.options.timestamps).toBe(true);
   });
 
@@ -113,6 +115,35 @@ describe("customer model", () => {
     expect(json.passwordVersion).toBeUndefined();
     expect(json.id).toBe(customer._id.toHexString());
     expect(Customer.schema.path("passwordHash").options.select).toBe(false);
+  });
+
+  it("requires complete redacted state for anonymized records", async () => {
+    const valid = new Customer({
+      firstName: "Deleted",
+      lastName: "Customer",
+      mobile: `anon_${"b".repeat(24)}`,
+      email: null,
+      passwordHash,
+      status: "anonymized",
+      anonymizedAt: new Date(),
+      deletionRequestedAt: new Date(),
+      privacyRetentionReason: "historical_orders",
+      deletedAt: new Date(),
+      deletedBy: { kind: "customer", actorId: "b".repeat(24) },
+    });
+    await expect(valid.validate()).resolves.toBeUndefined();
+
+    const invalid = new Customer({
+      firstName: "Sara",
+      lastName: "Kazemi",
+      mobile: "912345678",
+      email: "sara@example.com",
+      passwordHash,
+      status: "anonymized",
+    });
+    await expect(invalid.validate()).rejects.toMatchObject({
+      errors: expect.objectContaining({ anonymizedAt: expect.anything() }),
+    });
   });
 
   it("defines mobile and optional-email unique indexes across statuses", () => {

@@ -24,3 +24,32 @@ export {
   normalizeCustomerMobile,
   normalizeCustomerName,
 } from "./validation/customer-identity";
+export { CUSTOMER_STATUSES, type CustomerStatus } from "./model/customer";
+export {
+  createCustomerRepository,
+  CustomerRepositoryConflictError,
+  type CustomerListOptions,
+  type CustomerListResult,
+  type CustomerProfileWrite,
+  type CustomerRepository,
+  type CustomerSnapshot,
+  type CustomerWriteActor,
+} from "./repository/customer";
+export {
+  createCustomerCrudServices,
+  CustomerCrudError,
+  type CustomerCrudAction,
+  type CustomerCrudActor,
+  type CustomerCrudAuditEvent,
+  type CustomerCrudDependencies,
+  type CustomerView,
+} from "./service/customer-crud";
+export { createCustomerAuditSink } from "./service/customer-audit";
+export {
+  customerEmptyMutationSchema,
+  customerIdParametersSchema,
+  customerListQuerySchema,
+  customerProfileUpdateSchema,
+  customerStatusSchema,
+  type CustomerProfileUpdateInput,
+} from "./validation/customer-request";
