@@ -26,7 +26,7 @@ export async function findAdminForLogin(
   const identifier = normalizeAdminIdentifier(suppliedIdentifier);
   if (!isValidAdminIdentifier(identifier)) return null;
   const admin = await getAdminModel(connection)
-    .findOne({ identifier, active: true })
+    .findOne({ identifier, active: true, deletedAt: null })
     .select("_id passwordVersion")
     .lean()
     .exec();
@@ -39,7 +39,7 @@ export async function getActiveAdminIdentity(
 ): Promise<ActiveAdminIdentity | null> {
   if (!isValidObjectId(adminId)) return null;
   const admin = await getAdminModel(connection)
-    .findOne({ _id: adminId, active: true })
+    .findOne({ _id: adminId, active: true, deletedAt: null })
     .select("_id firstName lastName role passwordVersion")
     .lean()
     .exec();
@@ -60,7 +60,7 @@ export async function recordAdminLastLogin(
 ): Promise<boolean> {
   if (!isValidObjectId(adminId)) return false;
   const result = await getAdminModel(connection).updateOne(
-    { _id: adminId, active: true },
+    { _id: adminId, active: true, deletedAt: null },
     { $set: { lastLoginAt: at } },
   );
   return result.matchedCount === 1;

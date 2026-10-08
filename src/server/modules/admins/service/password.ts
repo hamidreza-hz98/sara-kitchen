@@ -24,11 +24,13 @@ export async function verifyAdminPasswordForLogin(
 ): Promise<boolean> {
   if (!isValidObjectId(adminId)) return false;
   const Admin = getAdminModel(connection);
-  const admin = await Admin.findOne({ _id: adminId, active: true }).select("+passwordHash").exec();
+  const admin = await Admin.findOne({ _id: adminId, active: true, deletedAt: null })
+    .select("+passwordHash")
+    .exec();
   if (!admin?.passwordHash) return false;
   return verifyAndUpgradePassword(password, admin.passwordHash, async (oldHash, newHash) => {
     const updated = await Admin.updateOne(
-      { _id: adminId, active: true, passwordHash: oldHash },
+      { _id: adminId, active: true, deletedAt: null, passwordHash: oldHash },
       { $set: { passwordHash: newHash } },
       { runValidators: true },
     );

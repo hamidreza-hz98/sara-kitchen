@@ -8,7 +8,11 @@ import {
   permissionsForRole,
   type AdminRole,
 } from "@/constants/admin-access";
-import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
+import {
+  createBaseSchema,
+  type BaseDocumentFields,
+  type SoftDeleteFields,
+} from "@/server/database/schema";
 import { isPasswordHash } from "@/server/security/password";
 
 import {
@@ -18,16 +22,17 @@ import {
   normalizeAdminName,
 } from "../validation/admin-identity";
 
-export type AdminRecord = BaseDocumentFields & {
-  firstName: string;
-  lastName: string;
-  identifier: string;
-  role: AdminRole;
-  passwordHash: string;
-  passwordVersion: number;
-  active: boolean;
-  lastLoginAt: Date | null;
-};
+export type AdminRecord = BaseDocumentFields &
+  SoftDeleteFields & {
+    firstName: string;
+    lastName: string;
+    identifier: string;
+    role: AdminRole;
+    passwordHash: string;
+    passwordVersion: number;
+    active: boolean;
+    lastLoginAt: Date | null;
+  };
 
 const adminSchema = createBaseSchema<AdminRecord>(
   {
@@ -68,11 +73,16 @@ const adminSchema = createBaseSchema<AdminRecord>(
     active: { type: Boolean, required: true, default: true },
     lastLoginAt: { type: Date, default: null },
   },
-  { collection: "admins", searchSourcePaths: ["firstName", "lastName", "identifier"] },
+  {
+    collection: "admins",
+    searchSourcePaths: ["firstName", "lastName", "identifier"],
+    softDelete: true,
+  },
 );
 
 adminSchema.index({ identifier: 1 }, { unique: true, name: "admins_identifier_unique" });
 adminSchema.index({ active: 1, role: 1 });
+adminSchema.index({ deletedAt: 1, active: 1, role: 1, createdAt: -1 });
 
 adminSchema.virtual("permissions").get(function permissions(this: AdminRecord) {
   return isAdminRole(this.role) ? permissionsForRole(this.role) : [];
