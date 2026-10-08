@@ -9,6 +9,7 @@ import {
 
 import {
   customerAdminRequestContext,
+  customerOrderSummaries,
   resolveCustomerCrudServices,
   translateCustomerCrudError,
 } from "../route-helper";
@@ -28,12 +29,19 @@ export async function GET(request: NextRequest, context: RouteContext): Promise<
       validation,
     );
     try {
-      return apiSuccess(
-        await resolveCustomerCrudServices(connection, requestId).get(
-          { kind: "admin", id: actor.id, role: actor.role },
-          customerId,
-        ),
+      const customer = await resolveCustomerCrudServices(connection, requestId).get(
+        { kind: "admin", id: actor.id, role: actor.role },
+        customerId,
       );
+      const summaries = await customerOrderSummaries(connection, [customerId]);
+      return apiSuccess({
+        ...customer,
+        summary: summaries[customerId] ?? {
+          orderCount: 0,
+          totalSpentCents: 0,
+          lastOrderAt: null,
+        },
+      });
     } catch (error) {
       return translateCustomerCrudError(error);
     }

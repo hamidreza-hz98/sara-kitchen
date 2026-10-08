@@ -25,6 +25,7 @@ import {
 import {
   countHistoricalOrdersForCustomer,
   exportOrderHistoryForCustomer,
+  summarizeOrdersForCustomers,
 } from "@/server/modules/orders";
 import { revokeActorSessions } from "@/server/modules/sessions";
 
@@ -81,6 +82,10 @@ export function resolveCustomerCrudServices(
     countHistoricalOrders: (customerId) => countHistoricalOrdersForCustomer(connection, customerId),
     exportOrderHistory: (customerId) => exportOrderHistoryForCustomer(connection, customerId),
   });
+}
+
+export function customerOrderSummaries(connection: Connection, customerIds: readonly string[]) {
+  return summarizeOrdersForCustomers(connection, customerIds);
 }
 
 export function translateCustomerCrudError(error: unknown): never {

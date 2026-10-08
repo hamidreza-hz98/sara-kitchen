@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
   setStatus: vi.fn(),
   exportAccount: vi.fn(),
   anonymize: vi.fn(),
+  summaries: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
@@ -29,6 +30,7 @@ vi.mock("@/app/api/customers/route-helper", async () => {
       exportAccount: state.exportAccount,
       anonymize: state.anonymize,
     }),
+    customerOrderSummaries: state.summaries,
     translateCustomerCrudError(error: unknown): never {
       if (error instanceof CustomerCrudError) {
         if (error.code === "forbidden") throw ApiError.authorization();
@@ -78,6 +80,9 @@ beforeEach(() => {
   });
   state.selfContext.mockResolvedValue({ connection: {}, actor: { id: customerId }, validation });
   state.list.mockResolvedValue({ items: [{ id: customerId }], total: 1 });
+  state.summaries.mockResolvedValue({
+    [customerId]: { orderCount: 2, totalSpentCents: 3_500, lastOrderAt: null },
+  });
   for (const operation of [state.get, state.update, state.setStatus])
     operation.mockResolvedValue({ id: customerId });
   state.exportAccount.mockResolvedValue({ profile: { id: customerId }, orders: [] });
@@ -97,6 +102,7 @@ describe("customer Route Handler contracts", () => {
       { page: 2, pageSize: 10, status: "disabled", sortBy: "lastName", sortDirection: "asc" },
     );
     expect((await adminDetail(request(`/api/customers/${customerId}`), context)).status).toBe(200);
+    expect(state.summaries).toHaveBeenCalledWith({}, [customerId]);
     expect((await adminList(request("/api/customers?pageSize=1000"))).status).toBe(400);
   });
 

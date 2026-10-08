@@ -4,3 +4,4 @@ export {
   countHistoricalOrdersForCustomer,
   exportOrderHistoryForCustomer,
 } from "./service/customer-privacy";
+export { summarizeOrdersForCustomers, type CustomerOrderSummary } from "./service/customer-summary";

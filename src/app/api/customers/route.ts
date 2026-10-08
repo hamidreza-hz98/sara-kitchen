@@ -6,6 +6,7 @@ import { customerListQuerySchema } from "@/server/modules/customers";
 
 import {
   customerAdminRequestContext,
+  customerOrderSummaries,
   resolveCustomerCrudServices,
   translateCustomerCrudError,
 } from "./route-helper";
@@ -31,7 +32,22 @@ export async function GET(request: NextRequest): Promise<Response> {
           sortDirection: query.sortDirection,
         },
       );
-      const page = pageResult(result.items, result.total, query);
+      const summaries = await customerOrderSummaries(
+        connection,
+        result.items.map((customer) => customer.id),
+      );
+      const page = pageResult(
+        result.items.map((customer) => ({
+          ...customer,
+          summary: summaries[customer.id] ?? {
+            orderCount: 0,
+            totalSpentCents: 0,
+            lastOrderAt: null,
+          },
+        })),
+        result.total,
+        query,
+      );
       return apiSuccess(page.data, { meta: page.meta });
     } catch (error) {
       return translateCustomerCrudError(error);
