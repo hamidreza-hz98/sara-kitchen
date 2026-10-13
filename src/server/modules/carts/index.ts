@@ -2,6 +2,28 @@
 export const MODULE_NAME = "carts" as const;
 
 export {
+  CART_AVAILABILITY_ISSUE_CODES,
+  CART_AVAILABILITY_STAGES,
+  CART_SERVICE_WEEKDAYS,
+  CartAvailabilityPolicyError,
+  validateCartAvailability,
+  type CartAvailabilityCorrection,
+  type CartAvailabilityDependencies,
+  type CartAvailabilityDishSource,
+  type CartAvailabilityFulfillment,
+  type CartAvailabilityIssue,
+  type CartAvailabilityIssueCode,
+  type CartAvailabilityLineInput,
+  type CartAvailabilityLineResult,
+  type CartAvailabilityResult,
+  type CartAvailabilityStage,
+  type CartServicePeriod,
+  type CartServicePolicy,
+  type CartServiceWeekday,
+  type ValidateCartAvailabilityInput,
+} from "./availability/cart-availability";
+
+export {
   CART_CURRENCY,
   CART_GUEST_TOKEN_HASH_PATTERN,
   CART_INDEX_NAMES,

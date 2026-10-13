@@ -20,3 +20,9 @@ SK-0138 adds the server-only pricing engine documented in
 through the Dishes public API, applies unit discount rounding and schedules, calculates delivery from
 server policy, keeps MVP tax explicit at zero, applies bounded server adjustments, and returns an
 immutable integer-cent snapshot. Browser-supplied prices and totals are never inputs to the calculation.
+
+SK-0139 adds the shared availability policy documented in
+[`docs/cart-availability.md`](../../../../docs/cart-availability.md). Cart mutations and checkout use
+the same authoritative checks for dish lifecycle/schedules, quantity, maximum lead time, configured
+service hours and cutoff, fresh delivery-area eligibility, and optional future stock. Stale conditions
+return typed, localized corrections and never silently remove or change a customer's line.

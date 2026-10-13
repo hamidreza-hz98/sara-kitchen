@@ -26,6 +26,7 @@ Current records:
 - [`api-contract.md`](./api-contract.md) — typed JSON envelopes, public error taxonomy, request IDs, and internal-error safety;
 - [`cache-revalidation.md`](./cache-revalidation.md) — public content tags, dependency-aware reads, targeted mutation expiry, and visibility timing;
 - [`cart-model.md`](./cart-model.md) — server-side cart identities, lines, pricing snapshot, lifecycle invariants, active uniqueness, and terminal-only TTL cleanup;
+- [`cart-availability.md`](./cart-availability.md) — shared cart/checkout orderability checks, service windows, cutoff, lead time, delivery area, optional stock, and recoverable stale-cart corrections;
 - [`cart-pricing-engine.md`](./cart-pricing-engine.md) — authoritative integer-cent cart totals, discount timing, distance-band delivery, free-delivery threshold, adjustments, and explicit MVP tax policy;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`contact-settings.md`](./contact-settings.md) — validated multilingual contact details, Porto location/service area, business hours, safe map configuration, and public projection.
