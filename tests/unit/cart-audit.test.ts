@@ -5,7 +5,10 @@ const recordAuditEvent = vi.hoisted(() => vi.fn(async () => ({ id: "audit-cart-1
 vi.mock("server-only", () => ({}));
 vi.mock("@/server/modules/logs", () => ({ recordAuditEvent }));
 
-import { createCartAuditSink } from "@/server/modules/carts/service/cart-audit";
+import {
+  createCartAuditSink,
+  createCartMergeAuditSink,
+} from "@/server/modules/carts/service/cart-audit";
 
 describe("cart audit adapter", () => {
   it("records customer mutation metadata without cart content", async () => {
@@ -47,6 +50,27 @@ describe("cart audit adapter", () => {
         actor: expect.objectContaining({ kind: "anonymous", ref: null }),
         outcome: "failure",
         context: { cartAction: "update_quantity", optimisticConflict: true },
+      }),
+    );
+    expect(JSON.stringify(recordAuditEvent.mock.calls)).not.toContain("guestTokenHash");
+  });
+
+  it("records merge replay state without accepting a guest credential", async () => {
+    recordAuditEvent.mockClear();
+    const sink = createCartMergeAuditSink({} as never, { requestId: "cart-merge-request" });
+    await sink({
+      customerId: "d".repeat(24),
+      cartId: "e".repeat(24),
+      guestCartId: "f".repeat(24),
+      idempotent: true,
+      outcome: "success",
+    });
+    expect(recordAuditEvent).toHaveBeenCalledWith(
+      {},
+      expect.objectContaining({
+        actor: expect.objectContaining({ kind: "customer", ref: "d".repeat(24) }),
+        resource: expect.objectContaining({ kind: "cart", ref: "e".repeat(24) }),
+        context: expect.objectContaining({ cartAction: "merge_guest", idempotentReplay: true }),
       }),
     );
     expect(JSON.stringify(recordAuditEvent.mock.calls)).not.toContain("guestTokenHash");

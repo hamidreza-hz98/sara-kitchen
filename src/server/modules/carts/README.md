@@ -32,3 +32,9 @@ SK-0140 adds the optimistic repository and application service documented in
 availability plus a complete authoritative pricing result. Mutations require the last observed cart
 version, rerun availability/pricing before persistence, increment exactly once, and return the winning
 fresh cart on conflict. Guest digests remain private and the audit adapter records no cart contents.
+
+SK-0141 adds the replica-set transaction and merge coordinator documented in
+[`docs/cart-merge.md`](../../../../docs/cart-merge.md). Duplicate quantities are summed and capped with
+notices, guest-only unavailable lines are reported and skipped, customer notes/address win, guest notes
+fill only an empty customer note, and both carts commit atomically. The durable guest merge target makes
+login retries idempotent without retaining or exposing the raw guest token.

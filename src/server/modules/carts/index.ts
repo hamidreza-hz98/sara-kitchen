@@ -47,6 +47,14 @@ export {
   type CartWrite,
 } from "./repository/cart";
 export {
+  CartMergeRepositoryError,
+  createCartMergeRepository,
+  type CartMergePlan,
+  type CartMergeRepository,
+  type CartMergeRepositoryResult,
+  type CartMergeTransactionState,
+} from "./repository/cart-merge";
+export {
   CART_FREE_DELIVERY_THRESHOLD_CENTS,
   CART_PRICING_ERROR_CODES,
   CART_TAX_POLICY,
@@ -80,4 +88,12 @@ export {
   type CartOperationResult,
   type CartRuntimePolicies,
 } from "./service/cart-crud";
-export { createCartAuditSink } from "./service/cart-audit";
+export { createCartAuditSink, createCartMergeAuditSink } from "./service/cart-audit";
+export {
+  CartMergeError,
+  createCartMergeService,
+  type CartMergeAuditEvent,
+  type CartMergeDependencies,
+  type CartMergeNotice,
+  type CartMergeResult,
+} from "./service/cart-merge";

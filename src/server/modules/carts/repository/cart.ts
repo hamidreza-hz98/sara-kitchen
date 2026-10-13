@@ -64,7 +64,9 @@ export interface CartRepository {
   save(current: CartSnapshot, expectedVersion: number, value: CartWrite): Promise<CartSnapshot>;
 }
 
-function snapshot(document: InstanceType<ReturnType<typeof getCartModel>>): CartSnapshot {
+export function mapCartSnapshot(
+  document: InstanceType<ReturnType<typeof getCartModel>>,
+): CartSnapshot {
   return Object.freeze({
     id: document._id.toHexString(),
     customerId: document.customerId?.toHexString() ?? null,
@@ -136,7 +138,7 @@ export function createCartRepository(connection: Connection): CartRepository {
   async function persist(document: InstanceType<typeof Cart>) {
     try {
       await document.save();
-      return snapshot(document);
+      return mapCartSnapshot(document);
     } catch (error) {
       if (isPersistenceConflict(error)) throw new CartRepositoryConflictError();
       throw error;
@@ -146,7 +148,7 @@ export function createCartRepository(connection: Connection): CartRepository {
   return {
     async findActive(identity) {
       const document = await Cart.findOne({ status: "active", ...identityFilter(identity) });
-      return document ? snapshot(document) : null;
+      return document ? mapCartSnapshot(document) : null;
     },
     async create(identity, expiry) {
       const metadata = actor(identity);

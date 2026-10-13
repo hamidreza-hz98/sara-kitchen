@@ -5,6 +5,7 @@ import type { Connection } from "mongoose";
 import { recordAuditEvent } from "@/server/modules/logs";
 
 import type { CartCrudAuditEvent } from "./cart-crud";
+import type { CartMergeAuditEvent } from "./cart-merge";
 
 const ACTION_CODES = {
   get: "security.access.check",
@@ -40,6 +41,37 @@ export function createCartAuditSink(
       outcome: event.outcome === "conflict" ? "failure" : event.outcome,
       requestId: context.requestId,
       context: { cartAction: event.action, optimisticConflict: event.outcome === "conflict" },
+      network: { policy: "omitted", ipHash: null, ipAddress: null },
+      userAgent: context.userAgent ?? null,
+    });
+  };
+}
+
+/** Login-merge audit adapter; the guest bearer digest is never part of the event contract. */
+export function createCartMergeAuditSink(
+  connection: Connection,
+  context: Readonly<{ requestId: string; userAgent?: string | null }>,
+) {
+  return async (event: CartMergeAuditEvent): Promise<void> => {
+    await recordAuditEvent(connection, {
+      action: "crud.resource.update",
+      actor: {
+        kind: "customer",
+        ref: event.customerId,
+        snapshot: { displayName: null, role: null },
+      },
+      resource: {
+        kind: "cart",
+        ref: event.cartId,
+        snapshot: { code: null, label: null, status: "active" },
+      },
+      outcome: event.outcome === "conflict" ? "failure" : event.outcome,
+      requestId: context.requestId,
+      context: {
+        cartAction: "merge_guest",
+        idempotentReplay: event.idempotent,
+        optimisticConflict: event.outcome === "conflict",
+      },
       network: { policy: "omitted", ipHash: null, ipAddress: null },
       userAgent: context.userAgent ?? null,
     });
