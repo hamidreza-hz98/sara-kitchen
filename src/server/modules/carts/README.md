@@ -13,5 +13,10 @@ SK-0137 adds the private Cart model documented in
 [`docs/cart-model.md`](../../../../docs/cart-model.md). Its partial unique indexes enforce one active
 cart for each guest digest or customer, and its only TTL index is restricted to terminal records with
 an explicit purge timestamp. `guestTokenHash` is excluded from normal queries and JSON output. Pricing
-fields are persistence invariants only; the authoritative engine remains the responsibility of
-SK-0138.
+fields are persistence invariants only.
+
+SK-0138 adds the server-only pricing engine documented in
+[`docs/cart-pricing-engine.md`](../../../../docs/cart-pricing-engine.md). It loads current dish prices
+through the Dishes public API, applies unit discount rounding and schedules, calculates delivery from
+server policy, keeps MVP tax explicit at zero, applies bounded server adjustments, and returns an
+immutable integer-cent snapshot. Browser-supplied prices and totals are never inputs to the calculation.
