@@ -17,6 +17,7 @@ const expectedFiles = [
   "0006-minio-object-storage.md",
   "0007-production-deployment-target.md",
   "0008-transaction-boundaries.md",
+  "0009-server-side-cart-identity.md",
 ];
 const requiredSections = ["Context", "Decision", "Alternatives considered", "Consequences"];
 

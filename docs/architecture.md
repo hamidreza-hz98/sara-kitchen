@@ -123,6 +123,7 @@ Settings does not import Customer or Order models.
 - MongoDB transactions are opened at the workflow boundary and passed through explicit infrastructure contracts; repositories do not silently create nested transactions.
 - Side effects such as WhatsApp/email notifications occur after durable state is recorded and use idempotent event/outbox processing where consistency matters.
 - Checkout, payment results, and refund-recording boundaries follow [ADR-0008](./adr/0008-transaction-boundaries.md). The current local standalone MongoDB cannot execute those workflows; they fail closed until a replica set is available.
+- Guest/customer cart identity, shared multi-device behavior, expiry, and transactional login merge follow [ADR-0009](./adr/0009-server-side-cart-identity.md). Login orchestration calls the Auth and Carts public APIs without creating a module-level dependency from Auth to Carts.
 
 ## Evolution rule
 
