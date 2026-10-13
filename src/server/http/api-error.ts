@@ -63,12 +63,16 @@ export class ApiError extends Error {
 
   static conflict(
     options: {
+      availability?: unknown;
+      current?: unknown;
       field?: string;
       publicMessage?: string;
       resource?: string;
     } = {},
   ): ApiError {
     const details: ApiErrorDetails = {
+      ...(options.availability !== undefined ? { availability: options.availability } : {}),
+      ...(options.current !== undefined ? { current: options.current } : {}),
       ...(options.field ? { field: options.field } : {}),
       ...(options.resource ? { resource: options.resource } : {}),
     };

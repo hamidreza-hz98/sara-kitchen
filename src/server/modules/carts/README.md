@@ -44,3 +44,9 @@ SK-0142 adds the optional recommendation coordinator documented in
 queries and locale-safe public projections; Carts applies a strict total time budget and fails open so
 the recommendation shelf can never delay authoritative cart rendering. Ranking is deterministic and
 explainable without customer history or behavioral profiles.
+
+SK-0143 adds the storefront-wide adapter and HTTP boundary documented in
+[`docs/global-cart-state.md`](../../../../docs/global-cart-state.md). A single `CartProvider` owns the
+sanitized projection, optimistic in-memory intents, rollback, version-conflict rebasing, cross-tab
+invalidation, and authentication-boundary refresh. Thin Route Handlers resolve server-owned identity
+and invoke the SK-0140 service; they never accept identity or pricing claims from the browser.

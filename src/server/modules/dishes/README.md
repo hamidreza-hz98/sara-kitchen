@@ -6,6 +6,10 @@ Cart recommendation reads remain a Dishes-owned public API. They use bounded rel
 candidate pools, current availability, deterministic ranking, and the ordinary locale-safe card
 projection; Carts never accesses the Dish model directly.
 
+Cart mutations consume `loadDishCartSources()`, a Dishes-owned public projection containing only
+authoritative pricing and availability facts. Route Handlers and Carts never import or query the Dish
+model directly.
+
 The Dish model implements the SK-0091 contract with English-canonical translated name, excerpt,
 bounded rich-text description, and labelled specifications; a stable unique slug; ordered media and
 category references; and ingredient links with optional paired amount/unit plus localized notes. One

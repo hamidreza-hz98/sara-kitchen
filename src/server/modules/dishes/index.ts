@@ -55,6 +55,7 @@ export type {
   DishPricingIssue,
 } from "./pricing/dish-pricing";
 export { countDishesUsingIngredient } from "./repository/ingredient-references";
+export { loadDishCartSources, type DishCartSource } from "./repository/cart-sources";
 export { countDishesUsingCategory } from "./repository/category-references";
 export { isAvailableDishSlug, listAvailableDishesForSitemap } from "./repository/sitemap";
 export type { DishSitemapEntry } from "./repository/sitemap";

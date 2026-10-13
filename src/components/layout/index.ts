@@ -9,3 +9,4 @@ export {
   type DashboardPermission,
 } from "./dashboard-policy";
 export { StorefrontShell, type StorefrontShellProps } from "./storefront-shell";
+export { StorefrontCartHeader, StorefrontCartMobileNavigation } from "./storefront-cart-chrome";

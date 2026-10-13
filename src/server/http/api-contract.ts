@@ -52,6 +52,10 @@ export type ApiValidationIssue = {
 };
 
 export type ApiErrorDetails = {
+  /** Sanitized authoritative resource snapshot for optimistic-conflict recovery. */
+  current?: unknown;
+  /** Sanitized structured correction details for recoverable availability conflicts. */
+  availability?: unknown;
   dependencies?: Readonly<{
     mongodb: "ready" | "unavailable";
     objectStorage: "ready" | "unavailable";

@@ -22,3 +22,9 @@ boundaries.
 locale and theme providers so messages, direction, close labels, and component styling are correct.
 It carries presentation state only; mutation outcomes and authoritative error data remain owned by
 the calling feature or server module.
+
+`CartProvider` is scoped to the storefront beneath `CustomerAuthProvider`. It projects bounded in-memory
+quantity intents over the latest sanitized server response, serializes mutations by authoritative version,
+and exposes one `useCart()` contract to the header, dish, and checkout surfaces. Browser storage contains
+only random cross-tab invalidation nonces. Authentication invalidation aborts guest-era work and reloads the
+post-merge customer cart. See [`docs/global-cart-state.md`](../../docs/global-cart-state.md).
