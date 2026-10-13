@@ -39,6 +39,14 @@ export {
   type CartStatus,
 } from "./model/cart";
 export {
+  CartRepositoryConflictError,
+  createCartRepository,
+  type CartIdentity,
+  type CartRepository,
+  type CartSnapshot,
+  type CartWrite,
+} from "./repository/cart";
+export {
   CART_FREE_DELIVERY_THRESHOLD_CENTS,
   CART_PRICING_ERROR_CODES,
   CART_TAX_POLICY,
@@ -56,3 +64,20 @@ export {
   type CartPricingResult,
   type DeliveryPriceBand,
 } from "./pricing/cart-pricing";
+export {
+  CART_CRUD_ACTIONS,
+  CART_CUSTOMER_IDLE_TTL_MS,
+  CART_GUEST_ABSOLUTE_TTL_MS,
+  CART_GUEST_IDLE_TTL_MS,
+  CART_TERMINAL_RETENTION_MS,
+  CartCrudError,
+  createCartCrudServices,
+  type CartCrudAction,
+  type CartCrudAuditEvent,
+  type CartCrudDependencies,
+  type CartDeliveryResolution,
+  type CartExpirationResult,
+  type CartOperationResult,
+  type CartRuntimePolicies,
+} from "./service/cart-crud";
+export { createCartAuditSink } from "./service/cart-audit";

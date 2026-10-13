@@ -26,3 +26,9 @@ SK-0139 adds the shared availability policy documented in
 the same authoritative checks for dish lifecycle/schedules, quantity, maximum lead time, configured
 service hours and cutoff, fresh delivery-area eligibility, and optional future stock. Stale conditions
 return typed, localized corrections and never silently remove or change a customer's line.
+
+SK-0140 adds the optimistic repository and application service documented in
+[`docs/cart-crud.md`](../../../../docs/cart-crud.md). Every successful read/mutation carries current
+availability plus a complete authoritative pricing result. Mutations require the last observed cart
+version, rerun availability/pricing before persistence, increment exactly once, and return the winning
+fresh cart on conflict. Guest digests remain private and the audit adapter records no cart contents.
