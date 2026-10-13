@@ -2,6 +2,10 @@
 
 Owns dish translations, slug, catalog state, media/category/ingredient references, base price/discount source data, availability, lead time, relations, and dish counters. It may consume the public APIs of Media, Categories, and Ingredients. Orders and carts persist their own snapshots rather than reaching into the Dish model.
 
+Cart recommendation reads remain a Dishes-owned public API. They use bounded related/category/featured
+candidate pools, current availability, deterministic ranking, and the ordinary locale-safe card
+projection; Carts never accesses the Dish model directly.
+
 The Dish model implements the SK-0091 contract with English-canonical translated name, excerpt,
 bounded rich-text description, and labelled specifications; a stable unique slug; ordered media and
 category references; and ingredient links with optional paired amount/unit plus localized notes. One

@@ -97,3 +97,9 @@ export {
   type CartMergeNotice,
   type CartMergeResult,
 } from "./service/cart-merge";
+export {
+  CART_RECOMMENDATION_TIME_BUDGET_MS,
+  createCartRecommendationLoader,
+  type CartRecommendationDependencies,
+  type CartRecommendationResult,
+} from "./service/cart-recommendations";

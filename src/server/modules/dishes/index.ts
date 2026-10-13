@@ -69,6 +69,15 @@ export type {
   DishCatalogRepository,
   DishCatalogRepositoryResult,
 } from "./repository/catalog";
+export {
+  DISH_RECOMMENDATION_QUERY_MAX_TIME_MS,
+  createDishRecommendationRepository,
+} from "./repository/recommendations";
+export type {
+  DishRecommendationCandidatePools,
+  DishRecommendationRepository,
+  DishRecommendationSource,
+} from "./repository/recommendations";
 export { DishRepositoryConflictError, createDishRepository } from "./repository/dish";
 export type {
   DishIngredientSnapshot,
@@ -92,6 +101,20 @@ export {
   DishCatalogQueryError,
   createDishCatalogService,
 } from "./service/catalog-query";
+export {
+  DISH_RECOMMENDATION_DEFAULT_LIMIT,
+  DISH_RECOMMENDATION_MAX_LIMIT,
+  DISH_RECOMMENDATION_MAX_SOURCE_DISHES,
+  DishRecommendationError,
+  createDishRecommendationService,
+} from "./service/recommendations";
+export type {
+  DishRecommendationDependencies,
+  DishRecommendationInput,
+  DishRecommendationItem,
+  DishRecommendationReason,
+  DishRecommendationResult,
+} from "./service/recommendations";
 export {
   DISH_VIEW_DEDUPLICATION_WINDOW_MS,
   DISH_VIEW_MINIMUM_ENGAGEMENT_MS,

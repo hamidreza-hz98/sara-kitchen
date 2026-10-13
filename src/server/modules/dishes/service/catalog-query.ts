@@ -320,7 +320,7 @@ function allergensFor(
   };
 }
 
-function toCatalogItem(
+export function mapDishCatalogItem(
   record: DishCatalogRecord,
   parsed: Pick<ParsedDishCatalogQuery, "locale" | "fallbackLocale">,
   at: Date,
@@ -366,7 +366,7 @@ export function createDishCatalogService(dependencies: DishCatalogDependencies) 
       const ingredientAllergens =
         await dependencies.ingredients.getAllergensByIngredientIds(ingredientIds);
       const items = result.items.map((record) =>
-        toCatalogItem(record, parsed.data, at, ingredientAllergens),
+        mapDishCatalogItem(record, parsed.data, at, ingredientAllergens),
       );
       const pagination = pageResult(items, result.total, {
         page: parsed.data.page,
@@ -398,7 +398,7 @@ export function createDishCatalogService(dependencies: DishCatalogDependencies) 
       const ingredientAllergens = await dependencies.ingredients.getAllergensByIngredientIds(
         record.ingredientIds,
       );
-      const item = toCatalogItem(record, parsed.data, at, ingredientAllergens);
+      const item = mapDishCatalogItem(record, parsed.data, at, ingredientAllergens);
       const localeOptions = {
         ...(parsed.data.fallbackLocale !== undefined
           ? { fallbackLocale: parsed.data.fallbackLocale }

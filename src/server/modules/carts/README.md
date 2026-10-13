@@ -38,3 +38,9 @@ SK-0141 adds the replica-set transaction and merge coordinator documented in
 notices, guest-only unavailable lines are reported and skipped, customer notes/address win, guest notes
 fill only an empty customer note, and both carts commit atomically. The durable guest merge target makes
 login retries idempotent without retaining or exposing the raw guest token.
+
+SK-0142 adds the optional recommendation coordinator documented in
+[`docs/cart-recommendations.md`](../../../../docs/cart-recommendations.md). Dishes owns bounded candidate
+queries and locale-safe public projections; Carts applies a strict total time budget and fails open so
+the recommendation shelf can never delay authoritative cart rendering. Ranking is deterministic and
+explainable without customer history or behavioral profiles.

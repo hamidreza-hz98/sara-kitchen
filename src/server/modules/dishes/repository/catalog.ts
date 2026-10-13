@@ -63,7 +63,7 @@ export interface DishCatalogRepository {
   findBySlug(slug: string): Promise<DishCatalogDetailRecord | null>;
 }
 
-const PUBLIC_CATALOG_PROJECTION = {
+export const DISH_PUBLIC_CATALOG_PROJECTION = {
   translations: 1,
   slug: 1,
   mediaIds: 1,
@@ -83,7 +83,7 @@ const PUBLIC_CATALOG_PROJECTION = {
 } as const;
 
 const PUBLIC_DETAIL_PROJECTION = {
-  ...PUBLIC_CATALOG_PROJECTION,
+  ...DISH_PUBLIC_CATALOG_PROJECTION,
   ingredients: 1,
   relatedDishIds: 1,
   relatedBlogIds: 1,
@@ -110,7 +110,7 @@ type ProjectedDish = Pick<
   | "featuredOrder"
 >;
 
-function toRecord(value: ProjectedDish): DishCatalogRecord {
+export function mapDishCatalogRecord(value: ProjectedDish): DishCatalogRecord {
   return {
     id: value._id.toHexString(),
     translations: value.translations,
@@ -151,7 +151,7 @@ type ProjectedDishDetail = ProjectedDish &
 
 function toDetailRecord(value: ProjectedDishDetail): DishCatalogDetailRecord {
   return {
-    ...toRecord(value),
+    ...mapDishCatalogRecord(value),
     ingredients: value.ingredients.map((ingredient) => ({
       ingredientId: ingredient.ingredientId.toHexString(),
       notes: ingredient.notes.map((note) => ({ ...note })),
@@ -168,14 +168,14 @@ export function createDishCatalogRepository(connection: Connection): DishCatalog
   return {
     async list(plan) {
       const [items, total] = await Promise.all([
-        Dish.find(plan.filter, PUBLIC_CATALOG_PROJECTION)
+        Dish.find(plan.filter, DISH_PUBLIC_CATALOG_PROJECTION)
           .sort(plan.sort)
           .skip(plan.skip)
           .limit(plan.limit)
           .lean<ProjectedDish[]>(),
         Dish.countDocuments(plan.filter),
       ]);
-      return { items: items.map(toRecord), total };
+      return { items: items.map(mapDishCatalogRecord), total };
     },
     async findBySlug(slug) {
       const item = await Dish.findOne(
