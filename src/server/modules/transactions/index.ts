@@ -33,3 +33,15 @@ export {
   type IdempotencyOutcome,
   type JsonValue,
 } from "./service/idempotency";
+
+export {
+  PaymentProviderError,
+  type PaymentProvider,
+  type PaymentProviderCapabilities,
+  type PaymentInitiation,
+  type ProviderCancellation,
+  type ProviderPaymentStatus,
+  type ProviderRefund,
+  type ProviderWebhookEnvelope,
+  type VerifiedProviderWebhook,
+} from "./provider/payment-provider";
