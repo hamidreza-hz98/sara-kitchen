@@ -5,8 +5,13 @@ import type { Connection, Model, Types } from "mongoose";
 
 import { SUPPORTED_LOCALES, type SupportedLocale } from "@/constants";
 import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
+import { TRANSACTION_STATUSES, type TransactionStatus } from "@/server/modules/transactions";
 
 import { generateOrderCode, ORDER_CODE_PATTERN } from "../policy/order-code";
+import {
+  validateInitialOrderState,
+  validateOrderTransitionEvidence,
+} from "../policy/order-state-machine";
 
 export const ORDER_STATUSES = [
   "pending_payment",
@@ -18,6 +23,7 @@ export const ORDER_STATUSES = [
   "payment_failed",
   "cancelled",
   "expired",
+  "refunded",
 ] as const;
 export const ORDER_MAX_MONEY_CENTS = 100_000_000;
 export const ORDER_MAX_LINES = 100;
@@ -105,6 +111,7 @@ export type OrderStatusEvent = {
   actorKind: "system" | "admin" | "customer";
   actorId: Types.ObjectId | null;
   reasonCode: string | null;
+  paymentStatus: TransactionStatus;
   occurredAt: Date;
   recordedAt: Date;
 };
@@ -332,6 +339,7 @@ const statusEventSchema = new Schema<OrderStatusEvent>(
       validate: { validator: (v: Types.ObjectId | null) => v === null || isValidObjectId(v) },
     },
     reasonCode: { type: String, default: null, match: /^[a-z][a-z0-9._-]{1,63}$/u },
+    paymentStatus: { type: String, enum: TRANSACTION_STATUSES, required: true },
     occurredAt: { type: Date, required: true },
     recordedAt: { type: Date, required: true, default: Date.now },
   },
@@ -357,7 +365,7 @@ export const orderSchema = createBaseSchema<OrderRecord>(
     items: { type: [itemSchema], required: true },
     transactionIds: { type: [Schema.Types.ObjectId], ref: "Transaction", default: [] },
     notes: note(1_000),
-    currency: { type: String, enum: ["EUR"], required: true, immutable: true, default: "EUR" },
+    currency: { type: String, enum: ["EUR"], required: true, immutable: true },
     locale: { type: String, enum: SUPPORTED_LOCALES, required: true, immutable: true },
     pricing: { type: pricingSchema, required: true },
     fulfillment: { type: fulfillmentSchema, required: true },
@@ -560,6 +568,36 @@ function checkInvariants(document: OrderRecord): string[] {
     new Set(history.map((event) => event.eventKey)).size !== history.length
   ) {
     errors.push("Order status/history revision is inconsistent.");
+  }
+  if (history.length > 0 && fulfillment) {
+    try {
+      validateInitialOrderState({
+        status: history[0]!.status,
+        actorKind: history[0]!.actorKind,
+        paymentStatus: history[0]!.paymentStatus,
+      });
+      for (let index = 1; index < history.length; index += 1) {
+        const previous = history[index - 1]!;
+        const current = history[index]!;
+        validateOrderTransitionEvidence({
+          from: previous.status,
+          to: current.status,
+          method: fulfillment.method,
+          paymentStatus: current.paymentStatus,
+          priorPaymentStatus: previous.paymentStatus,
+          actorKind: current.actorKind,
+          reasonCode: current.reasonCode,
+        });
+      }
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : "Invalid order transition history.");
+    }
+  }
+  if (
+    fulfillment &&
+    Boolean(fulfillment.completedAt) !== history.some((event) => event.status === "completed")
+  ) {
+    errors.push("Completion time must match a completed lifecycle event.");
   }
   if (history.some((event) => (event.actorKind === "system") !== (event.actorId === null))) {
     errors.push("Order status event actor is invalid.");

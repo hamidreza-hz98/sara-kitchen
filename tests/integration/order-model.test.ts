@@ -129,6 +129,7 @@ describe("persisted order model", () => {
       actorKind: "system",
       actorId: null,
       reasonCode: "payment_confirmed",
+      paymentStatus: "paid",
       occurredAt: new Date(),
       recordedAt: new Date(),
     });
@@ -155,5 +156,119 @@ describe("persisted order model", () => {
     await expect(Order.deleteOne({ _id: order._id })).rejects.toThrow(
       ORDER_SNAPSHOT_IMMUTABLE_ERROR,
     );
+  });
+
+  it("replays payment-coupled transitions on save even when validation is skipped", async () => {
+    if (!client) throw new Error("MongoDB did not start.");
+    const Order = getOrderModel(client.connection);
+    const order = await Order.create(validOrder());
+    order.status = "confirmed";
+    order.revision = 2;
+    order.statusHistory.push({
+      eventKey: "forged-confirmation",
+      status: "confirmed",
+      actorKind: "admin",
+      actorId: new Types.ObjectId(),
+      reasonCode: null,
+      paymentStatus: "pending",
+      occurredAt: new Date(),
+      recordedAt: new Date(),
+    });
+    await expect(order.save({ validateBeforeSave: false })).rejects.toThrow(/settled payment/u);
+    const persisted = await Order.collection.findOne({ _id: order._id });
+    expect(persisted).toMatchObject({ status: "pending_payment", currency: "EUR" });
+
+    const valid = await Order.findById(order._id);
+    if (!valid) throw new Error("Order disappeared.");
+    valid.status = "confirmed";
+    valid.revision = 2;
+    valid.statusHistory.push({
+      eventKey: "paid-confirmation",
+      status: "confirmed",
+      actorKind: "system",
+      actorId: null,
+      reasonCode: "payment_confirmed",
+      paymentStatus: "paid",
+      occurredAt: new Date(),
+      recordedAt: new Date(),
+    });
+    await valid.save();
+    expect((await Order.findById(order._id))?.status).toBe("confirmed");
+  });
+
+  it("persists pickup completion, partial-refund sync, then full refund without losing fulfillment history", async () => {
+    if (!client) throw new Error("MongoDB did not start.");
+    const Order = getOrderModel(client.connection);
+    const order = await Order.create(validOrder());
+    const adminId = new Types.ObjectId();
+    const observedAt = new Date("2026-10-14T12:00:00.000Z");
+    const steps = [
+      {
+        status: "confirmed",
+        actorKind: "system",
+        actorId: null,
+        paymentStatus: "paid",
+        reasonCode: "payment_confirmed",
+      },
+      {
+        status: "preparing",
+        actorKind: "admin",
+        actorId: adminId,
+        paymentStatus: "paid",
+        reasonCode: null,
+      },
+      {
+        status: "ready",
+        actorKind: "admin",
+        actorId: adminId,
+        paymentStatus: "paid",
+        reasonCode: null,
+      },
+      {
+        status: "completed",
+        actorKind: "admin",
+        actorId: adminId,
+        paymentStatus: "paid",
+        reasonCode: null,
+      },
+      {
+        status: "completed",
+        actorKind: "system",
+        actorId: null,
+        paymentStatus: "partially-refunded",
+        reasonCode: "payment_partial_refund",
+      },
+      {
+        status: "refunded",
+        actorKind: "system",
+        actorId: null,
+        paymentStatus: "refunded",
+        reasonCode: "refund_completed",
+      },
+    ] as const;
+    for (const [index, step] of steps.entries()) {
+      order.statusHistory.push({
+        eventKey: `step-${index + 1}`,
+        ...step,
+        occurredAt: observedAt,
+        recordedAt: observedAt,
+      });
+    }
+    order.status = "refunded";
+    order.revision = order.statusHistory.length;
+    order.fulfillment.completedAt = observedAt;
+    await order.save();
+    const stored = await Order.findById(order._id);
+    expect(stored?.status).toBe("refunded");
+    expect(stored?.statusHistory.map((event) => event.status)).toEqual([
+      "pending_payment",
+      "confirmed",
+      "preparing",
+      "ready",
+      "completed",
+      "completed",
+      "refunded",
+    ]);
+    expect(stored?.fulfillment.completedAt).toEqual(observedAt);
   });
 });

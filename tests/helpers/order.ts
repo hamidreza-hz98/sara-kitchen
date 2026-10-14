@@ -63,6 +63,7 @@ export function validOrder(overrides: Record<string, unknown> = {}) {
         actorKind: "system" as const,
         actorId: null,
         reasonCode: null,
+        paymentStatus: "pending" as const,
         occurredAt: acceptedAt,
         recordedAt: acceptedAt,
       },

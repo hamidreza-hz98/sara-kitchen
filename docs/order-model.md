@@ -5,7 +5,7 @@
 ## Identity and lifecycle
 
 - The server generates `SK-XXXX-XXXX-XXXX-XXXX` from 80 cryptographically random bits, using an unambiguous Crockford-style alphabet. The unique `code` index prevents persisted collisions. A rare duplicate-key failure must cause the **outer checkout transaction** to retry with a newly generated code; do not retry a duplicate write inside an already-aborted MongoDB transaction. The checkout workflow owns that retry in SK-0154.
-- The order stores a `status`, monotonically appended `statusHistory`, and a revision equal to history length. Existing events cannot be edited or removed; event keys are unique. Allowed transitions, terminal behavior, and actor policy belong to SK-0153.
+- The order stores a `status`, monotonically appended `statusHistory`, and a revision equal to history length. Existing events cannot be edited or removed; event keys are unique. Each event records the observed Transaction state. Allowed transitions, terminal behavior, and actor policy are defined in `docs/order-state-machine.md`.
 - Transaction IDs are append-only and unique, accommodating a later replacement payment attempt or refund record without erasing history. The Orders module does not import the Transaction model.
 - Customer and status timelines, transaction lookup, and unique code have indexes. Financial orders have no TTL or soft deletion.
 

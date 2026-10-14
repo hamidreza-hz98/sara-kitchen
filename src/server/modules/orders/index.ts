@@ -2,6 +2,18 @@
 export const MODULE_NAME = "orders" as const;
 export { ORDER_STATUSES, type OrderStatus } from "./model/order";
 export {
+  ORDER_TRANSITIONS,
+  OrderTransitionError,
+  initialOrderEffects,
+  planOrderTransition,
+  soldCountLifecycle,
+  validateInitialOrderState,
+  type OrderNotificationIntent,
+  type OrderTransitionActor,
+  type OrderTransitionEffects,
+  type OrderTransitionInput,
+} from "./policy/order-state-machine";
+export {
   countHistoricalOrdersForCustomer,
   exportOrderHistoryForCustomer,
 } from "./service/customer-privacy";
