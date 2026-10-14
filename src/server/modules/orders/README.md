@@ -4,4 +4,6 @@ Owns order codes, immutable customer/address/item/pricing snapshots, status mach
 
 Checkout owns workflow composition and passes one transaction session explicitly to participating public module APIs. Order, local payment intent, cart transition, and outbox records commit together. Provider calls and WhatsApp notifications occur only after commit; see `docs/adr/0008-transaction-boundaries.md`.
 
+The private `Order` model, human-code uniqueness, immutable purchase snapshots, append-only lifecycle data, and indexes are specified in `docs/order-model.md`. Only this module may import its model. SK-0153 still owns allowed status transitions, and checkout must retry the entire transaction on a rare generated-code collision.
+
 For checkout implementation, use Transactions' public `runIdempotentOperation()` as the outer transaction owner; do not open a nested transaction. Its callback creates the order, local payment intent, cart transition, and outbox records with the supplied session. See `docs/idempotency.md`.
