@@ -36,7 +36,7 @@ function StatePanel({ action, description, icon, role = "status", title }: State
         >
           {icon}
         </Box>
-        <Typography component="h3" id={titleId} variant="h4">
+        <Typography component="h2" id={titleId} variant="h4">
           {title}
         </Typography>
         <Typography color="text.secondary">{description}</Typography>

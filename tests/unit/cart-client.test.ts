@@ -32,11 +32,12 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("cart HTTP transport", () => {
   it("uses versioned item endpoints and accepts only the sanitized server projection", async () => {
-    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response(JSON.stringify(body()), {
-        headers: { "content-type": "application/json" },
-        status: 200,
-      }),
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation(
+      async () =>
+        new Response(JSON.stringify(body()), {
+          headers: { "content-type": "application/json" },
+          status: 200,
+        }),
     );
     vi.stubGlobal("fetch", fetchMock);
     const controller = new AbortController();
@@ -96,5 +97,32 @@ describe("cart HTTP transport", () => {
     await expect(cartClientTransport.get(new AbortController().signal)).rejects.toMatchObject({
       code: "unknown",
     });
+  });
+
+  it("persists notes and clears the cart through versioned root operations", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation(
+      async () =>
+        new Response(JSON.stringify(body()), {
+          headers: { "content-type": "application/json" },
+          status: 200,
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const signal = new AbortController().signal;
+    await cartClientTransport.setNotes({ expectedVersion: 3, notes: "Ring the bell" }, signal);
+    await cartClientTransport.clear({ expectedVersion: 4 }, signal);
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      "/api/cart",
+      expect.objectContaining({
+        body: JSON.stringify({ expectedVersion: 3, notes: "Ring the bell" }),
+        method: "PATCH",
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      "/api/cart",
+      expect.objectContaining({ body: JSON.stringify({ expectedVersion: 4 }), method: "DELETE" }),
+    );
   });
 });

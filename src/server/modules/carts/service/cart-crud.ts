@@ -72,6 +72,7 @@ export type CartOperationResult = Readonly<{
   availability: CartAvailabilityResult;
   cart: CartSnapshot;
   pricing: CartPricingResult;
+  pricingChanged: boolean;
 }>;
 
 export type CartExpirationResult = Readonly<{
@@ -200,6 +201,7 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
     state: MutableCartState,
     at: Date,
     stage: "cart_mutation" | "checkout" = "cart_mutation",
+    allowUnavailable = false,
   ): Promise<Readonly<{ availability: CartAvailabilityResult; pricing: CartPricingResult }>> {
     const policies = await dependencies.loadPolicies();
     let delivery: CartDeliveryResolution | null = null;
@@ -225,7 +227,9 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
       },
       dependencies.availability,
     );
-    if (!availability.valid) throw new CartCrudError("availability_changed", { availability });
+    if (!availability.valid && !allowUnavailable) {
+      throw new CartCrudError("availability_changed", { availability });
+    }
 
     if (
       delivery?.eligible &&
@@ -271,9 +275,29 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
     return null;
   }
 
-  async function currentResult(cart: CartSnapshot): Promise<CartOperationResult> {
-    const result = await calculate(cart, mutable(cart), dependencies.now());
-    return Object.freeze({ cart: cartWithPricing(cart, result.pricing), ...result });
+  async function currentResult(
+    cart: CartSnapshot,
+    allowUnavailable = false,
+  ): Promise<CartOperationResult> {
+    const result = await calculate(
+      cart,
+      mutable(cart),
+      dependencies.now(),
+      "cart_mutation",
+      allowUnavailable,
+    );
+    const pricingChanged =
+      cart.pricing.subtotalCents !== result.pricing.summary.subtotalCents ||
+      cart.pricing.discountCents !== result.pricing.summary.discountCents ||
+      cart.pricing.deliveryFeeCents !== result.pricing.summary.deliveryFeeCents ||
+      cart.pricing.taxCents !== result.pricing.summary.taxCents ||
+      cart.pricing.adjustmentsCents !== result.pricing.summary.adjustmentsCents ||
+      cart.pricing.totalCents !== result.pricing.summary.totalCents;
+    return Object.freeze({
+      cart: cartWithPricing(cart, result.pricing),
+      ...result,
+      pricingChanged,
+    });
   }
 
   async function conflict(identity: CartIdentity): Promise<never> {
@@ -321,6 +345,7 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
       const result = Object.freeze({
         cart: cartWithPricing(saved, calculated.pricing),
         ...calculated,
+        pricingChanged: false,
       });
       await audit(action, identity, saved.id, "success");
       return result;
@@ -339,7 +364,7 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
       validateIdentity(identity);
       const cart = await active(identity);
       if (!cart) return null;
-      const result = await currentResult(cart);
+      const result = await currentResult(cart, true);
       await audit("get", identity, cart.id, "success");
       return result;
     },

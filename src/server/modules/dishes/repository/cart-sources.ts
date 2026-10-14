@@ -2,6 +2,9 @@ import "server-only";
 
 import { Types, type ClientSession, type Connection } from "mongoose";
 
+import type { SupportedLocale } from "@/constants";
+import { resolveLocalizedValue } from "@/locales/translation-selection";
+
 import {
   getDishModel,
   type DishAvailability,
@@ -25,6 +28,13 @@ export type DishCartSource = Readonly<{
     discount: DishDiscount;
     id: string;
   }>;
+}>;
+
+export type DishCartPresentation = Readonly<{
+  id: string;
+  imageMediaId: string | null;
+  name: string;
+  slug: string;
 }>;
 
 type ProjectedDish = Pick<
@@ -95,5 +105,37 @@ export async function loadDishCartSources(
         },
       },
     ];
+  });
+}
+
+type PresentationDish = Pick<DishRecord, "_id" | "mediaIds" | "slug" | "translations">;
+
+/** Localized, public-safe identity fields used to render cart lines. */
+export async function loadDishCartPresentations(
+  connection: Connection,
+  dishIds: readonly string[],
+  locale: SupportedLocale,
+): Promise<readonly DishCartPresentation[]> {
+  const validIds = [...new Set(dishIds)].filter((id) => Types.ObjectId.isValid(id));
+  if (validIds.length === 0) return [];
+  const records = await getDishModel(connection)
+    .find({ _id: { $in: validIds } }, { mediaIds: { $slice: 1 }, slug: 1, translations: 1 })
+    .lean<PresentationDish[]>();
+  const byId = new Map(records.map((record) => [record._id.toHexString(), record]));
+  return validIds.flatMap((id) => {
+    const record = byId.get(id);
+    const name = record
+      ? resolveLocalizedValue(record.translations, "name", locale)?.value
+      : undefined;
+    return record && name
+      ? [
+          {
+            id,
+            imageMediaId: record.mediaIds[0]?.toHexString() ?? null,
+            name,
+            slug: record.slug,
+          },
+        ]
+      : [];
   });
 }

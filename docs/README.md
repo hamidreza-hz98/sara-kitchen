@@ -31,6 +31,7 @@ Current records:
 - [`cart-merge.md`](./cart-merge.md) — transactional guest-login merge rules, quantity caps, unavailable-item notices, customer preference precedence, conflicts, and idempotent replay;
 - [`cart-recommendations.md`](./cart-recommendations.md) — deterministic related/category/featured ranking, explainability, privacy, bounded catalog work, localization, and cart-render failure isolation;
 - [`global-cart-state.md`](./global-cart-state.md) — server-authoritative optimistic cart state, mutation sequencing, rollback, shared badge state, cross-tab invalidation, and authentication merge refresh;
+- [`cart-step-one.md`](./cart-step-one.md) — responsive cart items, corrections, notes, authoritative summary, and non-blocking recommendations;
 - [`cart-pricing-engine.md`](./cart-pricing-engine.md) — authoritative integer-cent cart totals, discount timing, distance-band delivery, free-delivery threshold, adjustments, and explicit MVP tax policy;
 - [`code-quality.md`](./code-quality.md) — strict compiler, lint, import, runtime, and negative-test gates;
 - [`contact-settings.md`](./contact-settings.md) — validated multilingual contact details, Porto location/service area, business hours, safe map configuration, and public projection.

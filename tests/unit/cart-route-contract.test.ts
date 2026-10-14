@@ -4,10 +4,12 @@ vi.mock("server-only", () => ({}));
 
 const state = vi.hoisted(() => ({
   addItem: vi.fn(),
+  clear: vi.fn(),
   context: vi.fn(),
   create: vi.fn(),
   get: vi.fn(),
   removeItem: vi.fn(),
+  setNotes: vi.fn(),
   updateQuantity: vi.fn(),
 }));
 
@@ -16,12 +18,16 @@ vi.mock("@/app/api/cart/route-helper", () => ({
     if (token) response.headers.append("set-cookie", `sk_guest_cart=${token}; HttpOnly; Path=/`);
     return response;
   },
+  cartClientProjection: vi.fn(async (_connection: unknown, result: unknown) => result),
   cartRequestContext: state.context,
+  cartRequestLocale: vi.fn(() => "en"),
   resolveCartCrud: () => ({
     addItem: state.addItem,
+    clear: state.clear,
     create: state.create,
     get: state.get,
     removeItem: state.removeItem,
+    setNotes: state.setNotes,
     updateQuantity: state.updateQuantity,
   }),
   translateCartError(error: unknown): never {
@@ -29,7 +35,7 @@ vi.mock("@/app/api/cart/route-helper", () => ({
   },
 }));
 
-import { GET } from "@/app/api/cart/route";
+import { DELETE as CLEAR, GET, PATCH as NOTES } from "@/app/api/cart/route";
 import { POST } from "@/app/api/cart/items/route";
 import { DELETE, PATCH } from "@/app/api/cart/items/[dishId]/route";
 
@@ -56,8 +62,10 @@ beforeEach(() => {
   state.get.mockResolvedValue(cart);
   state.create.mockResolvedValue(cart);
   state.addItem.mockResolvedValue(cart);
+  state.clear.mockResolvedValue(cart);
   state.updateQuantity.mockResolvedValue(cart);
   state.removeItem.mockResolvedValue(cart);
+  state.setNotes.mockResolvedValue(cart);
 });
 
 describe("cart Route Handler contract", () => {
@@ -113,5 +121,17 @@ describe("cart Route Handler contract", () => {
     const response = await GET(request("/api/cart"));
     await expect(response.json()).resolves.toMatchObject({ data: null, ok: true });
     expect(state.get).not.toHaveBeenCalled();
+  });
+
+  it("updates notes and clears through versioned root mutations", async () => {
+    const notes = await NOTES(
+      request("/api/cart", "PATCH", { expectedVersion: 6, notes: "Ring the bell" }),
+    );
+    expect(notes.status).toBe(200);
+    expect(state.setNotes).toHaveBeenCalledWith(identity, 6, "Ring the bell");
+
+    const cleared = await CLEAR(request("/api/cart", "DELETE", { expectedVersion: 7 }));
+    expect(cleared.status).toBe(200);
+    expect(state.clear).toHaveBeenCalledWith(identity, 7);
   });
 });

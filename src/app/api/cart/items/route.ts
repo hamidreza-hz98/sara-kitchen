@@ -11,7 +11,9 @@ import { CART_MAX_QUANTITY_PER_LINE } from "@/server/modules/carts";
 
 import {
   appendGuestCookie,
+  cartClientProjection,
   cartRequestContext,
+  cartRequestLocale,
   resolveCartCrud,
   translateCartError,
 } from "../route-helper";
@@ -42,13 +44,14 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
     try {
       const current = await service.create(context.identity);
+      const result = await service.addItem(
+        context.identity,
+        input.expectedVersion ?? current.cart.version,
+        input.dishId,
+        input.quantity,
+      );
       return apiSuccess(
-        await service.addItem(
-          context.identity,
-          input.expectedVersion ?? current.cart.version,
-          input.dishId,
-          input.quantity,
-        ),
+        await cartClientProjection(context.connection, result, cartRequestLocale(request)),
       );
     } catch (error) {
       return translateCartError(error);

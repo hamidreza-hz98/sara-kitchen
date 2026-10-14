@@ -14,12 +14,13 @@ import {
 import { CUSTOMER_AUTH_SYNC_KEY } from "@/lib/customer-auth-sync";
 
 type CartIntent = {
-  dishId: string;
+  dishId?: string;
   id: number;
+  notes?: string | null;
   quantity?: number;
   reject(error: CartClientError): void;
   resolve(): void;
-  type: "add" | "remove" | "update";
+  type: "add" | "clear" | "notes" | "remove" | "update";
 };
 
 type CartView = Readonly<{
@@ -41,10 +42,13 @@ const EMPTY_PRICING = Object.freeze({
 
 function emptyCart(): CartClientSnapshot {
   return {
+    availability: { earliestReadyAt: null, orderLeadTimeMinutes: 0, valid: true },
     currency: "EUR",
     id: null,
     lines: [],
+    notes: null,
     pricing: EMPTY_PRICING,
+    pricingChanged: false,
     selectedAddressId: null,
     version: null,
   };
@@ -57,7 +61,17 @@ function project(
   if (!authoritative && intents.length === 0) return null;
   const source = authoritative ?? emptyCart();
   const lines = source.lines.map((line) => ({ ...line }));
+  let notes = source.notes;
   for (const intent of intents) {
+    if (intent.type === "clear") {
+      lines.splice(0);
+      continue;
+    }
+    if (intent.type === "notes") {
+      notes = intent.notes ?? null;
+      continue;
+    }
+    if (!intent.dishId) continue;
     const index = lines.findIndex(({ dishId }) => dishId === intent.dishId);
     if (intent.type === "remove") {
       if (index >= 0) lines.splice(index, 1);
@@ -68,9 +82,18 @@ function project(
       continue;
     }
     if (index >= 0) lines[index]!.quantity += intent.quantity ?? 1;
-    else lines.push({ dishId: intent.dishId, quantity: intent.quantity ?? 1 });
+    else
+      lines.push({
+        availability: null,
+        dishId: intent.dishId,
+        image: null,
+        name: null,
+        pricing: null,
+        quantity: intent.quantity ?? 1,
+        slug: null,
+      });
   }
-  return { ...source, lines };
+  return { ...source, lines, notes };
 }
 
 function normalizeError(error: unknown): CartClientError {
@@ -115,7 +138,7 @@ export function CartProvider({
     setView({
       cart: project(authoritative.current, intents.current),
       error,
-      pendingDishIds: new Set(intents.current.map(({ dishId }) => dishId)),
+      pendingDishIds: new Set(intents.current.flatMap(({ dishId }) => (dishId ? [dishId] : []))),
       status: status ?? (error ? "error" : "ready"),
     });
   }, []);
@@ -152,13 +175,27 @@ export function CartProvider({
         const epoch = identityEpoch.current;
         const controller = new AbortController();
         mutationController.current = controller;
-        const input = {
-          dishId: intent.dishId,
-          expectedVersion: authoritative.current?.version ?? null,
-          ...(intent.quantity === undefined ? {} : { quantity: intent.quantity }),
-        };
         try {
-          const result = await transport[intent.type](input, controller.signal);
+          const expectedVersion = authoritative.current?.version;
+          if (expectedVersion === null || expectedVersion === undefined) {
+            throw new CartClientError("rejected");
+          }
+          const result =
+            intent.type === "clear"
+              ? await transport.clear({ expectedVersion }, controller.signal)
+              : intent.type === "notes"
+                ? await transport.setNotes(
+                    { expectedVersion, notes: intent.notes ?? null },
+                    controller.signal,
+                  )
+                : await transport[intent.type](
+                    {
+                      dishId: intent.dishId!,
+                      expectedVersion,
+                      ...(intent.quantity === undefined ? {} : { quantity: intent.quantity }),
+                    },
+                    controller.signal,
+                  );
           if (epoch !== identityEpoch.current || controller.signal.aborted) continue;
           authoritative.current = result;
           intents.current = intents.current.filter(({ id }) => id !== intent.id);
@@ -188,17 +225,25 @@ export function CartProvider({
   }, [publish, refresh, transport]);
 
   const enqueue = useCallback(
-    (type: CartIntent["type"], dishId: string, quantity?: number): Promise<void> => {
+    (
+      type: CartIntent["type"],
+      dishId?: string,
+      quantity?: number,
+      notes?: string | null,
+    ): Promise<void> => {
       if (
-        !validDishId(dishId) ||
-        (type !== "remove" && (!Number.isSafeInteger(quantity) || (quantity ?? 0) < 1))
+        (["add", "remove", "update"].includes(type) && (!dishId || !validDishId(dishId))) ||
+        (["add", "update"].includes(type) &&
+          (!Number.isSafeInteger(quantity) || (quantity ?? 0) < 1)) ||
+        (type === "notes" && notes !== null && notes !== undefined && notes.length > 1_000)
       ) {
         return Promise.reject(new CartClientError("rejected"));
       }
       return new Promise<void>((resolve, reject) => {
         intents.current.push({
-          dishId: dishId.toLowerCase(),
+          ...(dishId ? { dishId: dishId.toLowerCase() } : {}),
           id: ++intentSequence.current,
+          ...(type === "notes" ? { notes: notes ?? null } : {}),
           ...(quantity === undefined ? {} : { quantity }),
           reject,
           resolve,
@@ -259,12 +304,14 @@ export function CartProvider({
     () => ({
       addItem: (dishId, quantity = 1) => enqueue("add", dishId, quantity),
       cart: view.cart,
+      clearCart: () => enqueue("clear"),
       clearError: () => publish(),
       error: view.error,
       itemCount: view.cart?.lines.reduce((total, line) => total + line.quantity, 0) ?? 0,
       pendingDishIds: view.pendingDishIds,
       refresh,
       removeItem: (dishId) => enqueue("remove", dishId),
+      setNotes: (notes) => enqueue("notes", undefined, undefined, notes),
       status: view.status,
       updateQuantity: (dishId, quantity) => enqueue("update", dishId, quantity),
     }),

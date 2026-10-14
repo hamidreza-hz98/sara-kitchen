@@ -50,3 +50,8 @@ SK-0143 adds the storefront-wide adapter and HTTP boundary documented in
 sanitized projection, optimistic in-memory intents, rollback, version-conflict rebasing, cross-tab
 invalidation, and authentication-boundary refresh. Thin Route Handlers resolve server-owned identity
 and invoke the SK-0140 service; they never accept identity or pricing claims from the browser.
+
+SK-0144 adds the first cart page, localized public line projection, versioned clear/notes operations,
+and non-blocking recommendation endpoint documented in
+[`docs/cart-step-one.md`](../../../../docs/cart-step-one.md). Recoverable unavailable lines remain
+visible for correction, while server prices and availability continue to gate checkout.

@@ -15,9 +15,24 @@ const DISH = "1".repeat(24);
 
 function snapshot(quantity: number, version: number): CartClientSnapshot {
   return {
+    availability: { earliestReadyAt: null, orderLeadTimeMinutes: 0, valid: true },
     currency: "EUR",
     id: "a".repeat(24),
-    lines: quantity > 0 ? [{ dishId: DISH, quantity }] : [],
+    lines:
+      quantity > 0
+        ? [
+            {
+              availability: null,
+              dishId: DISH,
+              image: null,
+              name: null,
+              pricing: null,
+              quantity,
+              slug: null,
+            },
+          ]
+        : [],
+    notes: null,
     pricing: {
       adjustmentsCents: 0,
       calculatedAt: "2026-10-13T12:00:00.000Z",
@@ -27,6 +42,7 @@ function snapshot(quantity: number, version: number): CartClientSnapshot {
       taxCents: 0,
       totalCents: quantity * 1_000,
     },
+    pricingChanged: false,
     selectedAddressId: null,
     version,
   };
@@ -45,8 +61,10 @@ function deferred<T>() {
 function transport(overrides: Partial<CartClientTransport> = {}): CartClientTransport {
   return {
     add: vi.fn(async () => snapshot(2, 2)),
+    clear: vi.fn(async () => snapshot(0, 2)),
     get: vi.fn(async () => snapshot(1, 1)),
     remove: vi.fn(async () => snapshot(0, 2)),
+    setNotes: vi.fn(async () => snapshot(1, 2)),
     update: vi.fn(async () => snapshot(3, 2)),
     ...overrides,
   };
