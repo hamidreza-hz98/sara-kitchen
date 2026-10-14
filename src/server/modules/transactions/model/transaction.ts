@@ -5,6 +5,8 @@ import type { Connection, Model, Types } from "mongoose";
 
 import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
 
+import { replayTransactionHistory } from "../policy/transaction-state-machine";
+
 export const TRANSACTION_METHODS = ["mbway", "paypal", "card", "cash"] as const;
 export const TRANSACTION_PROVIDERS = [
   "mbway-sandbox",
@@ -229,6 +231,26 @@ function hasEditedSavedEvents(document: {
   );
 }
 
+function historyError(document: TransactionRecord): string | null {
+  try {
+    const replayed = replayTransactionHistory(document.amounts.requestedCents, document.events);
+    if (replayed.status !== document.status) return "Transaction status must match its history.";
+    for (const key of [
+      "requestedCents",
+      "authorizedCents",
+      "capturedCents",
+      "refundedCents",
+    ] as const) {
+      if (replayed.amounts[key] !== document.amounts[key]) {
+        return "Transaction amounts must match its history.";
+      }
+    }
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : "Invalid transaction history.";
+  }
+}
+
 transactionSchema.post("init", rememberEvents);
 transactionSchema.post("save", rememberEvents);
 
@@ -253,8 +275,9 @@ transactionSchema.pre("validate", function validateTransaction() {
   if (this.events.length < 1 || this.events.length > TRANSACTION_MAX_EVENTS) {
     this.invalidate("events", "Transaction needs 1 to 500 bounded events.");
   }
-  if (this.events[0]?.status !== "created" || this.events.at(-1)?.status !== this.status) {
-    this.invalidate("events", "History must begin at created and end at the current status.");
+  if (this.amounts) {
+    const error = historyError(this);
+    if (error) this.invalidate("events", error);
   }
   const keys = this.events.map((event) => event.eventKey);
   if (new Set(keys).size !== keys.length) {
@@ -274,9 +297,8 @@ transactionSchema.pre("validate", function validateTransaction() {
 
 transactionSchema.pre("save", function rejectEventRewrite() {
   if (hasEditedSavedEvents(this)) throw new Error(TRANSACTION_APPEND_ONLY_ERROR);
-  if (this.events[0]?.status !== "created" || this.events.at(-1)?.status !== this.status) {
-    throw new Error("Transaction history must match its current status.");
-  }
+  const error = historyError(this);
+  if (error) throw new Error(error);
 });
 
 for (const operation of [

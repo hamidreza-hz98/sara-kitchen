@@ -120,7 +120,7 @@ describe("transaction model", () => {
       eventKey: "pending-2",
       source: "provider",
       status: "pending",
-      amountCents: 10_000,
+      amountCents: null,
       responseCode: "ACCEPTED",
       providerEventId: "evt_2",
       occurredAt: new Date("2026-10-14T10:01:00.000Z"),

@@ -73,7 +73,7 @@ describe("persisted transaction model", () => {
       eventKey: "provider-pending",
       source: "provider",
       status: "pending",
-      amountCents: 1200,
+      amountCents: null,
       responseCode: "ACCEPTED",
       providerEventId: "evt_pending",
       occurredAt: new Date(),
@@ -95,5 +95,53 @@ describe("persisted transaction model", () => {
       TRANSACTION_APPEND_ONLY_ERROR,
     );
     expect((await Transaction.findById(record._id))?.events).toHaveLength(2);
+  });
+
+  it("rejects persisted status regressions and duplicate callbacks", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const Transaction = getTransactionModel(client.connection);
+    const record = await Transaction.create(input("f".repeat(64)));
+    record.status = "paid";
+    record.amounts.capturedCents = 1200;
+    record.events.push({
+      eventKey: "paid-1",
+      source: "provider",
+      status: "paid",
+      amountCents: 1200,
+      responseCode: "PAID",
+      providerEventId: "provider-paid-1",
+      occurredAt: new Date(),
+      recordedAt: new Date(),
+    });
+    await record.save();
+
+    record.status = "pending";
+    record.events.push({
+      eventKey: "late-pending",
+      source: "provider",
+      status: "pending",
+      amountCents: null,
+      responseCode: "PENDING",
+      providerEventId: "provider-late-pending",
+      occurredAt: new Date(),
+      recordedAt: new Date(),
+    });
+    await expect(record.save()).rejects.toThrow(/invalid-transition|Cannot transition/u);
+
+    const fresh = await Transaction.findById(record._id);
+    if (!fresh) throw new Error("Transaction disappeared.");
+    fresh.status = "partially-refunded";
+    fresh.amounts.refundedCents = 100;
+    fresh.events.push({
+      eventKey: "refund-1",
+      source: "provider",
+      status: "partially-refunded",
+      amountCents: 100,
+      responseCode: "REFUNDED",
+      providerEventId: "provider-paid-1",
+      occurredAt: new Date(),
+      recordedAt: new Date(),
+    });
+    await expect(fresh.save()).rejects.toThrow(/already been recorded|unique/u);
   });
 });

@@ -4,6 +4,8 @@ Owns provider/type, monetary state, provider references, idempotency, append-onl
 
 The private `Transaction` Mongoose model and its invariants are documented in `docs/transaction-model.md`. Other modules must use future public transaction services, never import the model directly.
 
+The state transition table, replay rules, and internal MB Way sandbox fixture mapping are documented in `docs/transaction-state-machine.md`. The model rejects histories that the policy cannot replay. The selected live acquirer still needs its own authenticated event adapter.
+
 Payment callbacks persist their verified event and local state within the Orders-owned workflow transaction, using an explicit session. External MB Way requests and phone-call refunds are never made inside that transaction. Unknown results enter reconciliation; see `docs/adr/0008-transaction-boundaries.md`.
 
 The private `idempotency_records` collection and public `runIdempotentOperation()` contract are documented in `docs/idempotency.md`. The unique index is the concurrency guard; the TTL index is retention cleanup, not an exact expiration clock. The service owns the transaction, passes its session to the caller's workflow, and persists a small replayable result atomically. No external side effects are permitted inside its callback.

@@ -15,6 +15,18 @@ export {
 export { verifyMbWayWebhookSignature } from "./policy/mbway-webhook-signature";
 
 export {
+  mapMbWaySandboxEvent,
+  planTransactionTransition,
+  replayTransactionHistory,
+  TRANSACTION_TRANSITIONS,
+  TransactionTransitionError,
+  type TransactionEventKind,
+  type TransactionSnapshot,
+  type TransactionTransition,
+  type TransactionTransitionInput,
+} from "./policy/transaction-state-machine";
+
+export {
   fingerprintRequest,
   runIdempotentOperation,
   type IdempotencyInput,
