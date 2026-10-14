@@ -61,6 +61,7 @@ function createMemoryRepository() {
         customerId: identity.kind === "customer" ? identity.customerId : null,
         lines: Object.freeze([]),
         selectedAddressId: null,
+        pickupConfirmed: false,
         notes: null,
         pricing: Object.freeze(emptyPricing()),
         currency: "EUR",
@@ -80,6 +81,7 @@ function createMemoryRepository() {
         ...stored,
         lines: Object.freeze(value.lines.map((line) => Object.freeze({ ...line }))),
         selectedAddressId: value.selectedAddressId,
+        pickupConfirmed: value.pickupConfirmed === true,
         notes: value.notes,
         pricing: Object.freeze({
           ...value.pricing,
@@ -216,6 +218,13 @@ describe("cart CRUD services", () => {
     result = await test.services.selectAddress(CUSTOMER, result.cart.version, ADDRESS_ID);
     expect(test.resolveDelivery).toHaveBeenCalledWith(CUSTOMER_ID, ADDRESS_ID);
     expect(result.pricing.summary).toMatchObject({ deliveryFeeCents: 500, totalCents: 4_500 });
+    expect(result.cart.pickupConfirmed).toBe(false);
+
+    result = await test.services.selectAddress(CUSTOMER, result.cart.version, null);
+    expect(result.cart.pickupConfirmed).toBe(true);
+    expect(result.cart.selectedAddressId).toBeNull();
+    expect(result.pricing.summary.deliveryFeeCents).toBe(0);
+    result = await test.services.selectAddress(CUSTOMER, result.cart.version, ADDRESS_ID);
 
     const dish = test.catalog.get(DISH_A)!;
     test.catalog.set(DISH_A, {
@@ -232,7 +241,7 @@ describe("cart CRUD services", () => {
     result = await test.services.clear(CUSTOMER, result.cart.version);
     expect(result.cart.lines).toEqual([]);
     expect(result.pricing.summary.totalCents).toBe(0);
-    expect(result.cart.version).toBe(10);
+    expect(result.cart.version).toBe(12);
   });
 
   it("rejects stale versions with the fresh authoritative cart and totals", async () => {

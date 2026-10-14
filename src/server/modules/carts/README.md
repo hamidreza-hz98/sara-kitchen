@@ -55,3 +55,9 @@ SK-0144 adds the first cart page, localized public line projection, versioned cl
 and non-blocking recommendation endpoint documented in
 [`docs/cart-step-one.md`](../../../../docs/cart-step-one.md). Recoverable unavailable lines remain
 visible for correction, while server prices and availability continue to gate checkout.
+
+SK-0145 adds the authenticated address/pickup step documented in
+[`docs/cart-step-two.md`](../../../../docs/cart-step-two.md). The server checks saved-address ownership
+and Porto eligibility, prices delivery from published kitchen coordinates and distance bands, and
+persists explicit pickup confirmation under the cart version. Client-supplied fees and coordinates
+are never trusted for fulfillment selection.

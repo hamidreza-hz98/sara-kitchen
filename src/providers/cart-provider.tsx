@@ -50,6 +50,7 @@ function emptyCart(): CartClientSnapshot {
     pricing: EMPTY_PRICING,
     pricingChanged: false,
     selectedAddressId: null,
+    pickupConfirmed: false,
     version: null,
   };
 }

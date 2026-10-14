@@ -574,44 +574,132 @@ export function SettingsSectionEditor({
               />
             ) : null}
             {definition.key === "contact" && parsedData ? (
-              <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
-                <TextField
-                  label={t("email")}
-                  value={String(parsedData.email ?? "")}
-                  onChange={(event) => setData({ ...parsedData, email: event.target.value })}
-                  disabled={!canEdit}
-                  fullWidth
-                />
-                <TextField
-                  label={t("latitude")}
-                  value={String(asObject(parsedData.location).latitude ?? "")}
-                  onChange={(event) =>
+              <Stack sx={{ gap: 2 }}>
+                <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
+                  <TextField
+                    label={t("email")}
+                    value={String(parsedData.email ?? "")}
+                    onChange={(event) => setData({ ...parsedData, email: event.target.value })}
+                    disabled={!canEdit}
+                    fullWidth
+                  />
+                  <TextField
+                    label={t("latitude")}
+                    value={String(asObject(parsedData.location).latitude ?? "")}
+                    onChange={(event) =>
+                      setData({
+                        ...parsedData,
+                        location: {
+                          ...asObject(parsedData.location),
+                          latitude: Number(event.target.value),
+                        },
+                      })
+                    }
+                    disabled={!canEdit}
+                    fullWidth
+                  />
+                  <TextField
+                    label={t("longitude")}
+                    value={String(asObject(parsedData.location).longitude ?? "")}
+                    onChange={(event) =>
+                      setData({
+                        ...parsedData,
+                        location: {
+                          ...asObject(parsedData.location),
+                          longitude: Number(event.target.value),
+                        },
+                      })
+                    }
+                    disabled={!canEdit}
+                    fullWidth
+                  />
+                </Stack>
+                <Typography component="h3" variant="h6">
+                  {t("deliveryBands")}
+                </Typography>
+                <Typography color="text.secondary" variant="body2">
+                  {t("deliveryBandsHelp")}
+                </Typography>
+                {Array.isArray(parsedData.deliveryBands)
+                  ? parsedData.deliveryBands.map((entry, index) => {
+                      const band = asObject(entry);
+                      const updateBand = (field: "maxDistanceMeters" | "feeCents", value: number) =>
+                        setData({
+                          ...parsedData,
+                          deliveryBands: (parsedData.deliveryBands as unknown[]).map(
+                            (current, position) =>
+                              position === index
+                                ? { ...asObject(current), [field]: value }
+                                : current,
+                          ),
+                        });
+                      return (
+                        <Stack key={index} direction={{ xs: "column", sm: "row" }} sx={{ gap: 2 }}>
+                          <TextField
+                            disabled={!canEdit}
+                            fullWidth
+                            label={t("deliveryBandMeters", { number: index + 1 })}
+                            onChange={(event) =>
+                              updateBand("maxDistanceMeters", Number(event.target.value))
+                            }
+                            slotProps={{ htmlInput: { min: 1, step: 1 } }}
+                            type="number"
+                            value={String(band.maxDistanceMeters ?? "")}
+                          />
+                          <TextField
+                            disabled={!canEdit}
+                            fullWidth
+                            label={t("deliveryBandCents", { number: index + 1 })}
+                            onChange={(event) => updateBand("feeCents", Number(event.target.value))}
+                            slotProps={{ htmlInput: { min: 0, step: 1 } }}
+                            type="number"
+                            value={String(band.feeCents ?? "")}
+                          />
+                          <Button
+                            disabled={
+                              !canEdit || (parsedData.deliveryBands as unknown[]).length <= 1
+                            }
+                            onClick={() =>
+                              setData({
+                                ...parsedData,
+                                deliveryBands: (parsedData.deliveryBands as unknown[]).filter(
+                                  (_item, position) => position !== index,
+                                ),
+                              })
+                            }
+                          >
+                            {t("removeDeliveryBand")}
+                          </Button>
+                        </Stack>
+                      );
+                    })
+                  : null}
+                <Button
+                  disabled={
+                    !canEdit ||
+                    (Array.isArray(parsedData.deliveryBands) &&
+                      parsedData.deliveryBands.length >= 12)
+                  }
+                  onClick={() => {
+                    const bands = Array.isArray(parsedData.deliveryBands)
+                      ? parsedData.deliveryBands
+                      : [];
+                    const last = asObject(bands.at(-1));
                     setData({
                       ...parsedData,
-                      location: {
-                        ...asObject(parsedData.location),
-                        latitude: Number(event.target.value),
-                      },
-                    })
-                  }
-                  disabled={!canEdit}
-                  fullWidth
-                />
-                <TextField
-                  label={t("longitude")}
-                  value={String(asObject(parsedData.location).longitude ?? "")}
-                  onChange={(event) =>
-                    setData({
-                      ...parsedData,
-                      location: {
-                        ...asObject(parsedData.location),
-                        longitude: Number(event.target.value),
-                      },
-                    })
-                  }
-                  disabled={!canEdit}
-                  fullWidth
-                />
+                      deliveryBands: [
+                        ...bands,
+                        {
+                          maxDistanceMeters: Number(last.maxDistanceMeters ?? 0) + 5_000,
+                          feeCents: Number(last.feeCents ?? 0) + 200,
+                        },
+                      ],
+                    });
+                  }}
+                  variant="outlined"
+                >
+                  {t("addDeliveryBand")}
+                </Button>
               </Stack>
             ) : null}
             {definition.key === "languages" && parsedData && Array.isArray(parsedData.locales) ? (

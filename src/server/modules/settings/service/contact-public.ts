@@ -36,6 +36,7 @@ export type PublicContactSettings = Readonly<{
     name: string;
     description: string;
   }>;
+  deliveryBands: ContactSettingsPayload["data"]["deliveryBands"];
   businessHours: ContactSettingsPayload["data"]["businessHours"];
   businessHoursNote: string;
   timeZone: ContactSettingsPayload["data"]["timeZone"];
@@ -88,6 +89,7 @@ export function projectPublicContactSettings(
     },
     location: { ...payload.data.location },
     serviceArea: { ...payload.data.serviceArea, ...localized.serviceArea },
+    deliveryBands: payload.data.deliveryBands.map((band) => ({ ...band })),
     businessHours: payload.data.businessHours.map(({ day, periods }) => ({
       day,
       periods: periods.map((period) => ({ ...period })),

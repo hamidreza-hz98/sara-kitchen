@@ -40,6 +40,13 @@ export {
   type DeliveryZoneDecision,
 } from "./service/address-checkout";
 export {
+  PORTO_MUNICIPALITY_BOUNDARY,
+  evaluatePortoDelivery,
+  haversineDistanceMeters,
+  isPointInsideBoundary,
+  type DeliveryOrigin,
+} from "./service/delivery-zone";
+export {
   PORTUGUESE_POSTAL_CODE_PATTERN,
   addressEmptyMutationSchema,
   addressIdParametersSchema,

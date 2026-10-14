@@ -15,6 +15,7 @@ Locale-neutral data contains:
 - ISO two-letter country code and postal code;
 - WGS84 latitude/longitude, bounded to `-90..90` and `-180..180` respectively;
 - city or radius service-area mode, with a radius required only for radius mode;
+- ordered distance bands with integer-cent delivery fees (the final band covers the maximum supported distance);
 - all seven weekdays exactly once, with zero to three ordered, non-overlapping same-day opening periods;
 - the fixed `Europe/Lisbon` business timezone;
 - optional Leaflet or Google Maps Embed presentation data.
@@ -25,8 +26,9 @@ and must label every configured phone. Portuguese and Persian can be added indep
 for non-public/secondary numbers while the projection uses the canonical label fallback.
 
 The launch service area is represented as city mode with translated “Porto city” copy and no artificial
-radius. The actual delivery-price distance rules remain part of checkout/order settings rather than contact
-presentation data.
+radius. Checkout validates the address against the Porto municipality boundary, then applies the published
+distance bands from these settings to the kitchen-to-address distance. Without published contact settings,
+the documented local defaults apply.
 
 ## Map and secret policy
 
@@ -47,7 +49,7 @@ It resolves requested locale, optional configured fallback, then canonical Engli
 - phones marked public, with localized labels;
 - enabled WhatsApp details, otherwise `null`;
 - normalized email and translated address;
-- coordinates, service-area presentation, weekly hours, and Lisbon timezone;
+- coordinates, service-area presentation, distance bands, weekly hours, and Lisbon timezone;
 - safe map provider, URLs, zoom, and localized accessible label.
 
 Stable phone IDs and the `public` control are omitted. Unknown/provider credential fields cannot enter a parsed

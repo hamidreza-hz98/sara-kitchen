@@ -91,6 +91,11 @@ export function createInitialSettingsPayload(
         address: { postalCode: "4000-008", countryCode: "PT" },
         location: { latitude: 41.1579, longitude: -8.6291 },
         serviceArea: { mode: "city", radiusKm: null },
+        deliveryBands: [
+          { maxDistanceMeters: 5_000, feeCents: 400 },
+          { maxDistanceMeters: 10_000, feeCents: 600 },
+          { maxDistanceMeters: 20_000, feeCents: 800 },
+        ],
         businessHours: [
           "monday",
           "tuesday",

@@ -51,6 +51,7 @@ export type CartRecord = BaseDocumentFields & {
   pricing: CartPricingSummary;
   purgeAt: Date | null;
   selectedAddressId: Types.ObjectId | null;
+  pickupConfirmed: boolean;
   status: CartStatus;
   version: number;
 };
@@ -167,6 +168,7 @@ export const cartSchema = createBaseSchema<CartRecord>(
       ],
     },
     selectedAddressId: optionalObjectId("Address"),
+    pickupConfirmed: { type: Boolean, required: true, default: false },
     notes: { type: String, trim: true, maxlength: CART_MAX_NOTES_LENGTH, default: null },
     pricing: { type: pricingSummarySchema, required: true, default: () => ({}) },
     currency: {
@@ -201,8 +203,14 @@ cartSchema.pre("validate", function validateCartInvariants() {
     if (this.selectedAddressId) {
       this.invalidate("selectedAddressId", "Guest carts cannot select a customer address.");
     }
+    if (this.pickupConfirmed) {
+      this.invalidate("pickupConfirmed", "Guest carts cannot confirm pickup checkout.");
+    }
   } else if (this.absoluteExpiresAt !== null) {
     this.invalidate("absoluteExpiresAt", "Customer carts cannot contain a guest absolute expiry.");
+  }
+  if (this.pickupConfirmed && this.selectedAddressId) {
+    this.invalidate("pickupConfirmed", "Pickup and delivery address cannot both be selected.");
   }
 
   const isTerminal = (CART_TERMINAL_STATUSES as readonly string[]).includes(this.status);

@@ -33,6 +33,11 @@ function payload(): ContactSettingsPayload {
       address: { postalCode: "4000-008", countryCode: "PT" },
       location: { latitude: 41.1579, longitude: -8.6291 },
       serviceArea: { mode: "city", radiusKm: null },
+      deliveryBands: [
+        { maxDistanceMeters: 5_000, feeCents: 400 },
+        { maxDistanceMeters: 10_000, feeCents: 600 },
+        { maxDistanceMeters: 20_000, feeCents: 800 },
+      ],
       businessHours: CONTACT_WEEKDAYS.map((day) => ({
         day,
         periods: day === "sunday" ? [] : [{ opensAt: "09:00", closesAt: "18:00" }],
@@ -135,6 +140,17 @@ describe("contact-information settings", () => {
       { opensAt: "12:30", closesAt: "18:00" },
     ];
     invalid.data.serviceArea = { mode: "city", radiusKm: 20 };
+    expect(() => parseContactSettings(invalid)).toThrow();
+  });
+
+  it("requires increasing delivery bands with integer-cent fees", () => {
+    const invalid = payload();
+    invalid.data.deliveryBands = [
+      { maxDistanceMeters: 10_000, feeCents: 600 },
+      { maxDistanceMeters: 5_000, feeCents: 400 },
+    ];
+    expect(() => parseContactSettings(invalid)).toThrow(/Delivery bands/u);
+    invalid.data.deliveryBands = [{ maxDistanceMeters: 5_000, feeCents: -1 }];
     expect(() => parseContactSettings(invalid)).toThrow();
   });
 

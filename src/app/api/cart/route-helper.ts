@@ -8,6 +8,7 @@ import type { Connection } from "mongoose";
 import { PROJECT_TIME_ZONE, type SupportedLocale } from "@/constants";
 import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/locales/routing";
 import { connectToDatabase } from "@/server/database";
+import { getServerEnvironment } from "@/server/environment";
 import { ApiError } from "@/server/http";
 import {
   customerCookieName,
@@ -26,6 +27,8 @@ import {
   type CartIdentity,
   type CartOperationResult,
 } from "@/server/modules/carts";
+import { createAddressRepository, evaluatePortoDelivery } from "@/server/modules/addresses";
+import { createSettingsRuntime } from "@/server/modules/settings";
 import {
   createDishRecommendationRepository,
   createDishRecommendationService,
@@ -36,6 +39,11 @@ import { createIngredientAllergenCatalog } from "@/server/modules/ingredients";
 import { createMinioStorageProvider, resolveSeoMediaImage } from "@/server/modules/media";
 
 const GUEST_CART_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
+const PORTO_DELIVERY_BANDS = Object.freeze([
+  { maxDistanceMeters: 5_000, feeCents: 400 },
+  { maxDistanceMeters: 10_000, feeCents: 600 },
+  { maxDistanceMeters: 20_000, feeCents: 800 },
+]);
 
 export function guestCartCookieName(): string {
   return process.env.NODE_ENV === "production" ? "__Host-sk_guest_cart" : "sk_guest_cart";
@@ -99,17 +107,23 @@ export function resolveCartCrud(
   userAgent?: string | null,
 ) {
   const sources = (dishIds: readonly string[]) => loadDishCartSources(connection, dishIds);
+  const addresses = createAddressRepository(connection);
+  const contactSettings = () =>
+    createSettingsRuntime(connection, { requestId }).getPublic("contact", "en");
   return createCartCrudServices({
     repository: createCartRepository(connection),
     now: () => new Date(),
-    loadPolicies: async () => ({
-      servicePolicy: {
-        mode: "always",
-        timeZone: PROJECT_TIME_ZONE,
-        cutoffMinutesBeforeClose: 0,
-      },
-      deliveryBands: [],
-    }),
+    loadPolicies: async () => {
+      const contact = await contactSettings();
+      return {
+        servicePolicy: {
+          mode: "always" as const,
+          timeZone: PROJECT_TIME_ZONE,
+          cutoffMinutesBeforeClose: 0,
+        },
+        deliveryBands: contact?.deliveryBands ?? PORTO_DELIVERY_BANDS,
+      };
+    },
     availability: {
       loadDishesByIds: async (dishIds) =>
         (await sources(dishIds)).map(({ availability }) => availability),
@@ -117,8 +131,24 @@ export function resolveCartCrud(
     pricing: {
       loadDishesByIds: async (dishIds) => (await sources(dishIds)).map(({ pricing }) => pricing),
     },
-    // Address selection and configured distance bands are introduced by the checkout-address step.
-    resolveDelivery: async () => ({ eligible: false, reason: "unverified_address" }),
+    resolveDelivery: async (customerId, addressId) => {
+      const address = await addresses.findOwnedById(customerId, addressId);
+      if (!address) return { eligible: false, reason: "unverified_address" };
+      const environment = getServerEnvironment();
+      const contact = await contactSettings();
+      const decision = evaluatePortoDelivery(address.location, {
+        latitude: contact?.location.latitude ?? environment.KITCHEN_LATITUDE,
+        longitude: contact?.location.longitude ?? environment.KITCHEN_LONGITUDE,
+      });
+      if (!decision.eligible) return decision;
+      if (
+        contact?.serviceArea.mode === "radius" &&
+        contact.serviceArea.radiusKm !== null &&
+        decision.distanceMeters > contact.serviceArea.radiusKm * 1_000
+      )
+        return { eligible: false, reason: "outside_service_area" };
+      return decision;
+    },
     audit: createCartAuditSink(connection, { requestId, ...(userAgent ? { userAgent } : {}) }),
   });
 }
@@ -200,6 +230,7 @@ export async function cartClientProjection(
       valid: result.availability.valid,
     },
     selectedAddressId: result.cart.selectedAddressId,
+    pickupConfirmed: result.cart.pickupConfirmed === true,
     version: result.cart.version,
   } as const;
 }
@@ -259,6 +290,7 @@ export function translateCartError(error: unknown): never {
                 pricing: error.details.current.cart.pricing,
                 pricingChanged: error.details.current.pricingChanged,
                 selectedAddressId: error.details.current.cart.selectedAddressId,
+                pickupConfirmed: error.details.current.cart.pickupConfirmed === true,
                 version: error.details.current.cart.version,
               },
             }

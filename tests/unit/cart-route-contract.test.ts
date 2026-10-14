@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   get: vi.fn(),
   removeItem: vi.fn(),
   setNotes: vi.fn(),
+  selectAddress: vi.fn(),
   updateQuantity: vi.fn(),
 }));
 
@@ -28,6 +29,7 @@ vi.mock("@/app/api/cart/route-helper", () => ({
     get: state.get,
     removeItem: state.removeItem,
     setNotes: state.setNotes,
+    selectAddress: state.selectAddress,
     updateQuantity: state.updateQuantity,
   }),
   translateCartError(error: unknown): never {
@@ -66,6 +68,7 @@ beforeEach(() => {
   state.updateQuantity.mockResolvedValue(cart);
   state.removeItem.mockResolvedValue(cart);
   state.setNotes.mockResolvedValue(cart);
+  state.selectAddress.mockResolvedValue(cart);
 });
 
 describe("cart Route Handler contract", () => {
@@ -133,5 +136,34 @@ describe("cart Route Handler contract", () => {
     const cleared = await CLEAR(request("/api/cart", "DELETE", { expectedVersion: 7 }));
     expect(cleared.status).toBe(200);
     expect(state.clear).toHaveBeenCalledWith(identity, 7);
+  });
+
+  it("requires a versioned, server-owned fulfillment choice", async () => {
+    const addressId = "3".repeat(24);
+    const delivery = await NOTES(
+      request("/api/cart", "PATCH", {
+        expectedVersion: 8,
+        fulfillment: { method: "delivery", addressId },
+      }),
+    );
+    expect(delivery.status).toBe(200);
+    expect(state.selectAddress).toHaveBeenCalledWith(identity, 8, addressId);
+
+    const pickup = await NOTES(
+      request("/api/cart", "PATCH", {
+        expectedVersion: 9,
+        fulfillment: { method: "pickup" },
+      }),
+    );
+    expect(pickup.status).toBe(200);
+    expect(state.selectAddress).toHaveBeenCalledWith(identity, 9, null);
+
+    const invalid = await NOTES(
+      request("/api/cart", "PATCH", {
+        expectedVersion: 10,
+        fulfillment: { method: "delivery", addressId: "not-an-id", feeCents: 0 },
+      }),
+    );
+    expect(invalid.status).toBe(400);
   });
 });

@@ -109,6 +109,7 @@ type MutableCartState = {
   lines: { dishId: string; quantity: number }[];
   notes: string | null;
   selectedAddressId: string | null;
+  pickupConfirmed: boolean;
 };
 
 function validVersion(value: number): boolean {
@@ -140,6 +141,7 @@ function mutable(snapshot: CartSnapshot): MutableCartState {
     lines: snapshot.lines.map(({ dishId, quantity }) => ({ dishId, quantity })),
     notes: snapshot.notes,
     selectedAddressId: snapshot.selectedAddressId,
+    pickupConfirmed: snapshot.pickupConfirmed === true,
   };
 }
 
@@ -244,7 +246,7 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
         ...(policies.adjustments ? { adjustments: policies.adjustments } : {}),
         deliveryBands: policies.deliveryBands,
         fulfillment:
-          state.lines.length === 0 || !delivery
+          state.lines.length === 0 || !delivery || !delivery.eligible
             ? { method: "pickup" }
             : { method: "delivery", distanceMeters: delivery.distanceMeters! },
       },
@@ -465,6 +467,7 @@ export function createCartCrudServices(dependencies: CartCrudDependencies) {
       }
       return mutate("select_address", identity, expectedVersion, (state) => {
         state.selectedAddressId = addressId?.toLowerCase() ?? null;
+        state.pickupConfirmed = addressId === null;
       });
     },
 

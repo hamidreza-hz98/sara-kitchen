@@ -35,6 +35,7 @@ export type CartSnapshot = Readonly<{
     totalCents: number;
   }>;
   selectedAddressId: string | null;
+  pickupConfirmed?: boolean;
   updatedAt: string;
   version: number;
 }>;
@@ -45,6 +46,7 @@ export type CartWrite = Readonly<{
   notes: string | null;
   pricing: CartPricingSummary;
   selectedAddressId: string | null;
+  pickupConfirmed?: boolean;
 }>;
 
 export class CartRepositoryConflictError extends Error {
@@ -76,6 +78,7 @@ export function mapCartSnapshot(
       ),
     ),
     selectedAddressId: document.selectedAddressId?.toHexString() ?? null,
+    pickupConfirmed: document.pickupConfirmed,
     notes: document.notes,
     pricing: Object.freeze({
       subtotalCents: document.pricing.subtotalCents,
@@ -170,6 +173,7 @@ export function createCartRepository(connection: Connection): CartRepository {
       document.selectedAddressId = value.selectedAddressId
         ? new Types.ObjectId(value.selectedAddressId)
         : null;
+      document.pickupConfirmed = value.pickupConfirmed ?? false;
       document.notes = value.notes;
       document.pricing = { ...value.pricing };
       document.expiresAt = value.expiresAt;

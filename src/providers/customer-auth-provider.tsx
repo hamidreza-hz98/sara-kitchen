@@ -19,7 +19,11 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         cache: "no-store",
         credentials: "same-origin",
       });
-      if (!response.ok) return;
+      if (!response.ok) {
+        if (version === requestVersion.current)
+          setState((current) => ({ ...current, ready: true }));
+        return;
+      }
       const result = (await response.json()) as {
         data?: { authenticated?: boolean; displayName?: string };
       };
@@ -30,7 +34,8 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         ready: true,
       });
     } catch {
-      // A network failure must not be interpreted as a successful logout.
+      // Preserve any known authenticated state, while releasing an initial loading gate.
+      if (version === requestVersion.current) setState((current) => ({ ...current, ready: true }));
     }
   }, []);
 

@@ -44,6 +44,7 @@ export type CartClientSnapshot = Readonly<{
   pricing: CartClientPricing;
   pricingChanged: boolean;
   selectedAddressId: string | null;
+  pickupConfirmed?: boolean;
   version: number | null;
 }>;
 
@@ -184,6 +185,7 @@ function parseSnapshot(value: unknown): CartClientSnapshot {
     pricingChanged: candidate.pricingChanged === true,
     selectedAddressId:
       typeof candidate.selectedAddressId === "string" ? candidate.selectedAddressId : null,
+    pickupConfirmed: candidate.pickupConfirmed === true,
     version: version === null ? null : Number(version),
   };
 }

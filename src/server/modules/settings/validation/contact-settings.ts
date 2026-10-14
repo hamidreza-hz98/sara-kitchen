@@ -171,12 +171,38 @@ export const contactSettingsDataSchema = z
         radiusKm: z.number().positive().max(200).nullable(),
       })
       .strict(),
+    deliveryBands: z
+      .array(
+        z.strictObject({
+          maxDistanceMeters: z.number().int().positive().max(100_000),
+          feeCents: z.number().int().nonnegative().max(100_000),
+        }),
+      )
+      .min(1)
+      .max(12)
+      .default([
+        { maxDistanceMeters: 5_000, feeCents: 400 },
+        { maxDistanceMeters: 10_000, feeCents: 600 },
+        { maxDistanceMeters: 20_000, feeCents: 800 },
+      ]),
     businessHours: z.array(businessDaySchema).length(CONTACT_WEEKDAYS.length),
     timeZone: z.literal(PROJECT_TIME_ZONE),
     map: mapSchema.nullable(),
   })
   .strict()
   .superRefine((value, context) => {
+    for (let index = 1; index < value.deliveryBands.length; index += 1) {
+      if (
+        value.deliveryBands[index]!.maxDistanceMeters <=
+        value.deliveryBands[index - 1]!.maxDistanceMeters
+      ) {
+        context.addIssue({
+          code: "custom",
+          message: "Delivery bands must increase by distance.",
+          path: ["deliveryBands", index],
+        });
+      }
+    }
     const phoneIds = value.phones.map(({ id }) => id);
     const numbers = value.phones.map(({ number }) => number);
     if (new Set(phoneIds).size !== phoneIds.length) {

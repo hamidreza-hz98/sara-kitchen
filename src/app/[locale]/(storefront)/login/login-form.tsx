@@ -41,7 +41,8 @@ export function CustomerLoginForm() {
         return;
       }
       broadcastCustomerAuthChange();
-      router.replace("/profile");
+      const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+      router.replace(returnTo === "/cart/address" ? "/cart/address" : "/profile");
       router.refresh();
     } catch {
       setError("network");

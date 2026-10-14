@@ -43,23 +43,41 @@ const notesSchema = z.strictObject({
   expectedVersion: z.number().int().min(1),
   notes: z.string().trim().max(1_000).nullable(),
 });
+const fulfillmentSchema = z.strictObject({
+  expectedVersion: z.number().int().min(1),
+  fulfillment: z.discriminatedUnion("method", [
+    z.strictObject({ method: z.literal("pickup") }),
+    z.strictObject({
+      method: z.literal("delivery"),
+      addressId: z.string().regex(/^[a-f\d]{24}$/iu),
+    }),
+  ]),
+});
 const clearSchema = z.strictObject({ expectedVersion: z.number().int().min(1) });
 
 export async function PATCH(request: NextRequest): Promise<Response> {
   return handleApiRoute(request, async ({ requestId }) => {
     const input = await parseJsonRequest(
       request,
-      notesSchema,
+      z.union([notesSchema, fulfillmentSchema]),
       await getRequestValidationOptions(cartRequestLocale(request)),
     );
     const context = await cartRequestContext(request, { createGuest: false, mutation: true });
     if (!context.identity) return apiSuccess(null);
     try {
-      const result = await resolveCartCrud(
+      const services = resolveCartCrud(
         context.connection,
         requestId,
         request.headers.get("user-agent"),
-      ).setNotes(context.identity, input.expectedVersion, input.notes);
+      );
+      const result =
+        "notes" in input
+          ? await services.setNotes(context.identity, input.expectedVersion, input.notes)
+          : await services.selectAddress(
+              context.identity,
+              input.expectedVersion,
+              input.fulfillment.method === "delivery" ? input.fulfillment.addressId : null,
+            );
       return apiSuccess(
         await cartClientProjection(context.connection, result, cartRequestLocale(request)),
       );
