@@ -8,6 +8,8 @@ The state transition table, replay rules, and internal MB Way sandbox fixture ma
 
 The public provider contract and deterministic fake are documented in `docs/payment-provider-interface.md`. The fake is for tests only and is not wired into checkout or presented as a live MB Way gateway.
 
+The local MB Way sandbox adapter, timeout/idempotency policy, and provider-reference persistence are documented in `docs/mbway-sandbox-integration.md`. It is not a remote PSP connection and must not be enabled as a production payment rail.
+
 Payment callbacks persist their verified event and local state within the Orders-owned workflow transaction, using an explicit session. External MB Way requests and phone-call refunds are never made inside that transaction. Unknown results enter reconciliation; see `docs/adr/0008-transaction-boundaries.md`.
 
 The private `idempotency_records` collection and public `runIdempotentOperation()` contract are documented in `docs/idempotency.md`. The unique index is the concurrency guard; the TTL index is retention cleanup, not an exact expiration clock. The service owns the transaction, passes its session to the caller's workflow, and persists a small replayable result atomically. No external side effects are permitted inside its callback.
