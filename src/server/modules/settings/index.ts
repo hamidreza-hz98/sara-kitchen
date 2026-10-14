@@ -243,6 +243,8 @@ export type {
   PolicyLifecycleErrorCode,
   RecordPolicyConsentInput,
 } from "./service/policy-lifecycle";
+export { getCheckoutPolicies } from "./service/checkout-policies";
+export type { CheckoutPolicy } from "./service/checkout-policies";
 export type {
   HomepageReferenceDependencies,
   HomepageReferenceErrorCode,
