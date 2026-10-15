@@ -64,6 +64,7 @@ Current records:
 - [`error-monitoring.md`](./error-monitoring.md) — Sentry runtimes, privacy redaction, source maps, release tags, alert routing, and verification.
 - [`faq-settings.md`](./faq-settings.md) — staged ordered FAQs, per-item locale fallback, immutable authoring operations, active projection, and FAQPage structured-data handoff.
 - [`operational-metrics.md`](./operational-metrics.md) — typed signals, live instrumentation boundaries, dashboard queries, and launch alerts.
+- [`order-notifications.md`](./order-notifications.md) — localized order notices, durable outbox, retry/dead-letter behavior, private inbox, and live WhatsApp activation boundary.
 - [`media-model.md`](./media-model.md) — Media storage, variants, processing, localization, deletion, and index invariants.
 - [`feedback.md`](./feedback.md) — localized notification queues, safe confirmations, connectivity status, and route/global recovery.
 - [`formatting-and-hooks.md`](./formatting-and-hooks.md) — deterministic formatting and staged-commit safeguards.

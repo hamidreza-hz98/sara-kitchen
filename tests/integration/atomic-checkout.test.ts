@@ -6,6 +6,7 @@ vi.mock("server-only", () => ({}));
 import { submitAtomicCheckout } from "@/server/modules/orders";
 import { getCheckoutInitiationModel } from "@/server/modules/orders/model/checkout-initiation";
 import { getOrderModel } from "@/server/modules/orders/model/order";
+import { getOrderNotificationModel } from "@/server/modules/orders/model/order-notification";
 import { getTransactionModel } from "@/server/modules/transactions/model/transaction";
 import { FakePaymentProvider } from "@/server/modules/transactions/provider/fake-payment-provider";
 
@@ -27,6 +28,7 @@ describe("atomic checkout", () => {
     await client.connect(database.uri);
     await Promise.all([
       getOrderModel(client.connection).syncIndexes(),
+      getOrderNotificationModel(client.connection).syncIndexes(),
       getTransactionModel(client.connection).syncIndexes(),
       getCheckoutInitiationModel(client.connection).syncIndexes(),
       client.connection
@@ -46,6 +48,7 @@ describe("atomic checkout", () => {
   beforeEach(async () => {
     for (const name of [
       "orders",
+      "order_notifications",
       "transactions",
       "checkout_initiations",
       "idempotency_records",

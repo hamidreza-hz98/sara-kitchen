@@ -10,6 +10,7 @@ import type { VerifiedPaymentState } from "@/server/modules/transactions";
 
 import { getOrderModel, type OrderStatus } from "../model/order";
 import { planOrderTransition, soldCountLifecycle } from "../policy/order-state-machine";
+import { queueOrderNotifications } from "./notification-outbox";
 
 export class OrderPaymentSyncError extends Error {
   constructor() {
@@ -90,6 +91,13 @@ export async function applyVerifiedPaymentStateToOrder(
   order.revision = order.statusHistory.length;
   if (to === "refunded") order.refundFollowUpRequired = false;
   await order.save({ session });
+  await queueOrderNotifications(
+    connection,
+    order,
+    order.statusHistory.at(-1)!.eventKey,
+    effects.notificationIntents,
+    session,
+  );
   if (effects.recomputeSoldCount) {
     const lifecycle = soldCountLifecycle({ status: order.status, paymentStatus: state.status });
     await createDishSoldCountProjector(connection).project(

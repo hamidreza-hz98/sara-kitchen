@@ -34,6 +34,7 @@ export type OrderTransitionInput = Readonly<{
 }>;
 
 export type OrderNotificationIntent =
+  | "customer.order_received"
   | "customer.order_confirmed"
   | "customer.order_ready"
   | "customer.out_for_delivery"
@@ -179,7 +180,10 @@ const notificationByStatus: Partial<Record<OrderStatus, readonly OrderNotificati
 export function initialOrderEffects(): OrderTransitionEffects {
   return Object.freeze({
     customerVisibleStatus: "pending_payment",
-    notificationIntents: Object.freeze(["employer.order_submitted"] as const),
+    notificationIntents: Object.freeze([
+      "customer.order_received",
+      "employer.order_submitted",
+    ] as const),
     recomputeSoldCount: false,
     refundFollowUpRequired: false,
   });

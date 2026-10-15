@@ -5,6 +5,7 @@ vi.mock("server-only", () => ({}));
 
 import { createOrderManagement, OrderManagementError } from "@/server/modules/orders";
 import { getOrderModel } from "@/server/modules/orders/model/order";
+import { getOrderNotificationModel } from "@/server/modules/orders/model/order-notification";
 import { getAuditLogModel } from "@/server/modules/logs/model/audit-log";
 
 import { startTestMongoReplicaSet, type TestMongoDatabase } from "../helpers/mongodb";
@@ -26,6 +27,7 @@ describe("order management boundaries", () => {
     client = new Mongoose();
     await client.connect(database.uri);
     await getOrderModel(client.connection).syncIndexes();
+    await getOrderNotificationModel(client.connection).syncIndexes();
     await getAuditLogModel(client.connection).syncIndexes();
   }, 120_000);
 
@@ -35,7 +37,7 @@ describe("order management boundaries", () => {
   });
 
   beforeEach(async () => {
-    for (const name of ["orders", "transactions", "audit_logs"])
+    for (const name of ["orders", "order_notifications", "transactions", "audit_logs"])
       await client.connection.collection(name).deleteMany({});
   });
 

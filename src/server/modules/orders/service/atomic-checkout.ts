@@ -32,6 +32,8 @@ import {
 
 import { getCheckoutInitiationModel } from "../model/checkout-initiation";
 import { getOrderModel, type OrderItemSnapshot } from "../model/order";
+import { initialOrderEffects } from "../policy/order-state-machine";
+import { queueOrderNotifications } from "./notification-outbox";
 
 const RETENTION_MS = 30 * 24 * 60 * 60_000;
 
@@ -317,6 +319,13 @@ export async function submitAtomicCheckout(
         { session },
       );
       if (!order) throw new Error("checkout_order_not_created");
+      await queueOrderNotifications(
+        connection,
+        order,
+        order.statusHistory[0]!.eventKey,
+        initialOrderEffects().notificationIntents,
+        session,
+      );
       await createCheckoutTransaction(
         connection,
         {

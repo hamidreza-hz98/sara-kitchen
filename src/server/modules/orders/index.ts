@@ -8,6 +8,10 @@ export {
 export { ORDER_STATUSES, type OrderStatus } from "./model/order";
 export { applyVerifiedPaymentStateToOrder, OrderPaymentSyncError } from "./service/payment-state";
 export {
+  getOrderNotificationDeliveryHealth,
+  listCustomerOrderNotifications,
+} from "./service/notification-dispatch";
+export {
   createOrderManagement,
   OrderManagementError,
   type OrderAdmin,

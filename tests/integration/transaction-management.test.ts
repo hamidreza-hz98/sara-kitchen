@@ -8,6 +8,7 @@ vi.mock("server-only", () => ({}));
 
 import { applyVerifiedPaymentStateToOrder } from "@/server/modules/orders";
 import { getOrderModel } from "@/server/modules/orders/model/order";
+import { getOrderNotificationModel } from "@/server/modules/orders/model/order-notification";
 import { getAuditLogModel } from "@/server/modules/logs/model/audit-log";
 import {
   createTransactionManagement,
@@ -49,6 +50,7 @@ describe("transaction management", () => {
     client = new Mongoose();
     await client.connect(database.uri);
     await getOrderModel(client.connection).syncIndexes();
+    await getOrderNotificationModel(client.connection).syncIndexes();
     await getTransactionModel(client.connection).syncIndexes();
     await getAuditLogModel(client.connection).syncIndexes();
   }, 120_000);
@@ -59,7 +61,13 @@ describe("transaction management", () => {
   });
 
   beforeEach(async () => {
-    for (const name of ["orders", "transactions", "audit_logs", "dish_sold_projections"])
+    for (const name of [
+      "orders",
+      "order_notifications",
+      "transactions",
+      "audit_logs",
+      "dish_sold_projections",
+    ])
       await client.connection.collection(name).deleteMany({});
     fake = new FakePaymentProvider(secret, () => at);
     provider = {

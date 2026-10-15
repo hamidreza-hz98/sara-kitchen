@@ -13,6 +13,7 @@ import { getOrderPaymentView } from "@/server/modules/transactions";
 
 import { getOrderModel, type OrderRecord, type OrderStatus } from "../model/order";
 import { planOrderTransition, soldCountLifecycle } from "../policy/order-state-machine";
+import { queueOrderNotifications } from "./notification-outbox";
 
 export type OrderAdmin = Readonly<{ id: string; role: AdminRole; active: true }>;
 
@@ -207,6 +208,13 @@ export function createOrderManagement(connection: Connection, context: Managemen
         if (input.status === "completed") order.fulfillment.completedAt = at;
         if (effects.refundFollowUpRequired) order.refundFollowUpRequired = true;
         await order.save({ session });
+        await queueOrderNotifications(
+          connection,
+          order,
+          order.statusHistory.at(-1)!.eventKey,
+          effects.notificationIntents,
+          session,
+        );
         if (effects.recomputeSoldCount) {
           const lifecycle = soldCountLifecycle({
             status: order.status,
@@ -321,6 +329,13 @@ export function createOrderManagement(connection: Connection, context: Managemen
         });
         order.revision = order.statusHistory.length;
         await order.save({ session });
+        await queueOrderNotifications(
+          connection,
+          order,
+          order.statusHistory.at(-1)!.eventKey,
+          effects.notificationIntents,
+          session,
+        );
         await recordAuditEvent(
           connection,
           {

@@ -65,7 +65,10 @@ describe("order state machine", () => {
         }),
       ),
     ).toBe("invalid_initial_state");
-    expect(initialOrderEffects().notificationIntents).toEqual(["employer.order_submitted"]);
+    expect(initialOrderEffects().notificationIntents).toEqual([
+      "customer.order_received",
+      "employer.order_submitted",
+    ]);
   });
 
   it("couples capture, failure, expiry and full refund to system payment events", () => {
