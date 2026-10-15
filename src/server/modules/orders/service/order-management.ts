@@ -9,9 +9,9 @@ import { hasAdminPermission, type AdminRole } from "@/constants/admin-access";
 import { escapeSearchPattern, withMongoTransaction } from "@/server/database";
 import { createDishSoldCountProjector } from "@/server/modules/dishes";
 import { recordAuditEvent } from "@/server/modules/logs";
-import { getOrderPaymentView } from "@/server/modules/transactions";
+import { getOrderPaymentView, type TransactionStatus } from "@/server/modules/transactions";
 
-import { getOrderModel, type OrderRecord, type OrderStatus } from "../model/order";
+import { getOrderModel, ORDER_STATUSES, type OrderRecord, type OrderStatus } from "../model/order";
 import { planOrderTransition, soldCountLifecycle } from "../policy/order-state-machine";
 import { queueOrderNotifications } from "./notification-outbox";
 
@@ -113,27 +113,113 @@ export function createOrderManagement(connection: Connection, context: Managemen
         status?: OrderStatus;
         customerId?: string;
         search?: string;
+        searchMode?: "code" | "customer" | "mobile";
+        from?: string;
+        to?: string;
+        paymentStatus?: TransactionStatus;
+        sortBy?: "createdAt" | "code" | "totalCents";
         sortDirection: "asc" | "desc";
       }>,
     ) {
       requirePermission(actor, "orders:read");
-      const filter: Record<string, unknown> = {};
-      if (input.status) filter.status = input.status;
-      if (input.customerId) filter.customerId = new Types.ObjectId(input.customerId);
-      if (input.search)
-        filter.code = { $regex: `^${escapeSearchPattern(input.search.toUpperCase())}` };
-      const [orders, total] = await Promise.all([
+      const sensitive = hasAdminPermission(actor, "orders:read-sensitive");
+      if (input.search && input.searchMode && input.searchMode !== "code" && !sensitive)
+        throw new OrderManagementError("forbidden");
+      const baseFilter: Record<string, unknown> = {};
+      if (input.customerId) baseFilter.customerId = new Types.ObjectId(input.customerId);
+      if (input.from || input.to) {
+        const createdAt: Record<string, Date> = {};
+        if (input.from) createdAt.$gte = new Date(`${input.from}T00:00:00.000Z`);
+        if (input.to) {
+          const end = new Date(`${input.to}T00:00:00.000Z`);
+          end.setUTCDate(end.getUTCDate() + 1);
+          createdAt.$lt = end;
+        }
+        baseFilter.createdAt = createdAt;
+      }
+      if (input.paymentStatus) {
+        baseFilter.$expr = {
+          $eq: [{ $arrayElemAt: ["$statusHistory.paymentStatus", -1] }, input.paymentStatus],
+        };
+      }
+      if (input.search) {
+        const escaped = escapeSearchPattern(input.search);
+        switch (input.searchMode ?? "code") {
+          case "code":
+            baseFilter.code = { $regex: `^${escapeSearchPattern(input.search.toUpperCase())}` };
+            break;
+          case "customer":
+            if (input.search.trim().includes(" ")) {
+              const [first, ...lastParts] = input.search.trim().split(/\s+/u);
+              const last = lastParts.join(" ");
+              baseFilter.$and = [
+                {
+                  "customerSnapshot.firstName": {
+                    $regex: `^${escapeSearchPattern(first!)}`,
+                    $options: "i",
+                  },
+                },
+                {
+                  "customerSnapshot.lastName": {
+                    $regex: `^${escapeSearchPattern(last)}`,
+                    $options: "i",
+                  },
+                },
+              ];
+            } else {
+              baseFilter.$or = [
+                { "customerSnapshot.firstName": { $regex: `^${escaped}`, $options: "i" } },
+                { "customerSnapshot.lastName": { $regex: `^${escaped}`, $options: "i" } },
+              ];
+            }
+            break;
+          case "mobile":
+            baseFilter["customerSnapshot.mobile"] = { $regex: `^${escaped}` };
+            break;
+        }
+      }
+      const filter = input.status ? { ...baseFilter, status: input.status } : baseFilter;
+      const direction = input.sortDirection === "asc" ? 1 : -1;
+      const sortField =
+        input.sortBy === "code"
+          ? "code"
+          : input.sortBy === "totalCents"
+            ? "pricing.totalCents"
+            : "createdAt";
+      const [orders, total, summary] = await Promise.all([
         Order.find(filter)
-          .sort({
-            createdAt: input.sortDirection === "asc" ? 1 : -1,
-            _id: input.sortDirection === "asc" ? 1 : -1,
-          })
+          .sort({ [sortField]: direction, _id: direction })
           .skip((input.page - 1) * input.pageSize)
           .limit(input.pageSize),
         Order.countDocuments(filter),
+        Order.aggregate<{
+          _id: OrderStatus;
+          count: number;
+          amountCents: number;
+        }>([
+          { $match: baseFilter },
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
+              amountCents: { $sum: "$pricing.totalCents" },
+            },
+          },
+        ]),
       ]);
-      const sensitive = hasAdminPermission(actor, "orders:read-sensitive");
-      return { items: orders.map((order) => view(order, sensitive)), total };
+      const statusCounts = Object.fromEntries(
+        ORDER_STATUSES.map((status) => [
+          status,
+          summary.find((row) => row._id === status)?.count ?? 0,
+        ]),
+      ) as Record<OrderStatus, number>;
+      return {
+        items: orders.map((order) => view(order, sensitive)),
+        total,
+        statusCounts,
+        allCount: summary.reduce((sum, row) => sum + row.count, 0),
+        allAmountCents: summary.reduce((sum, row) => sum + row.amountCents, 0),
+      };
     },
     async get(actor: OrderAdmin, code: string) {
       requirePermission(actor, "orders:read");

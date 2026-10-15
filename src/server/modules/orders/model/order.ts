@@ -658,6 +658,10 @@ orderSchema.index({ createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.timeline
 orderSchema.index({ customerId: 1, createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.customer });
 orderSchema.index({ status: 1, createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.status });
 orderSchema.index({ transactionIds: 1 }, { name: ORDER_INDEX_NAMES.transaction });
+orderSchema.index(
+  { "customerSnapshot.mobile": 1, createdAt: -1 },
+  { name: "order_customer_mobile_timeline" },
+);
 
 export function getOrderModel(connection: Connection): Model<OrderRecord> {
   return (

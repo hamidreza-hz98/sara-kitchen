@@ -25,16 +25,28 @@ export async function GET(request: NextRequest): Promise<Response> {
           ...(query.status ? { status: query.status } : {}),
           ...(query.customerId ? { customerId: query.customerId } : {}),
           ...(query.search ? { search: query.search } : {}),
+          searchMode: query.searchMode,
+          sortBy: query.sortBy,
+          ...(query.from ? { from: query.from } : {}),
+          ...(query.to ? { to: query.to } : {}),
+          ...(query.paymentStatus ? { paymentStatus: query.paymentStatus } : {}),
         },
       );
       const page = pageResult(result.items, result.total, {
         page: query.page,
         pageSize: query.pageSize,
-        sortBy: "createdAt",
+        sortBy: query.sortBy,
         sortDirection: query.sortDirection,
       });
       return apiSuccess(page.data, {
-        meta: page.meta,
+        meta: {
+          ...page.meta,
+          summary: {
+            statusCounts: result.statusCounts,
+            allCount: result.allCount,
+            allAmountCents: result.allAmountCents,
+          },
+        },
         headers: { "Cache-Control": "private, no-store" },
       });
     } catch (error) {

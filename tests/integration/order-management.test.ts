@@ -73,6 +73,75 @@ describe("order management boundaries", () => {
     ).rejects.toMatchObject({ code: "forbidden" });
   });
 
+  it("keeps status tabs and totals consistent across search, date, and payment filters", async () => {
+    const pending = await fixture();
+    const paid = await getOrderModel(client.connection).create(
+      validOrder({
+        customerSnapshot: {
+          firstName: "Hamid",
+          lastName: "Hassanzadeh",
+          mobile: "+351923456789",
+          email: null,
+        },
+      }),
+    );
+    await client.connection.collection("orders").updateOne(
+      { _id: paid._id },
+      {
+        $set: {
+          status: "confirmed",
+          revision: 2,
+          createdAt: new Date("2026-10-14T12:00:00Z"),
+          statusHistory: [
+            ...paid.statusHistory,
+            {
+              eventKey: "test_paid",
+              status: "confirmed",
+              actorKind: "system",
+              actorId: null,
+              reasonCode: null,
+              paymentStatus: "paid",
+              occurredAt: new Date("2026-10-14T12:00:00Z"),
+              recordedAt: new Date("2026-10-14T12:00:00Z"),
+            },
+          ],
+        },
+      },
+    );
+    const all = await service().list(manager, { page: 1, pageSize: 20, sortDirection: "desc" });
+    expect(all.allCount).toBe(2);
+    expect(all.statusCounts.pending_payment).toBe(1);
+    expect(all.statusCounts.confirmed).toBe(1);
+    expect(all.allAmountCents).toBe(3_600);
+    const selected = await service().list(manager, {
+      page: 1,
+      pageSize: 20,
+      status: "confirmed",
+      search: "Hamid Hass",
+      searchMode: "customer",
+      paymentStatus: "paid",
+      from: "2026-10-14",
+      to: "2026-10-14",
+      sortBy: "totalCents",
+      sortDirection: "asc",
+    });
+    expect(selected.items.map((item) => item.code)).toEqual([paid.code]);
+    expect(selected.total).toBe(1);
+    expect(selected.allCount).toBe(1);
+    expect(selected.statusCounts.confirmed).toBe(1);
+    expect(selected.statusCounts.pending_payment).toBe(0);
+    expect(
+      await service().list(manager, {
+        page: 1,
+        pageSize: 20,
+        search: "+351923",
+        searchMode: "mobile",
+        sortDirection: "desc",
+      }),
+    ).toMatchObject({ total: 1 });
+    expect(pending.code).not.toBe(paid.code);
+  });
+
   it("allows an internal note but never changes a purchase snapshot", async () => {
     const order = await fixture();
     const result = await service().setInternalNote(manager, order.code, {
