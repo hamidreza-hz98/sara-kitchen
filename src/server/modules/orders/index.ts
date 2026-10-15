@@ -7,6 +7,19 @@ export {
 } from "./service/atomic-checkout";
 export { ORDER_STATUSES, type OrderStatus } from "./model/order";
 export {
+  createOrderManagement,
+  OrderManagementError,
+  type OrderAdmin,
+} from "./service/order-management";
+export {
+  orderCodeParametersSchema,
+  orderListQuerySchema,
+  orderInternalNoteSchema,
+  orderTransitionSchema,
+  orderCancelSchema,
+  orderTransactionSchema,
+} from "./validation/order-management";
+export {
   ORDER_TRANSITIONS,
   OrderTransitionError,
   initialOrderEffects,

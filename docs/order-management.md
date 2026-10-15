@@ -1,0 +1,19 @@
+# Order management (SK-0155)
+
+Customer checkout (`POST /api/checkout`) is the only order-creation path. The owner chose **customer checkout required** on 2026-10-15: staff cannot create a cash/manual order or accept terms or initiate MB Way on a customer's behalf. Accordingly there is no admin `POST /api/orders` action. An existing order's `customerId` and customer snapshot are immutable; no post-creation "add customer" case exists. There is no update/delete endpoint for the purchase snapshot.
+
+All administrative routes require the database-backed admin session. Mutations also require same-origin/CSRF protection. The action permission is checked in the route and again in the Orders service; a guessed order code does not bypass it. Inputs use strict Zod objects, bounded pagination, and an exact human-order-code pattern. Responses are private/no-store and are projected rather than returning Mongoose documents. Only `orders:read-sensitive` grants recipient/contact/notes data.
+
+| Route                                         | Permission               | Effect                                                                                                                                         |
+| --------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/orders`                             | `orders:read`            | Page/status/customer/code-prefix filters and stable timeline sort.                                                                             |
+| `GET /api/orders/[orderCode]`                 | `orders:read`            | Detail with sensitive fields redacted unless separately permitted.                                                                             |
+| `PATCH /api/orders/[orderCode]`               | `orders:update`          | Internal note only; requires lifecycle and management revisions.                                                                               |
+| `POST /api/orders/[orderCode]/status`         | `orders:update`          | Fulfillment transition only, through the order state machine. Cancellation uses its own action.                                                |
+| `POST /api/orders/[orderCode]/cancel`         | `orders:cancel`          | Requires reason and payment-backed cancellation state. Paid cancellation records a refund-follow-up flag; it does not claim a refund occurred. |
+| `POST /api/orders/[orderCode]/transactions`   | `transactions:reconcile` | Append an existing matching retry transaction only after the prior payment failed, expired, or was cancelled; never change earlier references. |
+| `POST /api/profile/orders/[orderCode]/cancel` | Owning customer          | Cancel a pending order only after the provider has confirmed payment cancellation.                                                             |
+
+The service reloads the latest order and Transaction-owned payment view in one MongoDB transaction. It verifies matching order, customer, currency, and amount before any lifecycle action. Status/history writes, sold-count projection when applicable, and the English audit record commit together. A stale lifecycle revision or management revision produces a conflict; MongoDB optimistic concurrency protects races. Provider-originated confirmation/failure/refund transitions and payment reconciliation remain owned by the following transaction/order tasks; an admin cannot claim that a payment succeeded.
+
+The model deliberately keeps purchase facts immutable. `internalNote`, `managementRevision`, and `refundFollowUpRequired` are operational fields only. The refund-follow-up flag is set on paid cancellation and is not a refund receipt. SK-0157 will deliver the state-machine notification intents after commit.

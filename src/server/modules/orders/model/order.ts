@@ -33,6 +33,7 @@ export const ORDER_HISTORY_APPEND_ONLY_ERROR =
   "Order history and transaction references are append-only.";
 export const ORDER_INDEX_NAMES = Object.freeze({
   code: "order_code_unique",
+  timeline: "order_timeline",
   customer: "order_customer_timeline",
   status: "order_status_timeline",
   transaction: "order_transaction_lookup",
@@ -121,6 +122,7 @@ export type OrderRecord = BaseDocumentFields & {
   status: OrderStatus;
   statusHistory: OrderStatusEvent[];
   revision: number;
+  managementRevision: number;
   customerId: Types.ObjectId;
   customerSnapshot: OrderCustomerSnapshot;
   addressId: Types.ObjectId | null;
@@ -128,6 +130,8 @@ export type OrderRecord = BaseDocumentFields & {
   items: OrderItemSnapshot[];
   transactionIds: Types.ObjectId[];
   notes: string | null;
+  internalNote: string | null;
+  refundFollowUpRequired: boolean;
   currency: "EUR";
   locale: SupportedLocale;
   pricing: OrderPricingSnapshot;
@@ -358,6 +362,7 @@ export const orderSchema = createBaseSchema<OrderRecord>(
     status: { type: String, enum: ORDER_STATUSES, required: true },
     statusHistory: { type: [statusEventSchema], required: true },
     revision: boundedInt(1, ORDER_MAX_HISTORY),
+    managementRevision: { type: Number, required: true, default: 0, min: 0, max: 10_000 },
     customerId: { ...ref("Customer"), immutable: true },
     customerSnapshot: { type: customerSnapshotSchema, required: true },
     addressId: ref("Address", false),
@@ -365,6 +370,8 @@ export const orderSchema = createBaseSchema<OrderRecord>(
     items: { type: [itemSchema], required: true },
     transactionIds: { type: [Schema.Types.ObjectId], ref: "Transaction", default: [] },
     notes: note(1_000),
+    internalNote: note(1_000),
+    refundFollowUpRequired: { type: Boolean, required: true, default: false },
     currency: { type: String, enum: ["EUR"], required: true, immutable: true },
     locale: { type: String, enum: SUPPORTED_LOCALES, required: true, immutable: true },
     pricing: { type: pricingSchema, required: true },
@@ -647,6 +654,7 @@ orderSchema.pre("bulkWrite", function rejectBulkMutation() {
 });
 
 orderSchema.index({ code: 1 }, { name: ORDER_INDEX_NAMES.code, unique: true });
+orderSchema.index({ createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.timeline });
 orderSchema.index({ customerId: 1, createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.customer });
 orderSchema.index({ status: 1, createdAt: -1, _id: -1 }, { name: ORDER_INDEX_NAMES.status });
 orderSchema.index({ transactionIds: 1 }, { name: ORDER_INDEX_NAMES.transaction });

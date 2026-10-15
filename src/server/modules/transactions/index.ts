@@ -1,6 +1,7 @@
 /** Public entry point for payment and financial transaction use cases. */
 export const MODULE_NAME = "transactions" as const;
 export { createCheckoutTransaction } from "./service/checkout-transaction";
+export { getOrderPaymentView } from "./service/order-payment-view";
 
 export {
   TRANSACTION_CURRENCY,

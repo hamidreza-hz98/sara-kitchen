@@ -7,3 +7,5 @@ Checkout owns workflow composition and passes one transaction session explicitly
 The private `Order` model, human-code uniqueness, immutable purchase snapshots, append-only lifecycle data, and indexes are specified in `docs/order-model.md`. Only this module may import its model. The transition graph, payment coupling, actor permissions, notification intents, and sold-count mapping are specified in `docs/order-state-machine.md`. Checkout must retry the entire transaction on a rare generated-code collision.
 
 For checkout implementation, use Transactions' public `runIdempotentOperation()` as the outer transaction owner; do not open a nested transaction. Its callback creates the order, local payment intent, cart transition, and outbox records with the supplied session. See `docs/idempotency.md`.
+
+Administrative order reads and post-checkout actions are described in `docs/order-management.md`. Customer checkout remains the sole creation path by product decision; staff cannot impersonate customer consent or replace historical snapshots.
