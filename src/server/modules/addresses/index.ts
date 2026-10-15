@@ -35,6 +35,7 @@ export {
 export { createAddressAuditSink } from "./service/address-audit";
 export {
   CheckoutAddressError,
+  loadOwnedAddressForCheckout,
   resolveAddressForCheckout,
   verifyOwnedAddressForCheckout,
   type DeliveryZoneDecision,

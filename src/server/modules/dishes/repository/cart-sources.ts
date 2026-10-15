@@ -37,6 +37,70 @@ export type DishCartPresentation = Readonly<{
   slug: string;
 }>;
 
+export type DishCheckoutSnapshot = Readonly<{
+  id: string;
+  slug: string;
+  name: string;
+  portionAmount: number;
+  portionUnit: DishRecord["portionUnit"];
+  leadTimeMinutes: number;
+  discount: DishDiscount;
+}>;
+
+/** Order-safe dish facts, read in the caller's checkout transaction. */
+export async function loadDishCheckoutSnapshots(
+  connection: Connection,
+  dishIds: readonly string[],
+  locale: SupportedLocale,
+  session: ClientSession,
+): Promise<readonly DishCheckoutSnapshot[]> {
+  const ids = [...new Set(dishIds)].filter((id) => Types.ObjectId.isValid(id));
+  if (ids.length === 0) return [];
+  const records = await getDishModel(connection)
+    .find(
+      { _id: { $in: ids } },
+      {
+        slug: 1,
+        translations: 1,
+        portionAmount: 1,
+        portionUnit: 1,
+        leadTimeMinutes: 1,
+        discount: 1,
+      },
+    )
+    .session(session)
+    .lean<
+      Pick<
+        DishRecord,
+        | "_id"
+        | "slug"
+        | "translations"
+        | "portionAmount"
+        | "portionUnit"
+        | "leadTimeMinutes"
+        | "discount"
+      >[]
+    >();
+  const byId = new Map(records.map((record) => [record._id.toHexString(), record]));
+  return ids.flatMap((id) => {
+    const record = byId.get(id);
+    const name = record && resolveLocalizedValue(record.translations, "name", locale)?.value;
+    return record && name
+      ? [
+          {
+            id,
+            slug: record.slug,
+            name,
+            portionAmount: record.portionAmount,
+            portionUnit: record.portionUnit,
+            leadTimeMinutes: record.leadTimeMinutes,
+            discount: record.discount,
+          },
+        ]
+      : [];
+  });
+}
+
 type ProjectedDish = Pick<
   DishRecord,
   | "_id"

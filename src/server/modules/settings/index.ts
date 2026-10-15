@@ -1,5 +1,6 @@
 /** Public entry point for versioned application settings. */
 export const MODULE_NAME = "settings" as const;
+export { getCheckoutContactSettings } from "./service/checkout-contact";
 
 export {
   SETTINGS_COLLECTION,

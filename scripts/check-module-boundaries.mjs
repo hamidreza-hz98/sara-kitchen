@@ -16,7 +16,7 @@ export const dependencyMap = Object.freeze({
   ingredients: ["logs", "media"],
   logs: [],
   media: ["logs"],
-  orders: ["addresses", "carts", "customers", "dishes", "logs", "transactions"],
+  orders: ["addresses", "carts", "customers", "dishes", "logs", "settings", "transactions"],
   seo: ["blogs", "categories", "dishes", "logs", "media"],
   sessions: ["logs"],
   settings: ["blogs", "categories", "dishes", "logs", "media"],

@@ -1,5 +1,10 @@
 /** Public entry point for cart, pricing, and availability coordination. */
 export const MODULE_NAME = "carts" as const;
+export {
+  loadCustomerCartForCheckout,
+  convertCustomerCartForCheckout,
+  type CheckoutCart,
+} from "./service/cart-checkout";
 
 export {
   CART_AVAILABILITY_ISSUE_CODES,

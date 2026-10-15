@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Connection } from "mongoose";
+import type { ClientSession, Connection } from "mongoose";
 
 import type { SupportedLocale } from "@/constants";
 import type { StoredRichText } from "@/lib/rich-text";
@@ -24,6 +24,7 @@ export async function getCheckoutPolicies(
   connection: Connection,
   locale: SupportedLocale,
   now: Date = new Date(),
+  session: ClientSession | null = null,
 ): Promise<readonly CheckoutPolicy[]> {
   const records = await getPolicyVersionModel(connection)
     .find({
@@ -32,6 +33,7 @@ export async function getCheckoutPolicies(
       effectiveAt: { $lte: now },
     })
     .sort({ documentType: 1, version: -1 })
+    .session(session)
     .lean()
     .exec();
   const selected = new Set<string>();

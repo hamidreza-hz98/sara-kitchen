@@ -58,6 +58,7 @@ export { countDishesUsingIngredient } from "./repository/ingredient-references";
 export {
   loadDishCartPresentations,
   loadDishCartSources,
+  loadDishCheckoutSnapshots,
   type DishCartPresentation,
   type DishCartSource,
 } from "./repository/cart-sources";

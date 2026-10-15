@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 
 import { isValidObjectId, Types } from "mongoose";
-import type { Connection } from "mongoose";
+import type { ClientSession, Connection } from "mongoose";
 
 import type { SupportedLocale } from "@/constants";
 
@@ -142,6 +142,7 @@ export type RecordPolicyConsentInput = Readonly<{
 export async function recordPolicyConsent(
   connection: Connection,
   input: RecordPolicyConsentInput,
+  session: ClientSession | null = null,
 ): Promise<PolicyConsentRecord> {
   if (
     !isValidObjectId(input.policyVersionId) ||
@@ -154,7 +155,7 @@ export async function recordPolicyConsent(
   }
   const acceptedAt = input.acceptedAt ?? new Date();
   const PolicyVersion = getPolicyVersionModel(connection);
-  const policy = await PolicyVersion.findById(input.policyVersionId).lean().exec();
+  const policy = await PolicyVersion.findById(input.policyVersionId).session(session).lean().exec();
   if (!policy) throw new PolicyLifecycleError("policy_not_found");
   const eligibleHistoricalImport =
     input.source === "admin-import" &&
@@ -168,22 +169,29 @@ export async function recordPolicyConsent(
 
   const Consent = getPolicyConsentModel(connection);
   try {
-    return await Consent.create({
-      subjectKind: input.subjectKind,
-      subjectId: new Types.ObjectId(input.subjectId),
-      customerId: input.customerId ? new Types.ObjectId(input.customerId) : null,
-      policyVersionId: policy._id,
-      policySnapshot: {
-        documentType: policy.documentType,
-        version: policy.version,
-        effectiveAt: policy.effectiveAt,
-        contentDigest: policy.contentDigest,
-      },
-      acceptedLocale: input.acceptedLocale,
-      acceptedAt,
-      source: input.source,
-      requestId: input.requestId ?? null,
-    });
+    const [created] = await Consent.create(
+      [
+        {
+          subjectKind: input.subjectKind,
+          subjectId: new Types.ObjectId(input.subjectId),
+          customerId: input.customerId ? new Types.ObjectId(input.customerId) : null,
+          policyVersionId: policy._id,
+          policySnapshot: {
+            documentType: policy.documentType,
+            version: policy.version,
+            effectiveAt: policy.effectiveAt,
+            contentDigest: policy.contentDigest,
+          },
+          acceptedLocale: input.acceptedLocale,
+          acceptedAt,
+          source: input.source,
+          requestId: input.requestId ?? null,
+        },
+      ],
+      { ...(session ? { session } : {}) },
+    );
+    if (!created) throw new Error("Policy consent was not persisted.");
+    return created;
   } catch (error) {
     if (
       typeof error !== "object" ||
@@ -197,7 +205,9 @@ export async function recordPolicyConsent(
       subjectKind: input.subjectKind,
       subjectId: new Types.ObjectId(input.subjectId),
       policyVersionId: policy._id,
-    }).exec();
+    })
+      .session(session)
+      .exec();
     if (!existing) throw error;
     return existing;
   }

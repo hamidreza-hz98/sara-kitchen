@@ -1,5 +1,10 @@
 /** Public entry point for checkout and order lifecycle use cases. */
 export const MODULE_NAME = "orders" as const;
+export {
+  submitAtomicCheckout,
+  type CheckoutSubmission,
+  type CheckoutResult,
+} from "./service/atomic-checkout";
 export { ORDER_STATUSES, type OrderStatus } from "./model/order";
 export {
   ORDER_TRANSITIONS,

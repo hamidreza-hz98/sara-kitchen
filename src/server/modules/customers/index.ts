@@ -1,5 +1,6 @@
 /** Public entry point for customer identity and profile management. */
 export const MODULE_NAME = "customers" as const;
+export { loadCustomerIdentityForCheckout } from "./service/customer-checkout";
 export { hashCustomerPassword, verifyCustomerPasswordForLogin } from "./service/password";
 export { registerCustomer } from "./service/signup";
 export {
