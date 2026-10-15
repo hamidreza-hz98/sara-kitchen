@@ -32,7 +32,10 @@ export const TRANSACTION_MAX_AMOUNT_CENTS = 100_000_000;
 export const TRANSACTION_MAX_EVENTS = 500;
 export const TRANSACTION_APPEND_ONLY_ERROR =
   "Transaction events are append-only; use document save to append.";
+export const TRANSACTION_REQUESTED_AMOUNT_IMMUTABLE_ERROR =
+  "The original requested amount is immutable.";
 export const TRANSACTION_INDEX_NAMES = Object.freeze({
+  timeline: "transaction_timeline",
   order: "transaction_order_timeline",
   customer: "transaction_customer_timeline",
   status: "transaction_status_timeline",
@@ -79,6 +82,8 @@ export type TransactionRecord = BaseDocumentFields & {
   providerReferences: TransactionProviderReferences;
   idempotencyKeyHash: string;
   responseCode: string | null;
+  internalNote: string | null;
+  managementRevision: number;
   events: TransactionEvent[];
 };
 
@@ -180,6 +185,8 @@ export const transactionSchema = createBaseSchema<TransactionRecord>(
       validate: { validator: (value: string) => /^[a-f0-9]{64}$/u.test(value) },
     },
     responseCode: { type: String, default: null, validate: { validator: safeCode } },
+    internalNote: { type: String, trim: true, maxlength: 1_000, default: null },
+    managementRevision: { type: Number, required: true, default: 0, min: 0, max: 10_000 },
     events: { type: [eventSchema], required: true, default: [] },
   },
   { collection: "transactions", schemaVersion: 1 },
@@ -209,9 +216,21 @@ function eventFingerprint(event: TransactionEvent): string {
 
 function rememberEvents(document: {
   events: TransactionEvent[];
+  amounts: TransactionAmounts;
   $locals: Record<string, unknown>;
 }) {
   document.$locals.savedEventFingerprints = document.events.map(eventFingerprint);
+  document.$locals.savedRequestedCents = document.amounts.requestedCents;
+}
+
+function hasEditedRequestedCents(document: {
+  isNew: boolean;
+  amounts: TransactionAmounts;
+  $locals: Record<string, unknown>;
+}) {
+  return (
+    !document.isNew && document.$locals.savedRequestedCents !== document.amounts.requestedCents
+  );
 }
 
 function hasEditedSavedEvents(document: {
@@ -293,10 +312,14 @@ transactionSchema.pre("validate", function validateTransaction() {
   if (hasEditedSavedEvents(this)) {
     this.invalidate("events", TRANSACTION_APPEND_ONLY_ERROR);
   }
+  if (hasEditedRequestedCents(this)) {
+    this.invalidate("amounts.requestedCents", TRANSACTION_REQUESTED_AMOUNT_IMMUTABLE_ERROR);
+  }
 });
 
 transactionSchema.pre("save", function rejectEventRewrite() {
   if (hasEditedSavedEvents(this)) throw new Error(TRANSACTION_APPEND_ONLY_ERROR);
+  if (hasEditedRequestedCents(this)) throw new Error(TRANSACTION_REQUESTED_AMOUNT_IMMUTABLE_ERROR);
   const error = historyError(this);
   if (error) throw new Error(error);
 });
@@ -338,6 +361,7 @@ transactionSchema.index(
   { orderId: 1, createdAt: -1, _id: -1 },
   { name: TRANSACTION_INDEX_NAMES.order },
 );
+transactionSchema.index({ createdAt: -1, _id: -1 }, { name: TRANSACTION_INDEX_NAMES.timeline });
 transactionSchema.index(
   { customerId: 1, createdAt: -1, _id: -1 },
   { name: TRANSACTION_INDEX_NAMES.customer },

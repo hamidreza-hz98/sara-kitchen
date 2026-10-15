@@ -15,6 +15,7 @@ import {
   TransactionTransitionError,
 } from "../policy/transaction-state-machine";
 import type { VerifiedMbWaySandboxEvent } from "../validation/mbway-sandbox-webhook";
+import type { PaymentStateHook } from "./transaction-management";
 
 export class PaymentWebhookConflictError extends Error {
   constructor() {
@@ -104,7 +105,7 @@ export async function receiveVerifiedMbWayWebhook(
 export async function processReceivedMbWayWebhook(
   connection: Connection,
   inboxId: string,
-  options: { beforeComplete?: () => Promise<void> } = {},
+  options: { beforeComplete?: () => Promise<void>; onApplied?: PaymentStateHook } = {},
 ): Promise<Exclude<PaymentWebhookOutcome, "duplicate">> {
   return withMongoTransaction(connection, async (session) => {
     const WebhookEvent = getPaymentWebhookEventModel(connection);
@@ -127,7 +128,12 @@ export async function processReceivedMbWayWebhook(
       const transition = planTransactionTransition(
         {
           requestedCents: transaction.amounts.requestedCents,
-          amounts: transaction.amounts,
+          amounts: {
+            requestedCents: transaction.amounts.requestedCents,
+            authorizedCents: transaction.amounts.authorizedCents,
+            capturedCents: transaction.amounts.capturedCents,
+            refundedCents: transaction.amounts.refundedCents,
+          },
           status: transaction.status,
           events: transaction.events,
         },
@@ -145,6 +151,13 @@ export async function processReceivedMbWayWebhook(
       transaction.amounts = transition.amounts;
       transaction.events.push(transition.event);
       await transaction.save({ session });
+      await options.onApplied?.(session, {
+        transactionId: transaction._id.toString(),
+        orderId: transaction.orderId.toString(),
+        customerId: transaction.customerId.toString(),
+        status: transaction.status,
+        occurredAt: inbox.occurredAt,
+      });
       inbox.status = "applied";
     } catch (error) {
       if (!(error instanceof TransactionTransitionError)) throw error;
@@ -163,11 +176,12 @@ export async function processReceivedMbWayWebhook(
 export async function acceptVerifiedMbWayWebhook(
   connection: Connection,
   event: VerifiedMbWaySandboxEvent,
+  options: { onApplied?: PaymentStateHook } = {},
 ): Promise<PaymentWebhookOutcome> {
   const received = await receiveVerifiedMbWayWebhook(connection, event);
   if (received.alreadyProcessed) {
     const existing = await getPaymentWebhookEventModel(connection).findById(received.id);
     return existing?.status === "ignored" ? "ignored" : "duplicate";
   }
-  return processReceivedMbWayWebhook(connection, received.id);
+  return processReceivedMbWayWebhook(connection, received.id, options);
 }

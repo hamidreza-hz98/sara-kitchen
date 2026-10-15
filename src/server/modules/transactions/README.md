@@ -1,6 +1,6 @@
 # Transactions
 
-Owns provider/type, monetary state, provider references, idempotency, append-only payment events, webhook processing, reconciliation, and manual refund recording. It may consume Customers’ public API. Order identifiers are opaque references so payment callbacks do not import the Order model.
+Owns provider/type, monetary state, provider references, idempotency, append-only payment events, webhook processing, and provider-backed reconciliation/cancellation/refunds. It may consume Customers’ public API. Order identifiers are opaque references so payment callbacks do not import the Order model; the route injects an Orders public-API hook into the same database transaction.
 
 The private `Transaction` Mongoose model and its invariants are documented in `docs/transaction-model.md`. Other modules must use future public transaction services, never import the model directly.
 
@@ -14,4 +14,6 @@ Payment callbacks persist their verified event and local state within the Orders
 
 The private `idempotency_records` collection and public `runIdempotentOperation()` contract are documented in `docs/idempotency.md`. The unique index is the concurrency guard; the TTL index is retention cleanup, not an exact expiration clock. The service owns the transaction, passes its session to the caller's workflow, and persists a small replayable result atomically. No external side effects are permitted inside its callback.
 
-SK-0151 adds a local-simulator-only webhook Route Handler, strict raw-body verification, durable event inbox, and transactional Transaction state update. It is disabled in production and does not update an Order until that module exists. See `docs/payment-webhook.md` and `docs/request-security.md`. A selected acquirer's documented signature format may replace this isolated verifier but may not bypass provider authentication.
+SK-0151 adds a local-simulator-only webhook Route Handler, strict raw-body verification, durable event inbox, and transactional Transaction/Order state update. It is disabled in production. See `docs/payment-webhook.md` and `docs/request-security.md`. A selected acquirer's documented signature format may replace this isolated verifier but may not bypass provider authentication.
+
+SK-0156 adds permission-gated transaction reads, an audited internal note, verified provider-status reconciliation, and provider-confirmed cancellation/refund operations. There is no admin create/delete or arbitrary amount/status update endpoint. See `docs/transaction-management.md`.

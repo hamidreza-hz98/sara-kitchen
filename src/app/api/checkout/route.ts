@@ -10,7 +10,7 @@ import {
 } from "@/server/http";
 import { getServerEnvironment } from "@/server/environment";
 import { isSameOriginMutation } from "@/server/modules/auth";
-import { createLocalMbWaySandboxProvider } from "@/server/modules/transactions";
+import { getLocalMbWaySandboxProvider } from "@/server/modules/transactions";
 import { submitAtomicCheckout } from "@/server/modules/orders";
 
 import { cartRequestContext, cartRequestLocale } from "../cart/route-helper";
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         longitude: environment.KITCHEN_LONGITUDE,
       },
       serviceRadiusKm: null,
-      provider: createLocalMbWaySandboxProvider(environment.MBWAY_WEBHOOK_SECRET),
+      provider: getLocalMbWaySandboxProvider(environment.MBWAY_WEBHOOK_SECRET),
     });
     return apiSuccess(result, { headers: { "Cache-Control": "private, no-store" } });
   });

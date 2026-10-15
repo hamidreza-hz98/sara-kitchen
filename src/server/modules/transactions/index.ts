@@ -2,6 +2,20 @@
 export const MODULE_NAME = "transactions" as const;
 export { createCheckoutTransaction } from "./service/checkout-transaction";
 export { getOrderPaymentView } from "./service/order-payment-view";
+export {
+  createTransactionManagement,
+  TransactionManagementError,
+  type PaymentStateHook,
+  type TransactionAdmin,
+  type VerifiedPaymentState,
+} from "./service/transaction-management";
+export {
+  transactionIdParametersSchema,
+  transactionListQuerySchema,
+  transactionNoteSchema,
+  transactionRefundSchema,
+  transactionEmptyActionSchema,
+} from "./validation/transaction-management";
 
 export {
   TRANSACTION_CURRENCY,
@@ -67,6 +81,7 @@ export {
   SandboxTransportError,
   type MbWaySandboxOptions,
 } from "./provider/mbway-sandbox-provider";
+export { getLocalMbWaySandboxProvider } from "./provider/local-mbway-provider";
 
 export {
   persistMbWaySandboxInitiation,

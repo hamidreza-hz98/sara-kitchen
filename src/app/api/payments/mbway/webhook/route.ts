@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { connectToDatabase, MongoTransactionUnavailableError } from "@/server/database";
 import { getServerEnvironment } from "@/server/environment";
 import { ApiError, apiSuccess, handleApiRoute } from "@/server/http";
+import { applyVerifiedPaymentStateToOrder } from "@/server/modules/orders";
 import {
   acceptVerifiedMbWayWebhook,
   MBWAY_SANDBOX_WEBHOOK_MAX_BYTES,
@@ -40,7 +41,7 @@ async function readRawBody(request: Request): Promise<string | null> {
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
-  return handleApiRoute(request, async () => {
+  return handleApiRoute(request, async ({ requestId }) => {
     // This adapter authenticates only our local simulator, not a real MB Way acquirer.
     if (process.env.NODE_ENV === "production") throw ApiError.notFound();
     const environment = getServerEnvironment();
@@ -62,7 +63,12 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     try {
       const connection = await connectToDatabase();
-      const outcome = await acceptVerifiedMbWayWebhook(connection, event);
+      const outcome = await acceptVerifiedMbWayWebhook(connection, event, {
+        onApplied: (session, state) =>
+          applyVerifiedPaymentStateToOrder(connection, state, session, requestId).then(
+            () => undefined,
+          ),
+      });
       return apiSuccess({ accepted: true, outcome });
     } catch (error) {
       if (error instanceof PaymentWebhookConflictError) throw ApiError.conflict();

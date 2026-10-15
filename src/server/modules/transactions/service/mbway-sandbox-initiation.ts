@@ -101,7 +101,12 @@ export async function persistMbWaySandboxInitiation(
   const transition = planTransactionTransition(
     {
       requestedCents: record.amounts.requestedCents,
-      amounts: record.amounts,
+      amounts: {
+        requestedCents: record.amounts.requestedCents,
+        authorizedCents: record.amounts.authorizedCents,
+        capturedCents: record.amounts.capturedCents,
+        refundedCents: record.amounts.refundedCents,
+      },
       status: record.status,
       events: record.events,
     },

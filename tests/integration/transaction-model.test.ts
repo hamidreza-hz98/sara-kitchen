@@ -6,6 +6,7 @@ vi.mock("server-only", () => ({}));
 import {
   getTransactionModel,
   TRANSACTION_APPEND_ONLY_ERROR,
+  TRANSACTION_REQUESTED_AMOUNT_IMMUTABLE_ERROR,
   TRANSACTION_INDEX_NAMES,
 } from "@/server/modules/transactions/model/transaction";
 
@@ -95,6 +96,19 @@ describe("persisted transaction model", () => {
       TRANSACTION_APPEND_ONLY_ERROR,
     );
     expect((await Transaction.findById(record._id))?.events).toHaveLength(2);
+  });
+
+  it("never permits the requested amount to be changed after creation", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const Transaction = getTransactionModel(client.connection);
+    const record = await Transaction.create(input("1".repeat(64)));
+    const saved = await Transaction.findById(record._id);
+    if (!saved) throw new Error("Transaction disappeared.");
+    saved.amounts.requestedCents = 1_300;
+    await expect(saved.save({ validateBeforeSave: false })).rejects.toThrow(
+      TRANSACTION_REQUESTED_AMOUNT_IMMUTABLE_ERROR,
+    );
+    expect((await Transaction.findById(record._id))?.amounts.requestedCents).toBe(1_200);
   });
 
   it("rejects persisted status regressions and duplicate callbacks", async () => {
