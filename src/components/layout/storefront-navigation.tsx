@@ -32,7 +32,7 @@ import { AppDrawer, AppLink } from "@/components/ui";
 import { useCustomerAuth, useFeedback } from "@/hooks";
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
-import { LOCALE_COOKIE_MAX_AGE, LOCALE_COOKIE_NAME } from "@/locales";
+import { saveBrowserLocalePreference } from "@/locales/client-preference";
 import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
@@ -92,8 +92,7 @@ function LocaleSelector() {
   const open = anchorElement !== null;
 
   const selectLocale = (nextLocale: string) => {
-    const secure = window.location.protocol === "https:" ? "; Secure" : "";
-    document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(nextLocale)}; Path=/; Max-Age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+    saveBrowserLocalePreference(nextLocale as "en" | "pt-PT" | "fa");
     window.location.reload();
   };
 
