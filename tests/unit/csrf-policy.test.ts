@@ -69,6 +69,33 @@ describe("mutation request protections", () => {
         }),
       ),
     ).toBe(true);
+    expect(
+      isSameOriginMutation(
+        new Request("http://localhost:3100/api/contact-submissions/form", {
+          method: "POST",
+          headers: {
+            origin: "http://127.0.0.1:3100",
+            host: "127.0.0.1:3100",
+            "x-forwarded-host": "127.0.0.1:3100",
+            "x-forwarded-proto": "http",
+            "sec-fetch-site": "same-origin",
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      isSameOriginMutation(
+        new Request("http://localhost:3100/api/contact-submissions/form", {
+          method: "POST",
+          headers: {
+            origin: "http://127.0.0.1:3100",
+            host: "127.0.0.1:3100",
+            "x-forwarded-host": "evil.example",
+            "x-forwarded-proto": "http",
+          },
+        }),
+      ),
+    ).toBe(false);
   });
 
   it("verifies the timestamped MB Way sandbox signature and rejects tampering", () => {

@@ -56,7 +56,7 @@ export function createContentSecurityPolicy(options: SecurityHeaderOptions): str
     `img-src ${sources("'self'", "data:", "blob:", mapTileOrigin, mediaOrigin)}`,
     `media-src ${sources("'self'", "blob:", mediaOrigin)}`,
     `connect-src ${sources("'self'", options.production ? undefined : "ws:", mediaOrigin, monitoringOrigin)}`,
-    `frame-src ${sources(mapFrameOrigin)}`,
+    `frame-src ${sources(mapFrameOrigin, "https://www.google.com", "https://maps.google.com")}`,
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "object-src 'none'",

@@ -7,6 +7,8 @@ const HANDLER_WRAPPER = /\bhandleApiRoute\s*\(/u;
 const HANDLER_WRAPPERS = /\bhandleApiRoute\s*\(/gu;
 const XML_ROUTE_MARKER = /^\s*\/\/\s*route-response:\s*xml\s*$/mu;
 const XML_RESPONSE_WRAPPER = /\bsitemapXmlResponse\s*\(/gu;
+const HTML_ROUTE_MARKER = /^\s*\/\/\s*route-response:\s*html\s*$/mu;
+const HTML_RESPONSE_WRAPPER = /\bhtmlResponse\s*\(/gu;
 const FUNCTION_METHOD_EXPORT =
   /\bexport\s+(?:async\s+)?function\s+(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s*\(/gu;
 const VARIABLE_METHOD_EXPORT =
@@ -32,6 +34,21 @@ export function validateRouteHandlerSource(source, file = "route.ts") {
     }
     if (/\b(?:Response|NextResponse)\.json\s*\(/u.test(source)) {
       errors.push(`${file}: XML handlers cannot return JSON responses.`);
+    }
+    return errors;
+  }
+  if (HTML_ROUTE_MARKER.test(source)) {
+    const responseCount = (source.match(HTML_RESPONSE_WRAPPER) ?? []).length;
+    if (responseCount < methodCount) {
+      errors.push(
+        `${file}: every HTML method must use htmlResponse() (${responseCount}/${methodCount}).`,
+      );
+    }
+    if (/\b(?:Response|NextResponse)\.json\s*\(/u.test(source)) {
+      errors.push(`${file}: HTML handlers cannot return JSON responses.`);
+    }
+    if (/\bnew\s+Response\s*\(/u.test(source)) {
+      errors.push(`${file}: HTML handlers cannot return ad hoc responses.`);
     }
     return errors;
   }

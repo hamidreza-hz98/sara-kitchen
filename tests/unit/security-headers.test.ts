@@ -48,6 +48,7 @@ describe("production response security", () => {
     expect(policy).toContain(`media-src 'self' blob: ${mediaOrigin}`);
     expect(policy).toContain(`connect-src 'self' ${mediaOrigin} ${monitoringOrigin}`);
     expect(policy).toContain("frame-src https://www.openstreetmap.org");
+    expect(policy).toContain("https://www.google.com https://maps.google.com");
     expect(policy).toContain("frame-ancestors 'none'");
     expect(policy).toContain("object-src 'none'");
     expect(policy).toContain("upgrade-insecure-requests");

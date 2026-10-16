@@ -63,3 +63,30 @@ test("rejects marked XML handlers that bypass their response boundary", () => {
   assert.match(findings.join("\n"), /sitemapXmlResponse/u);
   assert.match(findings.join("\n"), /cannot return JSON/u);
 });
+
+test("accepts an explicitly marked native HTML form handler through its response boundary", () => {
+  const findings = validateRouteHandlerSource(`
+    // route-response: html
+    import {htmlResponse} from "./html-response";
+    export function POST() {
+      return htmlResponse("en", "sent");
+    }
+  `);
+  assert.deepEqual(findings, []);
+});
+
+test("rejects marked HTML handlers with raw or JSON responses", () => {
+  const findings = validateRouteHandlerSource(`
+    // route-response: html
+    export function POST() {
+      return new Response("unsafe");
+    }
+    export function GET() {
+      return Response.json({unsafe: true});
+    }
+  `);
+  assert.equal(findings.length, 3);
+  assert.match(findings.join("\n"), /htmlResponse/u);
+  assert.match(findings.join("\n"), /cannot return JSON/u);
+  assert.match(findings.join("\n"), /ad hoc/u);
+});
