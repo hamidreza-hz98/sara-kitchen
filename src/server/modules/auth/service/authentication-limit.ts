@@ -133,11 +133,11 @@ export async function limitSensitiveAccountOperation(
   input: {
     principal: SessionPrincipal;
     actorId: string;
-    operation: "change-password" | "sessions";
+    operation: "change-password" | "sessions" | "privacy";
   },
 ): Promise<void> {
   const policy =
-    input.operation === "change-password"
+    input.operation === "change-password" || input.operation === "privacy"
       ? { actor: 5, ip: 20, windowMs: ONE_HOUR }
       : { actor: 30, ip: 60, windowMs: FIFTEEN_MINUTES };
   const prefix = `${input.principal}-${input.operation}`;

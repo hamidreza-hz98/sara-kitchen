@@ -1,19 +1,19 @@
 import type { NextRequest } from "next/server";
+import { z } from "zod";
 
 import { apiSuccess, handleApiRoute, parseJsonRequest } from "@/server/http";
 import { clearCustomerCookie } from "@/server/modules/auth";
-import {
-  customerEmptyMutationSchema,
-  customerProfileUpdateSchema,
-} from "@/server/modules/customers";
+import { customerProfileUpdateSchema } from "@/server/modules/customers";
 
 import {
   customerSelfRequestContext,
   resolveCustomerCrudServices,
   translateCustomerCrudError,
 } from "../customers/route-helper";
+import { confirmCustomerPrivacyPassword } from "./privacy-confirmation";
 
 export const runtime = "nodejs";
+const deletionConfirmationSchema = z.strictObject({ currentPassword: z.string().min(1).max(1024) });
 
 export async function GET(request: NextRequest): Promise<Response> {
   return handleApiRoute(request, async ({ requestId }) => {
@@ -52,7 +52,12 @@ export async function PATCH(request: NextRequest): Promise<Response> {
 export async function DELETE(request: NextRequest): Promise<Response> {
   const response = await handleApiRoute(request, async ({ requestId }) => {
     const { connection, actor, validation } = await customerSelfRequestContext(request, true);
-    await parseJsonRequest(request, customerEmptyMutationSchema, validation);
+    const { currentPassword } = await parseJsonRequest(
+      request,
+      deletionConfirmationSchema,
+      validation,
+    );
+    await confirmCustomerPrivacyPassword(connection, request, actor.id, currentPassword);
     try {
       return apiSuccess(
         await resolveCustomerCrudServices(

@@ -12,7 +12,7 @@ SK-0127 adds administrator management APIs and customer self-service profile/pri
 | Anonymize another account             | Administrator | `customers:delete`                                                  |
 | Read/update/export/delete own account | Customer      | Active session and exact ownership                                  |
 
-All mutations use same-origin and CSRF checks. UI visibility is not an authorization boundary. Password hashes and password versions never enter DTOs or exports. A changed mobile or email loses its verification timestamp.
+All mutations use same-origin and CSRF checks. Self-service export and deletion additionally require fresh current-password verification on every request and actor/IP rate limits (SK-0180); export is POST-only. UI visibility is not an authorization boundary. Password hashes and password versions never enter DTOs or exports. A changed mobile or email loses its verification timestamp.
 
 ## Deletion and retention
 

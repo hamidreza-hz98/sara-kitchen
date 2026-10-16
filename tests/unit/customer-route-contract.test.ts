@@ -13,9 +13,13 @@ const state = vi.hoisted(() => ({
   exportAccount: vi.fn(),
   anonymize: vi.fn(),
   summaries: vi.fn(),
+  confirmPrivacy: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/app/api/profile/privacy-confirmation", () => ({
+  confirmCustomerPrivacyPassword: state.confirmPrivacy,
+}));
 vi.mock("@/app/api/customers/route-helper", async () => {
   const { ApiError } = await import("@/server/http");
   const { CustomerCrudError } = await import("@/server/modules/customers");
@@ -50,7 +54,7 @@ import {
 } from "@/app/api/customers/[customerId]/route";
 import { POST as adminStatus } from "@/app/api/customers/[customerId]/status/route";
 import { GET as adminList } from "@/app/api/customers/route";
-import { GET as selfExport } from "@/app/api/profile/export/route";
+import { POST as selfExport } from "@/app/api/profile/export/route";
 import {
   DELETE as selfDelete,
   GET as selfDetail,
@@ -87,6 +91,7 @@ beforeEach(() => {
     operation.mockResolvedValue({ id: customerId });
   state.exportAccount.mockResolvedValue({ profile: { id: customerId }, orders: [] });
   state.anonymize.mockResolvedValue({ customer: { id: customerId }, hardDeleted: false });
+  state.confirmPrivacy.mockResolvedValue(undefined);
 });
 
 describe("customer Route Handler contracts", () => {
@@ -134,11 +139,32 @@ describe("customer Route Handler contracts", () => {
   it("always scopes self-service operations to the resolved customer", async () => {
     expect((await selfDetail(request("/api/profile"))).status).toBe(200);
     expect((await selfUpdate(request("/api/profile", "PATCH", { email: null }))).status).toBe(200);
-    expect((await selfExport(request("/api/profile/export"))).status).toBe(200);
-    const deleted = await selfDelete(request("/api/profile", "DELETE", {}));
+    expect(
+      (
+        await selfExport(
+          request("/api/profile/export", "POST", { currentPassword: "valid-password" }),
+        )
+      ).status,
+    ).toBe(200);
+    const deleted = await selfDelete(
+      request("/api/profile", "DELETE", { currentPassword: "valid-password" }),
+    );
     expect(deleted.status).toBe(200);
     expect(deleted.headers.get("set-cookie")).toContain("Max-Age=0");
     expect(state.anonymize).toHaveBeenCalledWith({ kind: "customer", id: customerId }, customerId);
+  });
+
+  it("requires immediate password confirmation for export and deletion", async () => {
+    state.confirmPrivacy.mockRejectedValue(ApiError.authorization());
+    expect(
+      (await selfExport(request("/api/profile/export", "POST", { currentPassword: "wrong" })))
+        .status,
+    ).toBe(403);
+    expect(
+      (await selfDelete(request("/api/profile", "DELETE", { currentPassword: "wrong" }))).status,
+    ).toBe(403);
+    expect(state.exportAccount).not.toHaveBeenCalled();
+    expect(state.anonymize).not.toHaveBeenCalled();
   });
 
   it("preserves authentication failures", async () => {
