@@ -3,6 +3,17 @@
     "title": "Sara Kitchen",
     "description": "Persian homemade food in Porto, Portugal."
   },
+  "about": {
+    "eyebrow": "Persian roots · Porto home",
+    "title": "Our Story",
+    "summary": "Sara Kitchen brings Persian homemade food to Porto, prepared with care and fresh ingredients.",
+    "storyHeading": "The heart of the kitchen",
+    "storyFallback": "Discover Persian home cooking, made with care in Porto. Our menu brings traditional flavours and fresh ingredients together at your table.",
+    "valuesHeading": "Our values",
+    "teamHeading": "Meet the team",
+    "kitchenHeading": "Inside our kitchen",
+    "exploreMenu": "Explore the menu"
+  },
   "home": {
     "eyebrow": "Persian homemade food in Porto",
     "title": "The warmth of Persian home cooking",

@@ -3,6 +3,17 @@
     "title": "Sara Kitchen",
     "description": "Comida persa caseira no Porto, Portugal."
   },
+  "about": {
+    "eyebrow": "Raízes persas · casa no Porto",
+    "title": "A nossa história",
+    "summary": "A Sara Kitchen traz comida persa caseira ao Porto, preparada com carinho e ingredientes frescos.",
+    "storyHeading": "O coração da cozinha",
+    "storyFallback": "Descubra a cozinha persa caseira, preparada com carinho no Porto. A nossa ementa junta sabores tradicionais e ingredientes frescos à sua mesa.",
+    "valuesHeading": "Os nossos valores",
+    "teamHeading": "Conheça a equipa",
+    "kitchenHeading": "Na nossa cozinha",
+    "exploreMenu": "Explorar a ementa"
+  },
   "home": {
     "eyebrow": "Comida persa caseira no Porto",
     "title": "O aconchego da cozinha persa caseira",
