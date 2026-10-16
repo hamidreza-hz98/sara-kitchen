@@ -7,6 +7,11 @@ const objectId = z.string().regex(/^[a-f\d]{24}$/iu);
 const code = z.string().regex(ORDER_CODE_PATTERN);
 
 export const orderCodeParametersSchema = z.strictObject({ orderCode: code });
+export const customerOrderListQuerySchema = z.strictObject({
+  tab: z.enum(["all", "active", "completed", "closed"]).default("all"),
+  status: z.enum(ORDER_STATUSES).optional(),
+  page: z.coerce.number().int().min(1).max(1000).default(1),
+});
 export const paymentResultQuerySchema = z.strictObject({ order: code });
 export const orderListQuerySchema = z
   .strictObject({

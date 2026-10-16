@@ -25,6 +25,7 @@ export {
 } from "./service/order-management";
 export {
   orderCodeParametersSchema,
+  customerOrderListQuerySchema,
   paymentResultQuerySchema,
   orderListQuerySchema,
   orderInternalNoteSchema,
@@ -60,3 +61,13 @@ export {
   type CustomerLatestOrder,
   type CustomerProfileOrders,
 } from "./service/customer-profile-overview";
+export {
+  CUSTOMER_ORDER_TABS,
+  customerOrderStatusFilter,
+  getCustomerOrderSummaryByCode,
+  listCustomerOrders,
+  type CustomerOrderListItem,
+  type CustomerOrderListInput,
+  type CustomerOrderListResult,
+  type CustomerOrderTab,
+} from "./service/customer-order-list";

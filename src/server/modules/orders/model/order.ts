@@ -4,6 +4,7 @@ import { isValidObjectId, Schema } from "mongoose";
 import type { Connection, Model, Types } from "mongoose";
 
 import { SUPPORTED_LOCALES, type SupportedLocale } from "@/constants";
+import { ORDER_STATUSES, type OrderStatus } from "@/constants/order-status";
 import { createBaseSchema, type BaseDocumentFields } from "@/server/database/schema";
 import { TRANSACTION_STATUSES, type TransactionStatus } from "@/server/modules/transactions";
 
@@ -13,18 +14,7 @@ import {
   validateOrderTransitionEvidence,
 } from "../policy/order-state-machine";
 
-export const ORDER_STATUSES = [
-  "pending_payment",
-  "confirmed",
-  "preparing",
-  "ready",
-  "out_for_delivery",
-  "completed",
-  "payment_failed",
-  "cancelled",
-  "expired",
-  "refunded",
-] as const;
+export { ORDER_STATUSES };
 export const ORDER_MAX_MONEY_CENTS = 100_000_000;
 export const ORDER_MAX_LINES = 100;
 export const ORDER_MAX_HISTORY = 200;
@@ -39,7 +29,7 @@ export const ORDER_INDEX_NAMES = Object.freeze({
   transaction: "order_transaction_lookup",
 } as const);
 
-export type OrderStatus = (typeof ORDER_STATUSES)[number];
+export type { OrderStatus };
 export type OrderFulfillmentMethod = "pickup" | "delivery";
 export type OrderDiscountType = "none" | "fixed" | "percentage";
 
