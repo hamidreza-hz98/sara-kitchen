@@ -5,6 +5,7 @@ import { isSupportedLocale } from "@/constants";
 import { resolveStorefrontMetadata, resolveStorefrontStructuredData } from "../storefront-metadata";
 import { StructuredDataScript } from "../structured-data-script";
 import { HomePage } from "./home-page";
+import { loadHomeContent } from "./home-data";
 
 type HomePageProps = { params: Promise<{ locale: string }> };
 
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 export default async function Home({ params }: HomePageProps) {
   const { locale } = await params;
   if (!isSupportedLocale(locale)) return <HomePage />;
+  const content = await loadHomeContent(locale);
   const translations = await getTranslations({ locale, namespace: "storefront.metadata" });
   const structuredData = await resolveStorefrontStructuredData(
     "/",
@@ -31,7 +33,7 @@ export default async function Home({ params }: HomePageProps) {
   return (
     <>
       <StructuredDataScript data={structuredData} />
-      <HomePage />
+      <HomePage content={content} />
     </>
   );
 }

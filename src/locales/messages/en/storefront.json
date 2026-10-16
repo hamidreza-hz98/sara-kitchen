@@ -5,9 +5,25 @@
   },
   "home": {
     "eyebrow": "Persian homemade food in Porto",
-    "title": "Sara Kitchen is getting ready to serve you.",
-    "description": "This multilingual foundation is ready for the menu, ordering experience, and management panel.",
-    "showcase": "View theme showcase"
+    "title": "The warmth of Persian home cooking",
+    "description": "Made with care in Porto. Explore comforting Persian dishes, prepared with fresh ingredients for your table.",
+    "showcase": "View theme showcase",
+    "browseMenu": "Explore the menu",
+    "hero": "Featured stories",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "banners": "Explore Sara Kitchen",
+    "featured": "Featured dishes",
+    "discounted": "Today's offers",
+    "categories": "Explore the menu",
+    "benefits": "Why Sara Kitchen",
+    "testimonials": "What our guests say",
+    "blog": "Food stories",
+    "viewAll": "View all",
+    "viewDish": "View dish",
+    "readPost": "Read story",
+    "readTime": "{count} min read",
+    "rating": "{count} out of 5 stars"
   },
   "menu": {
     "title": "Our menu",

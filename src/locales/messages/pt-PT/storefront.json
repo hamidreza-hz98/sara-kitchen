@@ -5,9 +5,25 @@
   },
   "home": {
     "eyebrow": "Comida persa caseira no Porto",
-    "title": "A Sara Kitchen está quase pronta para o servir.",
-    "description": "Esta base multilingue está pronta para o menu, a experiência de encomenda e o painel de gestão.",
-    "showcase": "Ver apresentação do tema"
+    "title": "O aconchego da cozinha persa caseira",
+    "description": "Preparada com carinho no Porto. Descubra pratos persas reconfortantes, feitos com ingredientes frescos.",
+    "showcase": "Ver apresentação do tema",
+    "browseMenu": "Explorar a ementa",
+    "hero": "Destaques",
+    "previousSlide": "Slide anterior",
+    "nextSlide": "Slide seguinte",
+    "banners": "Explorar Sara Kitchen",
+    "featured": "Pratos em destaque",
+    "discounted": "Ofertas de hoje",
+    "categories": "Explorar a ementa",
+    "benefits": "Porquê Sara Kitchen",
+    "testimonials": "O que dizem os clientes",
+    "blog": "Histórias da cozinha",
+    "viewAll": "Ver tudo",
+    "viewDish": "Ver prato",
+    "readPost": "Ler história",
+    "readTime": "{count} min de leitura",
+    "rating": "{count} de 5 estrelas"
   },
   "menu": {
     "title": "O nosso menu",

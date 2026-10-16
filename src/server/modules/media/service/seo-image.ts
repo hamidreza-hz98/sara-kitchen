@@ -42,12 +42,31 @@ function preferredVariant(variants: readonly MediaVariant[]): MediaVariant | nul
   );
 }
 
-/** Resolve an approved Media image to a short-lived crawler-readable URL. */
-export async function resolveSeoMediaImage(
+export function selectStorefrontVariant(
+  variants: readonly MediaVariant[],
+  size: "display" | "thumbnail",
+): MediaVariant | null {
+  const ready = variants.filter((variant) => variant.processingState === "ready");
+  const bySize = (left: MediaVariant, right: MediaVariant) => {
+    const leftPixels = (left.dimensions?.width ?? 0) * (left.dimensions?.height ?? 0);
+    const rightPixels = (right.dimensions?.width ?? 0) * (right.dimensions?.height ?? 0);
+    return size === "thumbnail" ? leftPixels - rightPixels : rightPixels - leftPixels;
+  };
+  return (
+    ready.filter((variant) => variant.mimeType === "image/webp").toSorted(bySize)[0] ??
+    ready
+      .filter((variant) => variant.mimeType === "image/jpeg" || variant.mimeType === "image/png")
+      .toSorted(bySize)[0] ??
+    null
+  );
+}
+
+async function resolveImage(
   connection: Connection,
   storage: StorageProvider,
   mediaId: string,
   locale: SupportedLocale,
+  role: "seo" | "display" | "thumbnail",
 ): Promise<SeoMediaImage | null> {
   if (!Types.ObjectId.isValid(mediaId)) return null;
   const record = await getMediaModel(connection)
@@ -78,7 +97,10 @@ export async function resolveSeoMediaImage(
   }
   if (!record.bucket || !record.objectKey) return null;
 
-  const variant = preferredVariant(record.variants);
+  const variant =
+    role === "seo"
+      ? preferredVariant(record.variants)
+      : selectStorefrontVariant(record.variants, role);
   const signed = await storage.signedReadUrl(
     { bucket: record.bucket, key: variant?.key ?? record.objectKey },
     900,
@@ -88,4 +110,25 @@ export async function resolveSeoMediaImage(
     alt,
     dimensions: variant?.dimensions ?? record.dimensions,
   };
+}
+
+/** Resolve an approved Media image to a short-lived crawler-readable fallback URL. */
+export function resolveSeoMediaImage(
+  connection: Connection,
+  storage: StorageProvider,
+  mediaId: string,
+  locale: SupportedLocale,
+): Promise<SeoMediaImage | null> {
+  return resolveImage(connection, storage, mediaId, locale, "seo");
+}
+
+/** Prefer already-processed WebP variants at a bounded storefront display size. */
+export function resolveStorefrontMediaImage(
+  connection: Connection,
+  storage: StorageProvider,
+  mediaId: string,
+  locale: SupportedLocale,
+  size: "display" | "thumbnail",
+): Promise<SeoMediaImage | null> {
+  return resolveImage(connection, storage, mediaId, locale, size);
 }
