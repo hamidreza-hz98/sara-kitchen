@@ -194,7 +194,7 @@ export function createBlogRepository(connection: Connection): BlogRepository {
       const document = await Blog.findOne({
         slug,
         deletedAt: null,
-        ...(publishedOnly ? { status: "published" } : {}),
+        ...(publishedOnly ? { status: "published", publishedAt: { $lte: new Date() } } : {}),
       });
       return document ? snapshot(document) : null;
     },
@@ -202,7 +202,11 @@ export function createBlogRepository(connection: Connection): BlogRepository {
       return listWithFilter(options, { deletedAt: null });
     },
     listPublic(options) {
-      return listWithFilter(options, { deletedAt: null, status: "published" });
+      return listWithFilter(options, {
+        deletedAt: null,
+        status: "published",
+        publishedAt: { $lte: new Date() },
+      });
     },
     async isSlugTaken(slug, excludingId) {
       return Boolean(

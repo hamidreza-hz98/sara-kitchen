@@ -348,7 +348,30 @@
     "networkError": "The connection was interrupted. No new request key was created; check order status before retrying."
   },
   "blog": {
-    "title": "Stories from Sara Kitchen"
+    "title": "Stories from Sara Kitchen",
+    "description": "Recipes, ingredients, and the stories behind our Persian kitchen.",
+    "breadcrumbs": "Breadcrumbs",
+    "home": "Home",
+    "featured": "Featured stories",
+    "latest": "Latest posts",
+    "search": "Search stories",
+    "sort": "Sort by",
+    "newest": "Newest first",
+    "oldest": "Oldest first",
+    "popular": "Most viewed",
+    "apply": "Apply",
+    "found": "{count} posts",
+    "grid": "Grid",
+    "list": "List",
+    "readTime": "{minutes} min read",
+    "readPost": "Read post",
+    "empty": "No stories found",
+    "emptyHint": "Try another search or clear the filters.",
+    "clearFilters": "Clear filters",
+    "pagination": "Blog pages",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page}"
   },
   "signup": {
     "title": "Create your account",

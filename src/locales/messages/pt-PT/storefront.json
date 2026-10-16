@@ -348,7 +348,30 @@
     "networkError": "A ligação foi interrompida. Não foi criada uma nova chave; verifique a encomenda antes de repetir."
   },
   "blog": {
-    "title": "Histórias da Sara Kitchen"
+    "title": "Histórias da Sara Kitchen",
+    "description": "Receitas, ingredientes e histórias da nossa cozinha persa.",
+    "breadcrumbs": "Navegação",
+    "home": "Início",
+    "featured": "Histórias em destaque",
+    "latest": "Publicações recentes",
+    "search": "Pesquisar histórias",
+    "sort": "Ordenar por",
+    "newest": "Mais recentes",
+    "oldest": "Mais antigas",
+    "popular": "Mais vistas",
+    "apply": "Aplicar",
+    "found": "{count} publicações",
+    "grid": "Grelha",
+    "list": "Lista",
+    "readTime": "{minutes} min de leitura",
+    "readPost": "Ler artigo",
+    "empty": "Nenhuma história encontrada",
+    "emptyHint": "Experimente outra pesquisa ou limpe os filtros.",
+    "clearFilters": "Limpar filtros",
+    "pagination": "Páginas do blogue",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "page": "Página {page}"
   },
   "signup": {
     "title": "Criar conta",

@@ -46,7 +46,7 @@ describe("blog publishing persistence", () => {
       authorAdminId: authorId,
       authorSnapshot: { displayName: "Sara Kazemi" },
     };
-    const [draft, scheduled, published, archived] = await Promise.all([
+    const [draft, scheduled, published, archived, futurePublished] = await Promise.all([
       new Blog({ ...base, slug: "draft-article", status: "draft" }).save(),
       new Blog({
         ...base,
@@ -66,11 +66,18 @@ describe("blog publishing persistence", () => {
         status: "archived",
         publishedAt: new Date("2026-09-23"),
       }).save(),
+      new Blog({
+        ...base,
+        slug: "future-published-article",
+        status: "published",
+        publishedAt: new Date("2099-01-01"),
+      }).save(),
     ]);
     const repository = createBlogRepository(client.connection);
     await expect(repository.findBySlug(draft.slug, true)).resolves.toBeNull();
     await expect(repository.findBySlug(scheduled.slug, true)).resolves.toBeNull();
     await expect(repository.findBySlug(archived.slug, true)).resolves.toBeNull();
+    await expect(repository.findBySlug(futurePublished.slug, true)).resolves.toBeNull();
     await expect(repository.findBySlug(published.slug, true)).resolves.toMatchObject({
       id: published._id.toHexString(),
     });
