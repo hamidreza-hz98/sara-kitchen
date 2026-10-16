@@ -227,6 +227,45 @@
     "requestNew": "Request a new link",
     "signIn": "Sign in"
   },
+  "paymentResult": {
+    "metadataTitle": "Payment result",
+    "orderCode": "Order code",
+    "lastChecked": "Order updated {time}",
+    "checking": "Checking the verified payment status…",
+    "pendingSafety": "Keep this page open. Do not place another order while the payment outcome is still pending.",
+    "pollingPaused": "Automatic checking paused. You can safely refresh the verified status below.",
+    "refresh": "Check status now",
+    "refreshing": "Checking…",
+    "refreshError": "We could not refresh the status. Your order is unchanged; try again shortly.",
+    "viewOrders": "View my orders",
+    "startNewOrder": "Start a new order",
+    "states": {
+      "pending": {
+        "title": "Payment is being confirmed",
+        "description": "MB Way may take a moment to send its final confirmation."
+      },
+      "success": {
+        "title": "Payment confirmed",
+        "description": "Your order is confirmed and Sara Kitchen can begin preparing it."
+      },
+      "failed": {
+        "title": "Payment failed",
+        "description": "No successful payment was recorded for this order."
+      },
+      "expired": {
+        "title": "Payment request expired",
+        "description": "The MB Way payment window closed before confirmation."
+      },
+      "cancelled": {
+        "title": "Payment or order cancelled",
+        "description": "This order will not proceed. Check your orders if you need more details."
+      },
+      "refunded": {
+        "title": "Payment refunded",
+        "description": "The verified payment record shows that this order was refunded."
+      }
+    }
+  },
   "shell": {
     "skipToContent": "Skip to main content",
     "primaryNavigation": "Primary navigation",

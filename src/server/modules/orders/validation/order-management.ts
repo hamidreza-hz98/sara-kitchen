@@ -7,6 +7,7 @@ const objectId = z.string().regex(/^[a-f\d]{24}$/iu);
 const code = z.string().regex(ORDER_CODE_PATTERN);
 
 export const orderCodeParametersSchema = z.strictObject({ orderCode: code });
+export const paymentResultQuerySchema = z.strictObject({ order: code });
 export const orderListQuerySchema = z
   .strictObject({
     page: z.coerce.number().int().min(1).max(1_000).default(1),

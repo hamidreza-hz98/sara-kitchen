@@ -18,12 +18,19 @@ export {
 } from "./service/order-management";
 export {
   orderCodeParametersSchema,
+  paymentResultQuerySchema,
   orderListQuerySchema,
   orderInternalNoteSchema,
   orderTransitionSchema,
   orderCancelSchema,
   orderTransactionSchema,
 } from "./validation/order-management";
+export {
+  getCustomerPaymentResult,
+  PaymentResultError,
+  type CustomerPaymentResult,
+  type CustomerPaymentResultState,
+} from "./service/payment-result";
 export {
   ORDER_TRANSITIONS,
   OrderTransitionError,

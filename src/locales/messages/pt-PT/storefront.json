@@ -227,6 +227,45 @@
     "requestNew": "Pedir nova ligação",
     "signIn": "Iniciar sessão"
   },
+  "paymentResult": {
+    "metadataTitle": "Resultado do pagamento",
+    "orderCode": "Código da encomenda",
+    "lastChecked": "Encomenda atualizada em {time}",
+    "checking": "A verificar o estado confirmado do pagamento…",
+    "pendingSafety": "Mantenha esta página aberta. Não faça outra encomenda enquanto o resultado estiver pendente.",
+    "pollingPaused": "A verificação automática foi pausada. Pode atualizar o estado confirmado em segurança.",
+    "refresh": "Verificar agora",
+    "refreshing": "A verificar…",
+    "refreshError": "Não foi possível atualizar o estado. A encomenda não foi alterada; tente novamente em breve.",
+    "viewOrders": "Ver as minhas encomendas",
+    "startNewOrder": "Iniciar nova encomenda",
+    "states": {
+      "pending": {
+        "title": "Pagamento em confirmação",
+        "description": "O MB Way pode demorar um momento a enviar a confirmação final."
+      },
+      "success": {
+        "title": "Pagamento confirmado",
+        "description": "A encomenda está confirmada e a Sara Kitchen pode começar a prepará-la."
+      },
+      "failed": {
+        "title": "Pagamento falhou",
+        "description": "Não foi registado um pagamento concluído para esta encomenda."
+      },
+      "expired": {
+        "title": "Pedido de pagamento expirado",
+        "description": "A janela de pagamento MB Way fechou antes da confirmação."
+      },
+      "cancelled": {
+        "title": "Pagamento ou encomenda cancelada",
+        "description": "Esta encomenda não vai prosseguir. Consulte as encomendas para mais detalhes."
+      },
+      "refunded": {
+        "title": "Pagamento reembolsado",
+        "description": "O registo confirmado indica que esta encomenda foi reembolsada."
+      }
+    }
+  },
   "shell": {
     "skipToContent": "Saltar para o conteúdo principal",
     "primaryNavigation": "Navegação principal",
