@@ -21,6 +21,8 @@ import {
 import type { PaymentProvider, ProviderPaymentStatus } from "../provider/payment-provider";
 
 export type TransactionAdmin = Readonly<{ id: string; role: AdminRole; active: true }>;
+export type TransactionSystemActor = Readonly<{ kind: "system" }>;
+type PaymentActor = TransactionAdmin | TransactionSystemActor;
 export type VerifiedPaymentState = Readonly<{
   transactionId: string;
   orderId: string;
@@ -45,6 +47,10 @@ function requirePermission(
   permission: "transactions:read" | "transactions:reconcile" | "transactions:refund",
 ) {
   if (!hasAdminPermission(actor, permission)) throw new TransactionManagementError("forbidden");
+}
+
+function isSystemActor(actor: PaymentActor): actor is TransactionSystemActor {
+  return "kind" in actor && actor.kind === "system";
 }
 
 function safeView(transaction: TransactionRecord & { _id: Types.ObjectId }, sensitive: boolean) {
@@ -131,7 +137,7 @@ export function createTransactionManagement(connection: Connection, context: Con
     return transaction;
   };
   const audit = async (
-    actor: TransactionAdmin,
+    actor: PaymentActor,
     transaction: TransactionRecord & { _id: Types.ObjectId },
     session: ClientSession,
     action: "crud.resource.update" | "payment.transaction.process",
@@ -141,7 +147,9 @@ export function createTransactionManagement(connection: Connection, context: Con
       connection,
       {
         action,
-        actor: { kind: "admin", ref: actor.id, snapshot: { displayName: null, role: actor.role } },
+        actor: isSystemActor(actor)
+          ? { kind: "system", ref: null, snapshot: { displayName: null, role: null } }
+          : { kind: "admin", ref: actor.id, snapshot: { displayName: null, role: actor.role } },
         resource: {
           kind: "transaction",
           ref: transaction._id.toString(),
@@ -156,10 +164,10 @@ export function createTransactionManagement(connection: Connection, context: Con
       { session },
     );
   };
-  const sensitive = (actor: TransactionAdmin) =>
-    hasAdminPermission(actor, "transactions:read-sensitive");
+  const sensitive = (actor: PaymentActor) =>
+    !isSystemActor(actor) && hasAdminPermission(actor, "transactions:read-sensitive");
   const applyProviderStatus = async (
-    actor: TransactionAdmin,
+    actor: PaymentActor,
     id: string,
     providerStatus: ProviderPaymentStatus,
     onApplied: PaymentStateHook,
@@ -292,12 +300,12 @@ export function createTransactionManagement(connection: Connection, context: Con
       });
     },
     async reconcile(
-      actor: TransactionAdmin,
+      actor: PaymentActor,
       id: string,
       provider: PaymentProvider,
       onApplied: PaymentStateHook,
     ) {
-      requirePermission(actor, "transactions:reconcile");
+      if (!isSystemActor(actor)) requirePermission(actor, "transactions:reconcile");
       const transaction = await load(id);
       if (transaction.provider !== provider.id || !transaction.providerReferences.paymentId)
         throw new TransactionManagementError("conflict");

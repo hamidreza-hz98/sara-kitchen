@@ -7,8 +7,13 @@ export {
   TransactionManagementError,
   type PaymentStateHook,
   type TransactionAdmin,
+  type TransactionSystemActor,
   type VerifiedPaymentState,
 } from "./service/transaction-management";
+export {
+  reconcilePayments,
+  type PaymentReconciliationOptions,
+} from "./service/payment-reconciliation";
 export {
   transactionIdParametersSchema,
   transactionListQuerySchema,

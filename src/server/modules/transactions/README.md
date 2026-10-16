@@ -17,3 +17,8 @@ The private `idempotency_records` collection and public `runIdempotentOperation(
 SK-0151 adds a local-simulator-only webhook Route Handler, strict raw-body verification, durable event inbox, and transactional Transaction/Order state update. It is disabled in production. See `docs/payment-webhook.md` and `docs/request-security.md`. A selected acquirer's documented signature format may replace this isolated verifier but may not bypass provider authentication.
 
 SK-0156 adds permission-gated transaction reads, an audited internal note, verified provider-status reconciliation, and provider-confirmed cancellation/refund operations. There is no admin create/delete or arbitrary amount/status update endpoint. See `docs/transaction-management.md`.
+
+SK-0161 adds a scheduler-authenticated, bounded payment-reconciliation worker. It discovers stale
+provider-addressable payments, uses leased durable work records, retries provider reads with bounded
+backoff, applies verified states through the existing transaction/order workflow, and durably alerts
+on mismatches or exhaustion. See `docs/payment-reconciliation.md`.

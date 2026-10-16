@@ -12,8 +12,10 @@ import { getOrderNotificationModel } from "@/server/modules/orders/model/order-n
 import { getAuditLogModel } from "@/server/modules/logs/model/audit-log";
 import {
   createTransactionManagement,
+  reconcilePayments,
   type VerifiedPaymentState,
 } from "@/server/modules/transactions";
+import { getPaymentReconciliationModel } from "@/server/modules/transactions/model/payment-reconciliation";
 import { getTransactionModel } from "@/server/modules/transactions/model/transaction";
 import { FakePaymentProvider } from "@/server/modules/transactions/provider/fake-payment-provider";
 import type { PaymentProvider } from "@/server/modules/transactions/provider/payment-provider";
@@ -52,6 +54,7 @@ describe("transaction management", () => {
     await getOrderModel(client.connection).syncIndexes();
     await getOrderNotificationModel(client.connection).syncIndexes();
     await getTransactionModel(client.connection).syncIndexes();
+    await getPaymentReconciliationModel(client.connection).syncIndexes();
     await getAuditLogModel(client.connection).syncIndexes();
   }, 120_000);
 
@@ -65,6 +68,7 @@ describe("transaction management", () => {
       "orders",
       "order_notifications",
       "transactions",
+      "payment_reconciliations",
       "audit_logs",
       "dish_sold_projections",
     ])
@@ -197,6 +201,81 @@ describe("transaction management", () => {
         .collection("audit_logs")
         .countDocuments({ actionCode: "payment.transaction.process" }),
     ).toBe(1);
+  });
+
+  it("detects and repairs a missed webhook through the bounded reconciliation worker", async () => {
+    const { order, transaction, response } = await fixture();
+    fake.simulateEvent(response.providerPaymentId, "PAID", 1_800, "missed_webhook_capture");
+    const workerNow = new Date(transaction.updatedAt.getTime() + 10 * 60_000);
+
+    const summary = await reconcilePayments(
+      client.connection,
+      (providerId) => (providerId === "mbway-sandbox" ? provider : null),
+      sync,
+      { now: () => workerNow, staleAfterMs: 5 * 60_000, requestId: "missed-webhook-test" },
+    );
+
+    expect(summary).toMatchObject({ discovered: 1, checked: 1, resolved: 1, alerted: 0 });
+    expect((await getTransactionModel(client.connection).findById(transaction._id))?.status).toBe(
+      "paid",
+    );
+    expect((await getOrderModel(client.connection).findById(order._id))?.status).toBe("confirmed");
+    expect(
+      await getPaymentReconciliationModel(client.connection).findOne({
+        transactionId: transaction._id,
+      }),
+    ).toMatchObject({ state: "resolved", attempts: 1, lastErrorCode: null });
+
+    const replay = await reconcilePayments(client.connection, () => provider, sync, {
+      now: () => workerNow,
+      staleAfterMs: 0,
+    });
+    expect(replay.checked).toBe(0);
+  });
+
+  it("durably alerts on a provider mismatch without changing financial state", async () => {
+    const { order, transaction, response } = await fixture();
+    const mismatch: PaymentProvider = {
+      ...provider,
+      fetchStatus: async () => ({
+        ...(await fake.fetchStatus(response.providerPaymentId)),
+        amounts: { requestedCents: 1_801, authorizedCents: 0, capturedCents: 0, refundedCents: 0 },
+      }),
+    };
+    const alerts: string[] = [];
+    const workerNow = new Date(transaction.updatedAt.getTime() + 10 * 60_000);
+    const summary = await reconcilePayments(client.connection, () => mismatch, sync, {
+      now: () => workerNow,
+      onAlert: (alert) => {
+        alerts.push(alert.errorCode);
+      },
+    });
+    expect(summary).toMatchObject({ checked: 1, alerted: 1, openAlerts: 1 });
+    expect(alerts).toEqual(["transaction_conflict"]);
+    expect((await getTransactionModel(client.connection).findById(transaction._id))?.status).toBe(
+      "pending",
+    );
+    expect((await getOrderModel(client.connection).findById(order._id))?.status).toBe(
+      "pending_payment",
+    );
+  });
+
+  it("reschedules a successfully checked payment that is still pending", async () => {
+    const { transaction } = await fixture();
+    const workerNow = new Date(transaction.updatedAt.getTime() + 10 * 60_000);
+    const summary = await reconcilePayments(client.connection, () => provider, sync, {
+      now: () => workerNow,
+    });
+    expect(summary).toMatchObject({ checked: 1, resolved: 0, retried: 1, alerted: 0 });
+    expect(
+      await getPaymentReconciliationModel(client.connection).findOne({
+        transactionId: transaction._id,
+      }),
+    ).toMatchObject({
+      state: "pending",
+      attempts: 1,
+      lastErrorCode: "provider_still_pending",
+    });
   });
 
   it("cancels only through provider confirmation, then updates the order", async () => {

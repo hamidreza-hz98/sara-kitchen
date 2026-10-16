@@ -94,6 +94,7 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "MBWAY_MERCHANT_ID",
   "MBWAY_API_KEY",
   "MBWAY_WEBHOOK_SECRET",
+  "PAYMENT_RECONCILIATION_CRON_SECRET",
   "WHATSAPP_ENABLED",
   "WHATSAPP_API_URL",
   "WHATSAPP_PHONE_NUMBER_ID",
@@ -167,6 +168,10 @@ export const serverEnvironmentSchema = z
     MBWAY_WEBHOOK_SECRET: z.preprocess(
       emptyStringToUndefined,
       requiredSecret("MBWAY_WEBHOOK_SECRET").optional(),
+    ),
+    PAYMENT_RECONCILIATION_CRON_SECRET: z.preprocess(
+      emptyStringToUndefined,
+      requiredSecret("PAYMENT_RECONCILIATION_CRON_SECRET").optional(),
     ),
     WHATSAPP_ENABLED: booleanString("WHATSAPP_ENABLED"),
     WHATSAPP_API_URL: optionalUrl("WHATSAPP_API_URL"),
