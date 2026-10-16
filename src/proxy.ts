@@ -42,6 +42,11 @@ export default function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(INTERNAL_LOCALE_HEADER, "1");
   requestHeaders.set("x-next-intl-locale", locale);
+  // The profile layout cannot otherwise see its nested public URL during an RSC render.
+  requestHeaders.set(
+    "x-sara-kitchen-public-path",
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+  );
 
   const response = NextResponse.rewrite(internalUrl, {
     request: { headers: requestHeaders },

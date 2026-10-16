@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -14,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ChangePasswordPage() {
   const t = await getTranslations("profile.changePassword");
   return (
-    <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
+    <Box sx={{ maxWidth: 620 }}>
       <Box
         sx={{
           bgcolor: "background.paper",
@@ -32,6 +31,6 @@ export default async function ChangePasswordPage() {
         </Typography>
         <ChangePasswordForm />
       </Box>
-    </Container>
+    </Box>
   );
 }

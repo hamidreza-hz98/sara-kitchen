@@ -4,6 +4,11 @@
   "information": "Informação pessoal",
   "addresses": "Moradas",
   "orders": "Encomendas",
+  "security": "Segurança e sessões",
+  "navigation": "Navegação do perfil",
+  "content": "Conteúdo do perfil",
+  "logout": "Terminar sessão",
+  "signingOut": "A terminar sessão…",
   "sessionsLink": "Gerir sessões ativas",
   "addressEditor": {
     "name": "Nome da morada",

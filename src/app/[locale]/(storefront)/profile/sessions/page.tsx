@@ -1,4 +1,4 @@
-import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CustomerSessionsPage() {
   const t = await getTranslations("shared.sessions");
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
+    <Box sx={{ maxWidth: 860 }}>
       <Typography component="h1" variant="h2" sx={{ mb: 4 }}>
         {t("title")}
       </Typography>
@@ -22,6 +22,6 @@ export default async function CustomerSessionsPage() {
         principal="customer"
         revokeOthers={revokeOtherSessionsAction.bind(null, "customer")}
       />
-    </Container>
+    </Box>
   );
 }

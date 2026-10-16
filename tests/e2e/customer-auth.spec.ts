@@ -5,10 +5,12 @@ test("profile routes redirect anonymous visitors to customer sign-in", async ({ 
   test.setTimeout(60_000);
   await page.goto("/profile");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible({ timeout: 20_000 });
-  await expect(page).toHaveURL(/\/login$/u);
-  await page.goto("/profile/orders");
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile$/u);
+  await page.goto("/profile/orders?page=2");
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible({ timeout: 20_000 });
-  await expect(page).toHaveURL(/\/login$/u);
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile%2Forders%3Fpage%3D2$/u);
+  await page.goto("/profile/addresses");
+  await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile%2Faddresses$/u);
 });
 
 test("customer sign-in and logout signals update another tab", async ({ context, page }) => {

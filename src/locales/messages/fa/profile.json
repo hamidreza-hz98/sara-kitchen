@@ -4,6 +4,11 @@
   "information": "اطلاعات شخصی",
   "addresses": "نشانی‌ها",
   "orders": "سفارش‌ها",
+  "security": "امنیت و نشست‌ها",
+  "navigation": "ناوبری پروفایل",
+  "content": "محتوای پروفایل",
+  "logout": "خروج",
+  "signingOut": "در حال خروج…",
   "sessionsLink": "مدیریت نشست‌های فعال",
   "addressEditor": {
     "name": "عنوان نشانی",

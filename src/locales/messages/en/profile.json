@@ -4,6 +4,11 @@
   "information": "Personal information",
   "addresses": "Addresses",
   "orders": "Orders",
+  "security": "Security and sessions",
+  "navigation": "Profile navigation",
+  "content": "Profile content",
+  "logout": "Sign out",
+  "signingOut": "Signing out…",
   "sessionsLink": "Manage active sessions",
   "addressEditor": {
     "name": "Address label",

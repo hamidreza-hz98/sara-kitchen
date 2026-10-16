@@ -12,6 +12,7 @@ import Link from "@mui/material/Link";
 import NextLink from "next/link";
 
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
+import { safeCustomerReturnTo } from "@/lib/customer-return-to";
 import { useRouter } from "@/locales/navigation";
 
 export function CustomerLoginForm() {
@@ -42,7 +43,7 @@ export function CustomerLoginForm() {
       }
       broadcastCustomerAuthChange();
       const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-      router.replace(returnTo === "/cart/address" ? "/cart/address" : "/profile");
+      router.replace(safeCustomerReturnTo(returnTo));
       router.refresh();
     } catch {
       setError("network");

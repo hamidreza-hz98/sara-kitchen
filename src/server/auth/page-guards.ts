@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import type { AdminPermission } from "@/constants/admin-access";
+import { safeCustomerReturnTo } from "@/lib/customer-return-to";
 import { connectToDatabase } from "@/server/database";
 import {
   adminCookieName,
@@ -42,13 +43,16 @@ export async function requireDashboardPage(segments: readonly string[]) {
   }
 }
 
-export async function requireCustomerPage() {
+export async function requireCustomerPage(returnTo?: string) {
+  const signInUrl = returnTo
+    ? `/login?returnTo=${encodeURIComponent(safeCustomerReturnTo(returnTo))}`
+    : "/login";
   const token = (await cookies()).get(customerCookieName())?.value;
-  if (!token) redirect("/login");
+  if (!token) redirect(signInUrl);
   try {
     return await requireCustomerActor(await connectToDatabase(), token);
   } catch (error) {
-    if (error instanceof AuthorizationGuardError) redirect("/login");
+    if (error instanceof AuthorizationGuardError) redirect(signInUrl);
     throw error;
   }
 }
