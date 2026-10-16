@@ -10,12 +10,20 @@ import { useId } from "react";
 type StatePanelProps = {
   action?: ReactNode;
   description: ReactNode;
+  headingLevel?: "h1" | "h2";
   icon: ReactNode;
   role?: "alert" | "status";
   title: ReactNode;
 };
 
-function StatePanel({ action, description, icon, role = "status", title }: StatePanelProps) {
+function StatePanel({
+  action,
+  description,
+  headingLevel = "h2",
+  icon,
+  role = "status",
+  title,
+}: StatePanelProps) {
   const titleId = useId();
 
   return (
@@ -36,7 +44,7 @@ function StatePanel({ action, description, icon, role = "status", title }: State
         >
           {icon}
         </Box>
-        <Typography component="h2" id={titleId} variant="h4">
+        <Typography component={headingLevel} id={titleId} variant="h4">
           {title}
         </Typography>
         <Typography color="text.secondary">{description}</Typography>

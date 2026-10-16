@@ -392,6 +392,28 @@
     "copied": "Link copied",
     "copyFailed": "Could not copy the link. Use a share button instead."
   },
+  "routeFeedback": {
+    "errorTitle": "We couldn't load this page",
+    "errorDescription": "The page is temporarily unavailable. Please try again or return to the homepage.",
+    "catalogErrorTitle": "We couldn't load the menu",
+    "catalogErrorDescription": "The menu is temporarily unavailable. Please retry or return to the homepage.",
+    "storiesErrorTitle": "We couldn't load the stories",
+    "storiesErrorDescription": "The stories are temporarily unavailable. Please retry or return to the homepage.",
+    "dishErrorTitle": "We couldn't load this dish",
+    "dishErrorDescription": "Please retry, or browse the menu while we reconnect.",
+    "blogErrorTitle": "We couldn't load this story",
+    "blogErrorDescription": "Please retry, or explore the other stories.",
+    "dishMissingTitle": "This dish is no longer available",
+    "dishMissingDescription": "It may have left the menu or its link may have changed. Explore our current dishes for another Persian favorite.",
+    "storyMissingTitle": "This story isn't available",
+    "storyMissingDescription": "It may have been unpublished or moved. Browse our latest stories instead.",
+    "categoryMissingTitle": "This menu category isn't available",
+    "categoryMissingDescription": "It may have changed. Explore the full menu to find something delicious.",
+    "retry": "Try again",
+    "home": "Home",
+    "menu": "Browse menu",
+    "stories": "Browse stories"
+  },
   "signup": {
     "title": "Create your account",
     "description": "Join Sara Kitchen to get ready for ordering. We won't reveal whether a contact is already registered.",

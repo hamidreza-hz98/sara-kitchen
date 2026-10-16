@@ -392,6 +392,28 @@
     "copied": "Ligação copiada",
     "copyFailed": "Não foi possível copiar a ligação. Use um botão de partilha."
   },
+  "routeFeedback": {
+    "errorTitle": "Não foi possível carregar esta página",
+    "errorDescription": "A página está temporariamente indisponível. Tente novamente ou volte ao início.",
+    "catalogErrorTitle": "Não foi possível carregar a ementa",
+    "catalogErrorDescription": "A ementa está temporariamente indisponível. Tente novamente ou volte ao início.",
+    "storiesErrorTitle": "Não foi possível carregar as histórias",
+    "storiesErrorDescription": "As histórias estão temporariamente indisponíveis. Tente novamente ou volte ao início.",
+    "dishErrorTitle": "Não foi possível carregar este prato",
+    "dishErrorDescription": "Tente novamente ou explore a ementa enquanto restabelecemos a ligação.",
+    "blogErrorTitle": "Não foi possível carregar esta história",
+    "blogErrorDescription": "Tente novamente ou descubra outras histórias.",
+    "dishMissingTitle": "Este prato já não está disponível",
+    "dishMissingDescription": "Pode ter saído da ementa ou a ligação pode ter mudado. Explore os pratos atuais para encontrar outra especialidade persa.",
+    "storyMissingTitle": "Esta história não está disponível",
+    "storyMissingDescription": "Pode ter sido retirada ou movida. Explore as histórias mais recentes.",
+    "categoryMissingTitle": "Esta categoria não está disponível",
+    "categoryMissingDescription": "Pode ter mudado. Explore a ementa completa para encontrar algo delicioso.",
+    "retry": "Tentar novamente",
+    "home": "Início",
+    "menu": "Explorar ementa",
+    "stories": "Explorar histórias"
+  },
   "signup": {
     "title": "Criar conta",
     "description": "Junte-se à Sara Kitchen para preparar as suas encomendas. Não revelamos se um contacto já está registado.",
