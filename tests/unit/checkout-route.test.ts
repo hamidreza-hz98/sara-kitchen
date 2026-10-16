@@ -5,7 +5,10 @@ vi.mock("@/server/modules/auth", () => ({
   isSameOriginMutation: (request: Request) =>
     request.headers.get("origin") === "https://sarakitchen.pt",
 }));
-const state = vi.hoisted(() => ({ checkout: vi.fn(), enabled: false }));
+const state = vi.hoisted(() => ({ checkout: vi.fn(), invalidate: vi.fn(), enabled: false }));
+vi.mock("@/server/cache/dashboard-revalidation", () => ({
+  revalidateDashboardFromRoute: state.invalidate,
+}));
 vi.mock("@/app/api/cart/route-helper", () => ({
   cartRequestContext: vi.fn(async () => ({
     connection: {},
@@ -26,7 +29,7 @@ vi.mock("@/server/modules/settings", () => ({
 }));
 vi.mock("@/server/modules/orders", () => ({ submitAtomicCheckout: state.checkout }));
 vi.mock("@/server/modules/transactions", () => ({
-  createLocalMbWaySandboxProvider: () => ({ id: "fake" }),
+  getLocalMbWaySandboxProvider: () => ({ id: "fake" }),
 }));
 
 import { POST } from "@/app/api/checkout/route";
@@ -44,6 +47,7 @@ const body = JSON.stringify({
 beforeEach(() => {
   state.enabled = false;
   state.checkout.mockReset();
+  state.invalidate.mockReset();
 });
 
 describe("checkout route", () => {
@@ -102,5 +106,6 @@ describe("checkout route", () => {
         customerId: "1".repeat(24),
       }),
     );
+    expect(state.invalidate).toHaveBeenCalledOnce();
   });
 });

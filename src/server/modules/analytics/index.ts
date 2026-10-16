@@ -5,6 +5,7 @@ export {
   type DashboardActor,
   type DashboardAggregationInput,
 } from "./service/dashboard-aggregation";
+export { getCachedDashboardAggregation } from "./service/dashboard-cache";
 export {
   resolveDashboardPeriods,
   type DashboardPeriodInput,

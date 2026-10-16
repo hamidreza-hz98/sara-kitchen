@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { apiSuccess, handleApiRoute, parseJsonRequest, parseRouteParameters } from "@/server/http";
 import {
@@ -24,12 +25,12 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
       parseJsonRequest(request, orderTransactionSchema, validation),
     ]);
     try {
-      return apiSuccess(
-        await createOrderManagement(connection, {
-          requestId,
-          userAgent: request.headers.get("user-agent"),
-        }).attachTransaction({ id: actor.id, role: actor.role, active: true }, orderCode, input),
-      );
+      const result = await createOrderManagement(connection, {
+        requestId,
+        userAgent: request.headers.get("user-agent"),
+      }).attachTransaction({ id: actor.id, role: actor.role, active: true }, orderCode, input);
+      revalidateDashboardFromRoute();
+      return apiSuccess(result);
     } catch (error) {
       return translateOrderError(error);
     }

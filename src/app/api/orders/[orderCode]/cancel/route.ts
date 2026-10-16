@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { apiSuccess, handleApiRoute, parseJsonRequest, parseRouteParameters } from "@/server/http";
 import {
@@ -24,15 +25,15 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
       parseJsonRequest(request, orderCancelSchema, validation),
     ]);
     try {
-      return apiSuccess(
-        await createOrderManagement(connection, {
-          requestId,
-          userAgent: request.headers.get("user-agent"),
-        }).transition({ id: actor.id, role: actor.role, active: true }, orderCode, {
-          ...input,
-          status: "cancelled",
-        }),
-      );
+      const result = await createOrderManagement(connection, {
+        requestId,
+        userAgent: request.headers.get("user-agent"),
+      }).transition({ id: actor.id, role: actor.role, active: true }, orderCode, {
+        ...input,
+        status: "cancelled",
+      });
+      revalidateDashboardFromRoute();
+      return apiSuccess(result);
     } catch (error) {
       return translateOrderError(error);
     }

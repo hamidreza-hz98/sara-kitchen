@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import {
   ApiError,
@@ -38,12 +39,12 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
         },
       ]);
     try {
-      return apiSuccess(
-        await createOrderManagement(connection, {
-          requestId,
-          userAgent: request.headers.get("user-agent"),
-        }).transition({ id: actor.id, role: actor.role, active: true }, orderCode, input),
-      );
+      const result = await createOrderManagement(connection, {
+        requestId,
+        userAgent: request.headers.get("user-agent"),
+      }).transition({ id: actor.id, role: actor.role, active: true }, orderCode, input);
+      revalidateDashboardFromRoute();
+      return apiSuccess(result);
     } catch (error) {
       return translateOrderError(error);
     }

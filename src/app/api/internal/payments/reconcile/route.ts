@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { connectToDatabase } from "@/server/database";
 import { getServerEnvironment } from "@/server/environment";
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         },
       },
     );
+    if (summary.checked > 0) revalidateDashboardFromRoute();
     logger.info({
       action: "payment.reconciliation.completed",
       context: summary,

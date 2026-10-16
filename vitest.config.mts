@@ -10,6 +10,8 @@ export default defineConfig({
     environment: "jsdom",
     // MUI/user-event component interactions can exceed Vitest's 5s default under Windows CI load.
     testTimeout: 10_000,
+    // Limit jsdom workers so interactive component tests retain CPU time under a full Windows run.
+    maxWorkers: 4,
     setupFiles: ["./tests/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}", "tests/{unit,component}/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["tests/e2e/**"],

@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { connectToDatabase, MongoTransactionUnavailableError } from "@/server/database";
 import { getServerEnvironment } from "@/server/environment";
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest): Promise<Response> {
             () => undefined,
           ),
       });
+      if (outcome === "applied") revalidateDashboardFromRoute();
       return apiSuccess({ accepted: true, outcome });
     } catch (error) {
       if (error instanceof PaymentWebhookConflictError) throw ApiError.conflict();

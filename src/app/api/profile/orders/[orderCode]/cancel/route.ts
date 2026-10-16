@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/locales/routing";
 import { connectToDatabase } from "@/server/database";
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
         requestId,
         userAgent: request.headers.get("user-agent"),
       }).cancelCustomer(actor.id, orderCode, input);
+      revalidateDashboardFromRoute();
       return apiSuccess(result, { headers: { "Cache-Control": "private, no-store" } });
     } catch (error) {
       return translateOrderError(error);

@@ -12,6 +12,7 @@ import { getServerEnvironment } from "@/server/environment";
 import { isSameOriginMutation } from "@/server/modules/auth";
 import { getLocalMbWaySandboxProvider } from "@/server/modules/transactions";
 import { submitAtomicCheckout } from "@/server/modules/orders";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { cartRequestContext, cartRequestLocale } from "../cart/route-helper";
 
@@ -75,6 +76,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       serviceRadiusKm: null,
       provider: getLocalMbWaySandboxProvider(environment.MBWAY_WEBHOOK_SECRET),
     });
+    if (!result.replayed) revalidateDashboardFromRoute();
     return apiSuccess(result, { headers: { "Cache-Control": "private, no-store" } });
   });
 }

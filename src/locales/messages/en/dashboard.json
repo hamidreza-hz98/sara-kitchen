@@ -36,6 +36,7 @@
     "unknownSection": "Dashboard section",
     "permissionDenied": "You do not have permission to view this section.",
     "previewTitle": "Dashboard shell preview",
+    "dataAsOf": "Data as of {timestamp}",
     "previewDescription": "Navigation and layout preview. Live dashboard data will be added in later tasks.",
     "authPending": "Administrator sign-in is not available yet. The dashboard remains protected while authentication is being implemented."
   },

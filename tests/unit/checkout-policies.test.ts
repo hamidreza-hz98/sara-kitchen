@@ -10,7 +10,9 @@ import { getCheckoutPolicies } from "@/server/modules/settings/service/checkout-
 
 describe("published checkout policies", () => {
   it("selects the latest effective version and falls back to canonical English", async () => {
-    state.find.mockReturnValue({ sort: () => ({ lean: () => ({ exec: state.exec }) }) });
+    state.find.mockReturnValue({
+      sort: () => ({ session: () => ({ lean: () => ({ exec: state.exec }) }) }),
+    });
     state.exec.mockResolvedValue([
       {
         _id: { toHexString: () => "1" },

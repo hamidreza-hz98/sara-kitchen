@@ -11,3 +11,6 @@ SK-0163 implements the bounded read projection in `service/dashboard-aggregation
 module exposes only its own narrow dashboard query API; Analytics combines those results and enforces
 `analytics:read`. Recent activity and identifying customer labels have separate permission gates.
 See `docs/dashboard-aggregation.md` for query plans and the view-retention limitation.
+
+SK-0164 wraps the protected aggregation in a short-lived, permission-scoped Next Data Cache
+snapshot. Mutation adapters invalidate its tag after commit; see `docs/dashboard-caching.md`.

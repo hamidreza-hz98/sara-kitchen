@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
 import { apiSuccess, handleApiRoute, parseJsonRequest, parseRouteParameters } from "@/server/http";
 import { applyVerifiedPaymentStateToOrder } from "@/server/modules/orders";
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
             () => undefined,
           ),
       );
+      revalidateDashboardFromRoute();
       return apiSuccess(result, { headers: { "Cache-Control": "private, no-store" } });
     } catch (error) {
       return translateTransactionError(error);
