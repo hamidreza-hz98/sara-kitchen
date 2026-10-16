@@ -636,6 +636,14 @@ export function OrderList({ capabilities }: { capabilities: Capabilities }) {
         >
           {t("view")}
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuOrder) router.push(`${pathname}/${encodeURIComponent(menuOrder.code)}`);
+            closeMenu();
+          }}
+        >
+          {t("fullDetails")}
+        </MenuItem>
         {capabilities.update && nextStatus ? (
           <MenuItem
             disabled={mutating}
@@ -701,6 +709,11 @@ export function OrderList({ capabilities }: { capabilities: Capabilities }) {
               <Typography sx={{ fontWeight: 700 }}>
                 {t("amount")}: {formatEuro(activeDetail.pricing.totalCents, locale)}
               </Typography>
+              <Button
+                onClick={() => router.push(`${pathname}/${encodeURIComponent(activeDetail.code)}`)}
+              >
+                {t("fullDetails")}
+              </Button>
             </>
           ) : (
             <Skeleton height={160} />

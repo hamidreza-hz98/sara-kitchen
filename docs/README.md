@@ -66,6 +66,7 @@ Current records:
 - [`operational-metrics.md`](./operational-metrics.md) — typed signals, live instrumentation boundaries, dashboard queries, and launch alerts.
 - [`order-notifications.md`](./order-notifications.md) — localized order notices, durable outbox, retry/dead-letter behavior, private inbox, and live WhatsApp activation boundary.
 - [`order-list-ui.md`](./order-list-ui.md) — responsive order management, URL filters, consistent status counts, safe actions, and query behavior.
+- [`order-details-ui.md`](./order-details-ui.md) — protected direct-link order details, snapshots, timeline, payment events, and safe actions.
 - [`media-model.md`](./media-model.md) — Media storage, variants, processing, localization, deletion, and index invariants.
 - [`feedback.md`](./feedback.md) — localized notification queues, safe confirmations, connectivity status, and route/global recovery.
 - [`formatting-and-hooks.md`](./formatting-and-hooks.md) — deterministic formatting and staged-commit safeguards.

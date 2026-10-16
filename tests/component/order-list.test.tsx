@@ -10,13 +10,13 @@ import messages from "@/locales/messages/en";
 import { FeedbackProvider } from "@/providers/feedback-provider";
 import { appTheme } from "@/theme";
 
-const navigation = vi.hoisted(() => ({ query: "", replace: vi.fn() }));
+const navigation = vi.hoisted(() => ({ query: "", replace: vi.fn(), push: vi.fn() }));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(navigation.query),
 }));
 vi.mock("@/locales/navigation", () => ({
   usePathname: () => "/dashboard/orders",
-  useRouter: () => ({ replace: navigation.replace }),
+  useRouter: () => ({ replace: navigation.replace, push: navigation.push }),
 }));
 vi.mock("@/lib/csrf-client", () => ({
   csrfJsonHeaders: async () => ({ "content-type": "application/json" }),
@@ -78,6 +78,7 @@ function renderList(capabilities = { readSensitive: true, update: true, cancel: 
 beforeEach(() => {
   navigation.query = "";
   navigation.replace.mockReset();
+  navigation.push.mockReset();
   vi.stubGlobal(
     "fetch",
     vi.fn(async () => listResponse()),
@@ -143,5 +144,14 @@ describe("dashboard order list", () => {
     await waitFor(() =>
       expect(vi.mocked(fetch).mock.calls.some(([, init]) => init?.method === "POST")).toBe(true),
     );
+  });
+
+  it("opens the full details route from the action menu", async () => {
+    const user = userEvent.setup();
+    renderList();
+    await screen.findAllByText(order.code);
+    await user.click(screen.getAllByRole("button", { name: `Actions: ${order.code}` })[0]!);
+    await user.click(screen.getByRole("menuitem", { name: "Open full details" }));
+    expect(navigation.push).toHaveBeenCalledWith(`/dashboard/orders/${order.code}`);
   });
 });
