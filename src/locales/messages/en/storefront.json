@@ -373,6 +373,25 @@
     "next": "Next",
     "page": "Page {page}"
   },
+  "blogDetail": {
+    "breadcrumbs": "Breadcrumbs",
+    "home": "Home",
+    "blog": "Stories",
+    "byAuthor": "By {author}",
+    "readTime": "{minutes} min read",
+    "relatedDishes": "Pair it with",
+    "relatedBlogs": "More stories",
+    "viewDish": "View dish",
+    "share": "Share this story",
+    "shareOn": "Share on {platform}",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy the link. Use a share button instead."
+  },
   "signup": {
     "title": "Create your account",
     "description": "Join Sara Kitchen to get ready for ordering. We won't reveal whether a contact is already registered.",

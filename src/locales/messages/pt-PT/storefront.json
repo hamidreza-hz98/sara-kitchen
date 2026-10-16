@@ -373,6 +373,25 @@
     "next": "Seguinte",
     "page": "Página {page}"
   },
+  "blogDetail": {
+    "breadcrumbs": "Navegação",
+    "home": "Início",
+    "blog": "Histórias",
+    "byAuthor": "Por {author}",
+    "readTime": "{minutes} min de leitura",
+    "relatedDishes": "Combine com",
+    "relatedBlogs": "Mais histórias",
+    "viewDish": "Ver prato",
+    "share": "Partilhar esta história",
+    "shareOn": "Partilhar no {platform}",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "copyLink": "Copiar ligação",
+    "copied": "Ligação copiada",
+    "copyFailed": "Não foi possível copiar a ligação. Use um botão de partilha."
+  },
   "signup": {
     "title": "Criar conta",
     "description": "Junte-se à Sara Kitchen para preparar as suas encomendas. Não revelamos se um contacto já está registado.",
