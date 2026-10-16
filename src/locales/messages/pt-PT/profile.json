@@ -58,6 +58,24 @@
     "totalOrders": "Total de encomendas",
     "totalSpent": "Total gasto",
     "lastOrder": "Última encomenda",
-    "specialOffer": "Oferta especial"
+    "specialOffer": "Oferta especial",
+    "intro": "As suas encomendas e conta num só lugar.",
+    "noOrders": "Ainda não fez encomendas. Descubra o nosso menu e encontre o seu primeiro favorito.",
+    "viewOrder": "Ver as minhas encomendas",
+    "exploreOffer": "Explorar este prato",
+    "shortcuts": "Acesso rápido",
+    "browseMenu": "Ver o menu",
+    "status": {
+      "pending_payment": "A aguardar pagamento",
+      "confirmed": "Confirmada",
+      "preparing": "Em preparação",
+      "ready": "Pronta",
+      "out_for_delivery": "Em entrega",
+      "completed": "Concluída",
+      "payment_failed": "Pagamento falhou",
+      "cancelled": "Cancelada",
+      "expired": "Expirada",
+      "refunded": "Reembolsada"
+    }
   }
 }

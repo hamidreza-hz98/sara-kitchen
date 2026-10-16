@@ -22,7 +22,13 @@ const securityHeaders = createSecurityHeaders({
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: [...securityHeaders] }];
+    return [
+      { source: "/:path*", headers: [...securityHeaders] },
+      {
+        source: "/profile/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
+      },
+    ];
   },
   experimental: {
     globalNotFound: true,

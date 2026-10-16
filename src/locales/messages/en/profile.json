@@ -58,6 +58,24 @@
     "totalOrders": "Total orders",
     "totalSpent": "Total spent",
     "lastOrder": "Last order",
-    "specialOffer": "Special offer"
+    "specialOffer": "Special offer",
+    "intro": "Your orders and account at a glance.",
+    "noOrders": "No orders yet. Discover our menu to find your first favourite.",
+    "viewOrder": "View my orders",
+    "exploreOffer": "Explore this dish",
+    "shortcuts": "Quick links",
+    "browseMenu": "Browse the menu",
+    "status": {
+      "pending_payment": "Awaiting payment",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "out_for_delivery": "Out for delivery",
+      "completed": "Completed",
+      "payment_failed": "Payment failed",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "refunded": "Refunded"
+    }
   }
 }

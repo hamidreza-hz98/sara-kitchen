@@ -13,6 +13,13 @@ test("profile routes redirect anonymous visitors to customer sign-in", async ({ 
   await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile%2Faddresses$/u);
 });
 
+test("profile routes are not publicly reusable in development", async ({ request }) => {
+  const response = await request.get("/profile", { maxRedirects: 0 });
+  // Next dev forces no-cache even when production route headers specify private/no-store.
+  expect(response.headers()["cache-control"]).toMatch(/no-store|no-cache/u);
+  expect(response.headers()["cache-control"]).not.toContain("public");
+});
+
 test("customer sign-in and logout signals update another tab", async ({ context, page }) => {
   let authenticated = false;
   let loginPayload: Record<string, unknown> | undefined;

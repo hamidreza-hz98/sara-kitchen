@@ -58,6 +58,24 @@
     "totalOrders": "مجموع سفارش‌ها",
     "totalSpent": "مجموع خرید",
     "lastOrder": "آخرین سفارش",
-    "specialOffer": "پیشنهاد ویژه"
+    "specialOffer": "پیشنهاد ویژه",
+    "intro": "سفارش‌ها و حساب خود را در یک نگاه ببینید.",
+    "noOrders": "هنوز سفارشی ثبت نکرده‌اید. برای یافتن غذای دلخواهتان منو را ببینید.",
+    "viewOrder": "مشاهده سفارش‌های من",
+    "exploreOffer": "مشاهده این غذا",
+    "shortcuts": "دسترسی سریع",
+    "browseMenu": "مشاهده منو",
+    "status": {
+      "pending_payment": "در انتظار پرداخت",
+      "confirmed": "تأیید شده",
+      "preparing": "در حال آماده‌سازی",
+      "ready": "آماده",
+      "out_for_delivery": "در مسیر تحویل",
+      "completed": "تکمیل شده",
+      "payment_failed": "پرداخت ناموفق",
+      "cancelled": "لغو شده",
+      "expired": "منقضی شده",
+      "refunded": "بازپرداخت شده"
+    }
   }
 }

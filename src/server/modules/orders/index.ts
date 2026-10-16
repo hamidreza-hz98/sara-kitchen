@@ -55,3 +55,8 @@ export {
   exportOrderHistoryForCustomer,
 } from "./service/customer-privacy";
 export { summarizeOrdersForCustomers, type CustomerOrderSummary } from "./service/customer-summary";
+export {
+  readCustomerProfileOrders,
+  type CustomerLatestOrder,
+  type CustomerProfileOrders,
+} from "./service/customer-profile-overview";

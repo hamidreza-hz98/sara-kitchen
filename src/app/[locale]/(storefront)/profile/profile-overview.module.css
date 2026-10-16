@@ -1,0 +1,25 @@
+.actionLink {
+  color: var(--sara-palette-primary-main);
+  display: inline-flex;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.shortcut {
+  background: var(--sara-palette-background-paper);
+  border: 1px solid var(--sara-palette-divider);
+  border-radius: 1rem;
+  color: var(--sara-palette-text-primary);
+  display: block;
+  font-weight: 700;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+}
+
+.shortcut:hover,
+.shortcut:focus-visible {
+  border-color: var(--sara-palette-primary-main);
+  color: var(--sara-palette-primary-main);
+}

@@ -1,6 +1,10 @@
 /** Public entry point for payment and financial transaction use cases. */
 export const MODULE_NAME = "transactions" as const;
 export {
+  readCustomerLifetimeSpend,
+  type CustomerLifetimeSpend,
+} from "./service/customer-profile-spend";
+export {
   readDashboardFinance,
   type DashboardFinanceBucket,
   type DashboardCustomerSpend,
