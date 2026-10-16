@@ -82,12 +82,14 @@ export const DISH_PUBLIC_CATALOG_PROJECTION = {
   featuredOrder: 1,
 } as const;
 
-const PUBLIC_DETAIL_PROJECTION = {
+const PUBLIC_DETAIL_PROJECTION: Record<string, 1> = {
   ...DISH_PUBLIC_CATALOG_PROJECTION,
   ingredients: 1,
   relatedDishIds: 1,
   relatedBlogIds: 1,
-} as const;
+};
+// MongoDB rejects selecting both a whole embedded array and one of its child paths.
+delete PUBLIC_DETAIL_PROJECTION["ingredients.ingredientId"];
 
 type ProjectedDish = Pick<
   DishRecord,

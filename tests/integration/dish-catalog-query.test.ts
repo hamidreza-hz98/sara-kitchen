@@ -4,7 +4,10 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import { createDishCatalogRepository } from "@/server/modules/dishes/repository/catalog";
-import { createDishCatalogService } from "@/server/modules/dishes/service/catalog-query";
+import {
+  createDishCatalogService,
+  type DishCatalogQueryError,
+} from "@/server/modules/dishes/service/catalog-query";
 import { getDishModel } from "@/server/modules/dishes/model/dish";
 import { createIngredientAllergenCatalog, getIngredientModel } from "@/server/modules/ingredients";
 
@@ -141,6 +144,22 @@ describe("public Dish catalog queries", () => {
       availability: { isOrderable: true },
     });
     expect(result.meta.pagination.totalItems).toBe(1);
+  });
+
+  it("returns published unavailable details but never exposes draft or missing slugs", async () => {
+    const published = await service().getBySlug({ slug: "fesenjan-catalog", locale: "en" });
+    expect(published).toMatchObject({
+      name: { value: "Fesenjan" },
+      availability: { isOrderable: true },
+    });
+    const scheduled = await service().getBySlug({ slug: "season-salad-catalog", locale: "en" });
+    expect(scheduled.availability.isOrderable).toBe(false);
+    await expect(service().getBySlug({ slug: "hidden-draft-catalog" })).rejects.toMatchObject({
+      code: "not_found",
+    } satisfies Partial<DishCatalogQueryError>);
+    await expect(service().getBySlug({ slug: "missing-dish" })).rejects.toMatchObject({
+      code: "not_found",
+    } satisfies Partial<DishCatalogQueryError>);
   });
 
   it("returns active discounted dishes and stable non-overlapping pages", async () => {
