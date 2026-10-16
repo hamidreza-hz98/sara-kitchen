@@ -1,14 +1,14 @@
-import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
 
+import { requireCustomerPage } from "@/server/auth/page-guards";
+
+import { CustomerAddressManager } from "./customer-address-manager";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function ProfileAddressesPage() {
-  const t = await getTranslations("profile");
-  return (
-    <Typography component="h1" variant="h2">
-      {t("addresses")}
-    </Typography>
-  );
+  await requireCustomerPage("/profile/addresses");
+  return <CustomerAddressManager />;
 }

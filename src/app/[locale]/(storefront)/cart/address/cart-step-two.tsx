@@ -34,6 +34,7 @@ import { EmptyState, ErrorState } from "@/components/ui";
 import { isSupportedLocale } from "@/constants";
 import { useCart, useCustomerAuth } from "@/hooks";
 import { broadcastCartInvalidation } from "@/lib/cart-client";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { formatEuro } from "@/locales/formatters";
 
 type Address = AddressEditorValue & Readonly<{ id: string; version: number }>;
@@ -271,7 +272,7 @@ export function CartStepTwo() {
         {
           method: editingId ? "PATCH" : "POST",
           credentials: "same-origin",
-          headers: { "content-type": "application/json" },
+          headers: await csrfJsonHeaders("customer"),
           body: JSON.stringify(payload),
         },
       );

@@ -8,7 +8,10 @@ import type { Connection } from "mongoose";
 import { PROJECT_TIME_ZONE, type SupportedLocale } from "@/constants";
 import { LOCALE_COOKIE_NAME, resolveLocalePreference } from "@/locales/routing";
 import { connectToDatabase } from "@/server/database";
-import { getServerEnvironment } from "@/server/environment";
+import {
+  assessAddressDelivery,
+  loadAddressDeliveryPolicy,
+} from "@/server/delivery/address-eligibility";
 import { ApiError } from "@/server/http";
 import {
   customerCookieName,
@@ -27,7 +30,7 @@ import {
   type CartIdentity,
   type CartOperationResult,
 } from "@/server/modules/carts";
-import { createAddressRepository, evaluatePortoDelivery } from "@/server/modules/addresses";
+import { createAddressRepository } from "@/server/modules/addresses";
 import { createSettingsRuntime } from "@/server/modules/settings";
 import {
   createDishRecommendationRepository,
@@ -134,20 +137,10 @@ export function resolveCartCrud(
     resolveDelivery: async (customerId, addressId) => {
       const address = await addresses.findOwnedById(customerId, addressId);
       if (!address) return { eligible: false, reason: "unverified_address" };
-      const environment = getServerEnvironment();
-      const contact = await contactSettings();
-      const decision = evaluatePortoDelivery(address.location, {
-        latitude: contact?.location.latitude ?? environment.KITCHEN_LATITUDE,
-        longitude: contact?.location.longitude ?? environment.KITCHEN_LONGITUDE,
-      });
-      if (!decision.eligible) return decision;
-      if (
-        contact?.serviceArea.mode === "radius" &&
-        contact.serviceArea.radiusKm !== null &&
-        decision.distanceMeters > contact.serviceArea.radiusKm * 1_000
-      )
-        return { eligible: false, reason: "outside_service_area" };
-      return decision;
+      return assessAddressDelivery(
+        address.location,
+        await loadAddressDeliveryPolicy(connection, requestId),
+      );
     },
     audit: createCartAuditSink(connection, { requestId, ...(userAgent ? { userAgent } : {}) }),
   });
