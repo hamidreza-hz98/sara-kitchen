@@ -90,7 +90,8 @@ negative but negative/zero rows are omitted from the best-customer list.
   `Dish.viewCount` can rank “most visited overall” but cannot answer period trends by itself; period
   dashboards require a private, rebuildable analytics fact/rollup with no raw IP or user agent.
 - **Top-selling dish:** for each immutable order line, add quantity when its order first becomes
-  `completed`; subtract the refunded quantity when a verified partial/full refund effect occurs.
+  `completed`; subtract the full line quantity when the order reaches `refunded`. A monetary partial
+  refund does not identify item quantities in the current order model, so it does not reduce units.
   Attribute each delta by its lifecycle event time and rank the greatest positive net units. Tie-break
   by gross completed units descending, net line revenue descending, then stable dish ID ascending.
   Return `null` when no dish has positive net units. Archived/deleted dishes retain their snapshot

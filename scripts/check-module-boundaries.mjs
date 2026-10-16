@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 export const dependencyMap = Object.freeze({
   addresses: ["customers", "logs"],
   admins: ["logs"],
-  analytics: ["customers", "dishes", "logs", "orders"],
+  analytics: ["categories", "customers", "dishes", "logs", "orders", "transactions"],
   auth: ["admins", "customers", "logs", "sessions"],
   blogs: ["admins", "dishes", "logs", "media"],
   carts: ["addresses", "customers", "dishes", "logs"],

@@ -118,6 +118,7 @@ customerSchema.index(
   },
 );
 customerSchema.index({ status: 1, createdAt: -1 });
+customerSchema.index({ createdAt: -1, _id: -1 }, { name: "customer_registration_timeline" });
 
 customerSchema.pre("validate", function validateCustomerState() {
   if (!this.email && this.emailVerifiedAt) {

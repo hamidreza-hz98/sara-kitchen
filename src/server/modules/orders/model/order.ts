@@ -662,6 +662,10 @@ orderSchema.index(
   { "customerSnapshot.mobile": 1, createdAt: -1 },
   { name: "order_customer_mobile_timeline" },
 );
+orderSchema.index(
+  { "statusHistory.occurredAt": 1, "statusHistory.status": 1 },
+  { name: "order_status_event_period" },
+);
 
 export function getOrderModel(connection: Connection): Model<OrderRecord> {
   return (

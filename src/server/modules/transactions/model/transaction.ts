@@ -370,6 +370,10 @@ transactionSchema.index(
   { status: 1, createdAt: -1, _id: -1 },
   { name: TRANSACTION_INDEX_NAMES.status },
 );
+transactionSchema.index(
+  { "events.occurredAt": 1, "events.status": 1 },
+  { name: "transaction_financial_event_period" },
+);
 
 const baseJsonOptions = transactionSchema.get("toJSON") as {
   transform?: (document: unknown, value: Record<string, unknown>) => Record<string, unknown>;

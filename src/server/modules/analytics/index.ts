@@ -1,6 +1,16 @@
 /** Public entry point for dashboard and reporting queries. */
 export const MODULE_NAME = "analytics" as const;
 export {
+  getDashboardAggregation,
+  type DashboardActor,
+  type DashboardAggregationInput,
+} from "./service/dashboard-aggregation";
+export {
+  resolveDashboardPeriods,
+  type DashboardPeriodInput,
+  type DashboardPeriod,
+} from "./policy/dashboard-period";
+export {
   DASHBOARD_CURRENCY,
   DASHBOARD_METRIC_DEFINITIONS,
   DASHBOARD_METRIC_IDS,

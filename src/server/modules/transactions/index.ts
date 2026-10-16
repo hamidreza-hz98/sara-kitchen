@@ -1,5 +1,11 @@
 /** Public entry point for payment and financial transaction use cases. */
 export const MODULE_NAME = "transactions" as const;
+export {
+  readDashboardFinance,
+  type DashboardFinanceBucket,
+  type DashboardCustomerSpend,
+  type DashboardFinancePeriod,
+} from "./service/dashboard-finance";
 export { createCheckoutTransaction } from "./service/checkout-transaction";
 export { getOrderPaymentView } from "./service/order-payment-view";
 export {

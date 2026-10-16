@@ -1,6 +1,13 @@
 /** Public entry point for checkout and order lifecycle use cases. */
 export const MODULE_NAME = "orders" as const;
 export {
+  countDashboardOrdersCreated,
+  readDashboardOrders,
+  type DashboardOrderPeriod,
+  type DashboardRecentOrder,
+  type DashboardSoldDish,
+} from "./service/dashboard-orders";
+export {
   submitAtomicCheckout,
   type CheckoutSubmission,
   type CheckoutResult,

@@ -2,6 +2,7 @@ import "server-only";
 
 /** Public entry point for append-only audit activity. */
 export const MODULE_NAME = "logs" as const;
+export { readDashboardActivity } from "./service/dashboard-activity";
 
 export {
   AUDIT_ACTION_DEFINITIONS,

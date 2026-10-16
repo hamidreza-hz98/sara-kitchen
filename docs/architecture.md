@@ -95,7 +95,7 @@ Dependencies point from consumer to provider. “None” means the module accept
 | SEO          | Static/entity metadata, sitemap and structured-data inputs          | Blogs, Categories, Dishes, Logs, Media                            |
 | Settings     | Versioned site/content/policy configuration and consent evidence    | Blogs, Categories, Dishes, Logs, Media                            |
 | Logs         | Append-only audit events and authorized reads                       | None                                                              |
-| Analytics    | Derived dashboard/report queries and rollups                        | Customers, Dishes, Logs, Orders                                   |
+| Analytics    | Derived dashboard/report queries and rollups                        | Categories, Customers, Dishes, Logs, Orders, Transactions         |
 
 Legal-policy consent evidence is owned by Settings. Account and order workflows record consent
 through the Settings public API using opaque subject identifiers and immutable policy snapshots;

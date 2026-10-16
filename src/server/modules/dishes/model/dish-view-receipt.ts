@@ -36,6 +36,7 @@ dishViewReceiptSchema.index(
   { expiresAt: 1 },
   { expireAfterSeconds: 0, name: "dish_view_receipt_expiry_ttl" },
 );
+dishViewReceiptSchema.index({ createdAt: 1 }, { name: "dish_view_receipt_period" });
 
 export function getDishViewReceiptModel(connection: Connection): Model<DishViewReceiptRecord> {
   return (
