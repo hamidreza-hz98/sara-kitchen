@@ -71,3 +71,4 @@ export {
   type CustomerOrderListResult,
   type CustomerOrderTab,
 } from "./service/customer-order-list";
+export { getCustomerOrderDetail } from "./service/customer-order-detail";
