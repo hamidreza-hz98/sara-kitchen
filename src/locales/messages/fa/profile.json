@@ -90,7 +90,7 @@
     "emptyTitle": "سفارشی در این بخش نیست",
     "emptyDescription": "وضعیت دیگری را انتخاب کنید یا فهرست غذاها را ببینید.",
     "browseMenu": "دیدن منو",
-    "orderCode": "سفارش {code}",
+    "orderCode": "سفارش <bidi>{code}</bidi>",
     "moreItems": "+{count} مورد دیگر",
     "pickup": "دریافت حضوری",
     "delivery": "تحویل",
@@ -103,7 +103,7 @@
   },
   "orderDetails": {
     "back": "بازگشت به سفارش‌های من",
-    "title": "سفارش {code}",
+    "title": "سفارش <bidi>{code}</bidi>",
     "placedAt": "ثبت‌شده در {date}",
     "timeline": "روند سفارش",
     "items": "غذاهای سفارش‌داده‌شده",

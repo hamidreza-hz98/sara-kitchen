@@ -79,6 +79,7 @@ describe("customer order detail", () => {
   it("shows immutable item, timing, pricing, and timeline facts", () => {
     renderDetail();
     expect(screen.getByRole("heading", { name: `Order ${order.code}` })).toBeInTheDocument();
+    expect(screen.getByText(order.code).closest("bdi")).toHaveAttribute("dir", "ltr");
     expect(screen.getByText("Fesenjan")).toBeInTheDocument();
     expect(screen.getByText("No onions, please", { exact: false })).toBeInTheDocument();
     expect(screen.getAllByText("€18.00")).toHaveLength(2);

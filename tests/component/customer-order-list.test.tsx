@@ -57,6 +57,7 @@ describe("customer order list", () => {
   it("renders purchase snapshot, status, total and a working detail link", () => {
     renderList();
     expect(screen.getByRole("heading", { name: `Order ${code}` })).toBeInTheDocument();
+    expect(screen.getByText(code).closest("bdi")).toHaveAttribute("dir", "ltr");
     expect(screen.getByText("Confirmed")).toBeInTheDocument();
     expect(screen.getByText("2 × Kebab")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: `View order ${code}` })).toHaveAttribute(

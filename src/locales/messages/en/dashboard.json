@@ -37,8 +37,7 @@
     "permissionDenied": "You do not have permission to view this section.",
     "previewTitle": "Dashboard shell preview",
     "dataAsOf": "Data as of {timestamp}",
-    "previewDescription": "Navigation and layout preview. Live dashboard data will be added in later tasks.",
-    "authPending": "Administrator sign-in is not available yet. The dashboard remains protected while authentication is being implemented."
+    "previewDescription": "Navigation and layout preview. Sign in as an administrator to see live dashboard data."
   },
   "overview": {
     "heading": "Dashboard overview",
@@ -847,7 +846,6 @@
     "relations": "Connections",
     "relatedDishes": "Related dishes",
     "relatedBlogs": "Related blogs",
-    "blogRelationsPending": "The blog catalog becomes available after SK-0102 creates the Blog model. Existing relations are preserved.",
     "relationBrowse": "Browse catalog",
     "relationClose": "Done",
     "relationEmpty": "No relations selected or found.",
@@ -1326,7 +1324,7 @@
     }
   },
   "orderDetails": {
-    "title": "Order {code}",
+    "title": "Order <bidi>{code}</bidi>",
     "back": "Back to orders",
     "refresh": "Refresh",
     "retry": "Try again",

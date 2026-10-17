@@ -95,7 +95,7 @@
     "emptyTitle": "Não há encomendas nesta vista",
     "emptyDescription": "Experimente outro estado ou explore o menu.",
     "browseMenu": "Explorar menu",
-    "orderCode": "Encomenda {code}",
+    "orderCode": "Encomenda <bidi>{code}</bidi>",
     "moreItems": "+{count} mais",
     "pickup": "Levantamento",
     "delivery": "Entrega",
@@ -108,7 +108,7 @@
   },
   "orderDetails": {
     "back": "Voltar às minhas encomendas",
-    "title": "Encomenda {code}",
+    "title": "Encomenda <bidi>{code}</bidi>",
     "placedAt": "Efetuada em {date}",
     "timeline": "Histórico da encomenda",
     "items": "Artigos encomendados",

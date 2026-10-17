@@ -37,8 +37,7 @@
     "permissionDenied": "Não tem permissão para ver esta secção.",
     "previewTitle": "Pré-visualização do painel",
     "dataAsOf": "Dados atualizados em {timestamp}",
-    "previewDescription": "Pré-visualização da navegação e do layout. Os dados reais serão adicionados em tarefas futuras.",
-    "authPending": "O início de sessão de administrador ainda não está disponível. O painel permanece protegido enquanto a autenticação é implementada."
+    "previewDescription": "Pré-visualização da navegação e do layout. Inicie sessão como administrador para ver os dados reais do painel."
   },
   "overview": {
     "heading": "Visão geral do painel",
@@ -847,7 +846,6 @@
     "relations": "Ligações",
     "relatedDishes": "Pratos relacionados",
     "relatedBlogs": "Artigos relacionados",
-    "blogRelationsPending": "O catálogo do blog ficará disponível quando a tarefa SK-0102 criar o modelo Blog. As relações existentes são preservadas.",
     "relationBrowse": "Explorar catálogo",
     "relationClose": "Concluído",
     "relationEmpty": "Nenhuma relação selecionada ou encontrada.",
@@ -1326,7 +1324,7 @@
     }
   },
   "orderDetails": {
-    "title": "Encomenda {code}",
+    "title": "Encomenda <bidi>{code}</bidi>",
     "back": "Voltar às encomendas",
     "refresh": "Atualizar",
     "retry": "Tentar novamente",

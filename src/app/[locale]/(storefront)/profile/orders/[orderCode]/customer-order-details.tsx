@@ -62,7 +62,10 @@ export function CustomerOrderDetails({ locale, order }: Props) {
           sx={{ gap: 1, alignItems: { sm: "center" } }}
         >
           <Typography component="h1" variant="h2">
-            {t("title", { code: order.code })}
+            {t.rich("title", {
+              code: order.code,
+              bidi: (chunks) => <bdi dir="ltr">{chunks}</bdi>,
+            })}
           </Typography>
           <Chip label={statusT(order.status)} />
         </Stack>

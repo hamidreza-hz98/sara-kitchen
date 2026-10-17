@@ -49,3 +49,23 @@ test("locale validation rejects missing, empty, extra, and incompatible messages
   assert(errors.includes("errors.greeting must not be empty"));
   assert(errors.includes("pt-PT: placeholders differ for validation.greeting"));
 });
+
+test("locale validation rejects malformed ICU and missing plural fallbacks", async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "sara-locales-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  await writeCatalog(root, ({ locale, namespace, message }) => {
+    if (namespace !== "storefront") return;
+    message.greeting =
+      locale === "en"
+        ? "{count, plural, one {# item} other {# items}}"
+        : locale === "fa"
+          ? "{count, plural, one {# مورد}}"
+          : "{count, plural, one {# item} other {# itens}";
+  });
+
+  const errors = await validateLocaleCatalogs(root);
+  assert(errors.some((error) => error.startsWith("fa: invalid ICU message storefront.greeting")));
+  assert(
+    errors.some((error) => error.startsWith("pt-PT: invalid ICU message storefront.greeting")),
+  );
+});

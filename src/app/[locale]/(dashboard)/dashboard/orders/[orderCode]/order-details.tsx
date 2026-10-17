@@ -292,7 +292,10 @@ export function OrderDetails({
             {t("back")}
           </Button>
           <Typography component="h1" variant="h3" sx={{ mt: 1 }}>
-            {t("title", { code: order.code })}
+            {t.rich("title", {
+              code: order.code,
+              bidi: (chunks) => <bdi dir="ltr">{chunks}</bdi>,
+            })}
           </Typography>
           <Stack direction="row" sx={{ gap: 1, mt: 1, flexWrap: "wrap", alignItems: "center" }}>
             <Chip

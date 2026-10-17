@@ -1060,7 +1060,6 @@ export function DishEditor({
                 }}
                 mapOption={mapBlogRelation}
                 title={t("relatedBlogs")}
-                unavailableReason={t("blogRelationsPending")}
                 value={values.relatedBlogIds}
                 onChange={(relatedBlogIds) => update({ relatedBlogIds })}
               />

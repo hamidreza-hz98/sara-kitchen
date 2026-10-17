@@ -120,7 +120,10 @@ export function CustomerOrderList({ locale, page, tab, status }: Props) {
                 >
                   <Box>
                     <Typography component="h2" variant="h6">
-                      {t("orderCode", { code: order.code })}
+                      {t.rich("orderCode", {
+                        code: order.code,
+                        bidi: (chunks) => <bdi dir="ltr">{chunks}</bdi>,
+                      })}
                     </Typography>
                     <Typography color="text.secondary" variant="body2">
                       {formatDate(new Date(order.createdAt), locale)}

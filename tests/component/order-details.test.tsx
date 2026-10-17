@@ -138,6 +138,7 @@ describe("order details dashboard", () => {
   it("shows immutable snapshots, timeline, prices, and payment events", () => {
     renderDetails();
     expect(screen.getByRole("heading", { name: `Order ${order.code}` })).toBeInTheDocument();
+    expect(screen.getByText(order.code).closest("bdi")).toHaveAttribute("dir", "ltr");
     expect(screen.getByText("Fesenjan")).toBeInTheDocument();
     expect(screen.getByText("Rua Teste 1, Porto")).toBeInTheDocument();
     expect(screen.getByText("No nuts please")).toBeInTheDocument();

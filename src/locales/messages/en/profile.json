@@ -90,7 +90,7 @@
     "emptyTitle": "No orders match this view",
     "emptyDescription": "Try another status or explore the menu.",
     "browseMenu": "Browse menu",
-    "orderCode": "Order {code}",
+    "orderCode": "Order <bidi>{code}</bidi>",
     "moreItems": "+{count} more",
     "pickup": "Pickup",
     "delivery": "Delivery",
@@ -103,7 +103,7 @@
   },
   "orderDetails": {
     "back": "Back to my orders",
-    "title": "Order {code}",
+    "title": "Order <bidi>{code}</bidi>",
     "placedAt": "Placed {date}",
     "timeline": "Order timeline",
     "items": "Items ordered",

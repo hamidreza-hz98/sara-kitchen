@@ -139,7 +139,11 @@ export function PaymentResultView({ initialResult }: { initialResult: PaymentRes
               <Typography variant="body2" color="text.secondary">
                 {t("orderCode")}
               </Typography>
-              <Typography sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
+              <Typography
+                component="bdi"
+                dir="ltr"
+                sx={{ fontWeight: 800, overflowWrap: "anywhere" }}
+              >
                 {result.orderCode}
               </Typography>
               <Typography variant="h5">{formatEuro(result.amountCents, locale)}</Typography>

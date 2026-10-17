@@ -69,6 +69,7 @@ describe("payment result view", () => {
     );
     renderResult();
     expect(screen.getByRole("heading", { name: "Payment is being confirmed" })).toBeInTheDocument();
+    expect(screen.getByText(pending.orderCode).closest("bdi")).toHaveAttribute("dir", "ltr");
     expect(screen.queryByText("Payment confirmed")).not.toBeInTheDocument();
     await act(async () => vi.advanceTimersByTimeAsync(2_500));
     await waitFor(() =>

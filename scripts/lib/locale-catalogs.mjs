@@ -1,5 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { createTranslator } from "next-intl";
 
 export const LOCALES = ["en", "pt-PT", "fa"];
 export const MESSAGE_NAMESPACES = [
@@ -40,6 +41,46 @@ function collectMessages(value, prefix, errors, messages) {
 
 function placeholders(message) {
   return [...message.matchAll(/\{([A-Za-z][\w]*)\b[^}]*\}/g)].map((match) => match[1]).sort();
+}
+
+function validateMessageFormat(locale, key, message, errors) {
+  const types = new Map();
+  for (const match of message.matchAll(
+    /\{([A-Za-z][\w]*)(?:\s*,\s*(plural|selectordinal|select|number|date|time))?/g,
+  )) {
+    types.set(match[1], match[2] ?? "argument");
+  }
+  const tags = [...message.matchAll(/<([A-Za-z][\w]*)>/g)].map((match) => match[1]);
+  const reported = new Set();
+  const translator = createTranslator({
+    locale,
+    messages: { qa: message },
+    onError(error) {
+      reported.add(error.code ?? error.message);
+    },
+  });
+
+  for (const count of [0, 1, 2, 5]) {
+    const values = Object.fromEntries(
+      [...types].map(([name, type]) => [
+        name,
+        type === "plural" || type === "selectordinal" || type === "number"
+          ? count
+          : type === "date" || type === "time"
+            ? new Date("2026-01-01T12:00:00Z")
+            : type === "select"
+              ? "other"
+              : "Sample",
+      ]),
+    );
+    for (const tag of tags) values[tag] = (chunks) => chunks;
+    try {
+      translator.rich("qa", values);
+    } catch (error) {
+      reported.add(error.message);
+    }
+  }
+  for (const issue of reported) errors.push(`${locale}: invalid ICU message ${key} (${issue})`);
 }
 
 async function readLocale(messagesRoot, locale, errors) {
@@ -120,6 +161,12 @@ export async function validateLocaleCatalogs(messagesRoot) {
       if (!reference.has(key)) {
         errors.push(`${locale}: unexpected message ${key}`);
       }
+    }
+  }
+
+  for (const [locale, catalog] of catalogs) {
+    for (const [key, message] of catalog) {
+      validateMessageFormat(locale, key, message, errors);
     }
   }
 

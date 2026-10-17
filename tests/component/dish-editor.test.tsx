@@ -103,6 +103,10 @@ afterEach(() => vi.unstubAllGlobals());
 describe("dish editor", () => {
   it("creates a draft with the same normalized payload accepted by the server schema", async () => {
     renderEditor();
+    expect(screen.getAllByRole("button", { name: "Browse catalog" })).toHaveLength(2);
+    for (const button of screen.getAllByRole("button", { name: "Browse catalog" })) {
+      expect(button).toBeEnabled();
+    }
     fireEvent.change(screen.getByRole("textbox", { name: "Dish name" }), {
       target: { value: "Saffron rice" },
     });
