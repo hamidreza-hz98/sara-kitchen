@@ -118,13 +118,13 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
   return (
     <Box component="div" sx={{ bgcolor: "background.default", pb: { xs: 9, md: 14 } }}>
       <Box
-        sx={(theme) => ({
+        sx={{
           background: "linear-gradient(145deg, #fff0ee 0%, #f5eaea 58%, #faf7f5 100%)",
           overflow: "hidden",
-          ...theme.applyStyles("dark", {
+          "html.dark &": {
             background: "linear-gradient(145deg, #321b1b 0%, #432424 58%, #321b1b 100%)",
-          }),
-        })}
+          },
+        }}
       >
         <Container maxWidth="lg" sx={{ py: { xs: 7, md: 11 } }}>
           <Box

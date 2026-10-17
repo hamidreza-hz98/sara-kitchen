@@ -115,12 +115,12 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
   return (
     <Box sx={{ pb: { xs: 7, md: 12 }, bgcolor: "background.default" }}>
       <Box
-        sx={(theme) => ({
+        sx={{
           position: "relative",
           bgcolor: "#fff0e7",
           overflow: "hidden",
-          ...theme.applyStyles("dark", { bgcolor: "#321b1b" }),
-        })}
+          "html.dark &": { bgcolor: "#321b1b" },
+        }}
       >
         {content.banner && (
           <Box

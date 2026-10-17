@@ -93,6 +93,7 @@ Current records:
 - [`request-validation.md`](./request-validation.md) — transport parsing, strict Zod schemas, localized field-safe issues, and file-metadata limits.
 - [`schema-conventions.md`](./schema-conventions.md) — ObjectId, timestamps, actor provenance, soft deletion, normalized search, versions, and JSON rules.
 - [`screen-reader-audit.md`](./screen-reader-audit.md) — SK-0183 accessible-name/live-region findings, automated evidence, and remaining manual screen-reader checks.
+- [`responsive-device-audit.md`](./responsive-device-audit.md) — SK-0184 viewport, locale, touch, and keyboard simulation evidence with physical-device follow-up.
 - [`settings-storage.md`](./settings-storage.md) — singleton section registry, staged/direct revisions, editor provenance, safe payload envelope, and sequential migrations.
 - [`settings-service.md`](./settings-service.md) — typed Settings reads/writes, authorization, staged publication, path-only audit diffs, and precise public-cache revalidation.
 - [`settings-pages.md`](./settings-pages.md) — registry-driven localized settings forms, specialized controls, previews, publication state, permissions, and unsaved-change protection.

@@ -96,7 +96,7 @@ function ArticleCard({ article, view }: { article: BlogCard; view: BlogQuery["vi
           </Typography>
         )}
         <Button
-          component={Link}
+          component="a"
           href={`/blog/${article.slug}`}
           variant="contained"
           sx={{ alignSelf: "flex-start", mt: "auto !important" }}
@@ -121,16 +121,16 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
   return (
     <Box sx={{ bgcolor: "background.default", pb: { xs: 7, md: 12 } }}>
       <Box
-        sx={(theme) => ({
+        sx={{
           bgcolor: "#fff0e7",
           backgroundImage:
             "radial-gradient(circle at 15% 30%, #ffd7d0 0, transparent 24%), radial-gradient(circle at 85% 65%, #e2f0e5 0, transparent 26%)",
-          ...theme.applyStyles("dark", {
+          "html.dark &": {
             bgcolor: "#321b1b",
             backgroundImage:
               "radial-gradient(circle at 15% 30%, #432424 0, transparent 24%), radial-gradient(circle at 85% 65%, #3a282e 0, transparent 26%)",
-          }),
-        })}
+          },
+        }}
       >
         <Container maxWidth="lg" sx={{ py: { xs: 5, md: 7 } }}>
           <Box component="nav" aria-label={t("breadcrumbs")} sx={{ mb: 2 }}>
@@ -162,7 +162,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
               {featured.map((article) => (
                 <Box
                   key={article.slug}
-                  component={Link}
+                  component="a"
                   href={`/blog/${article.slug}`}
                   sx={{
                     position: "relative",
@@ -255,7 +255,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
               {t("found", { count: formatNumber(content.total, locale) })}
             </Typography>
             <Button
-              component={Link}
+              component="a"
               href={blogHref(query, { view: "grid", page: 1 })}
               aria-current={query.view === "grid" ? "true" : undefined}
               variant={query.view === "grid" ? "contained" : "outlined"}
@@ -264,7 +264,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
               {t("grid")}
             </Button>
             <Button
-              component={Link}
+              component="a"
               href={blogHref(query, { view: "list", page: 1 })}
               aria-current={query.view === "list" ? "true" : undefined}
               variant={query.view === "list" ? "contained" : "outlined"}
@@ -280,7 +280,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
             <Typography color="text.secondary" sx={{ mt: 1, mb: 2 }}>
               {t("emptyHint")}
             </Typography>
-            <Button component={Link} href="/blog" variant="outlined">
+            <Button component="a" href="/blog" variant="outlined">
               {t("clearFilters")}
             </Button>
           </Paper>
@@ -308,7 +308,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
           >
             {query.page > 1 && (
               <Button
-                component={Link}
+                component="a"
                 href={blogHref(query, { page: query.page - 1 })}
                 variant="outlined"
               >
@@ -318,7 +318,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
             {pages.map((page) => (
               <Button
                 key={page}
-                component={Link}
+                component="a"
                 href={blogHref(query, { page })}
                 variant={page === query.page ? "contained" : "outlined"}
                 aria-current={page === query.page ? "page" : undefined}
@@ -329,7 +329,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
             ))}
             {query.page < content.totalPages && (
               <Button
-                component={Link}
+                component="a"
                 href={blogHref(query, { page: query.page + 1 })}
                 variant="outlined"
               >

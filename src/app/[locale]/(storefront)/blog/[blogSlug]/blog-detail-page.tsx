@@ -190,7 +190,7 @@ export function BlogDetailPage({ article }: { article: BlogDetailContent }) {
                         {formatEuro(dish.priceCents, locale)}
                       </Typography>
                       <Button
-                        component={Link}
+                        component="a"
                         href={`/menu/${dish.slug}`}
                         size="small"
                         sx={{ alignSelf: "flex-start" }}
@@ -232,7 +232,7 @@ export function BlogDetailPage({ article }: { article: BlogDetailContent }) {
               {article.relatedBlogs.map((related) => (
                 <Paper
                   key={related.slug}
-                  component={Link}
+                  component="a"
                   href={`/blog/${related.slug}`}
                   variant="outlined"
                   sx={{
