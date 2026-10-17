@@ -202,10 +202,6 @@ const appThemeOptions = {
           color: colorTokens.brand.ink,
           backgroundColor: colorTokens.brand.accent,
         },
-        "*:focus-visible": {
-          outline: `2px solid ${colorTokens.brand.primary}`,
-          outlineOffset: spacingTokens.hairline,
-        },
       },
     },
     MuiButtonBase: { defaultProps: { disableTouchRipple: true } },
@@ -223,6 +219,9 @@ const appThemeOptions = {
             "transform",
           ]),
           "&:active": { transform: `scale(${motionTokens.transform.pressedScale})` },
+          "@media (prefers-reduced-motion: reduce)": {
+            "&:active": { transform: "none" },
+          },
           variants: [
             {
               props: { color: "primary", variant: "contained" },
@@ -253,6 +252,9 @@ const appThemeOptions = {
           borderRadius: radiusTokens.md,
           transition: theme.transitions.create(["background-color", "transform"]),
           "&:active": { transform: `scale(${motionTokens.transform.pressedScale})` },
+          "@media (prefers-reduced-motion: reduce)": {
+            "&:active": { transform: "none" },
+          },
         }),
       },
     },

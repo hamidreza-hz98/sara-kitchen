@@ -62,7 +62,7 @@ text or predictable light/dark elevation states.
 | `designTokens.color.light.surface`       | `#FFFFFF` | S01–S06; white cards, navigation, forms, dialogs, and glass bases                      |
 | `designTokens.color.light.surfaceMuted`  | `#FFF1F1` | S01/S02/S04; normalized coral-tinted sections and controls                             |
 | `designTokens.color.light.textPrimary`   | `#2C2C47` | S08 exact brand text                                                                   |
-| `designTokens.color.light.textSecondary` | `#64748B` | S01–S06; normalized repeated Slate 500 text utilities                                  |
+| `designTokens.color.light.textSecondary` | `#5A6678` | S01–S06; Slate 500-derived value darkened for AA contrast on the off-white canvas      |
 | `designTokens.color.light.divider`       | `#E8DEDE` | S01/S02/S05; normalized warm borders and primary-at-low-opacity rules                  |
 | `designTokens.color.dark.canvas`         | `#230F0F` | S01–S06; exact configured dark background in 33 exports                                |
 | `designTokens.color.dark.surface`        | `#321B1B` | S01/S05/S07; derived first warm elevation over the accepted dark canvas                |

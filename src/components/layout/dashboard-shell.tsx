@@ -298,7 +298,7 @@ export function DashboardShell({
                 {shell("brand")}
               </Typography>
               <Typography
-                color="primary"
+                color="primary.dark"
                 sx={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em" }}
               >
                 {shell("management")}
@@ -436,7 +436,7 @@ export function DashboardShell({
               sx={{
                 color: "text.secondary",
                 textDecoration: "none",
-                "&:hover": { color: "primary.main" },
+                "&:hover": { color: "primary.dark" },
               }}
             >
               {navigation("overview")}

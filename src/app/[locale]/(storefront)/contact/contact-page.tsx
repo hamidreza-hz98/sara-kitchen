@@ -39,10 +39,13 @@ export function ContactPage({ data }: { data: ContactPageData }) {
   return (
     <Box sx={{ bgcolor: "background.default", pb: { xs: 9, md: 14 } }}>
       <Box
-        sx={{
+        sx={(theme) => ({
           background: "linear-gradient(150deg, #ffe6de 0%, #f5d5d2 45%, #f3e5f0 100%)",
           py: { xs: 7, md: 11 },
-        }}
+          ...theme.applyStyles("dark", {
+            background: "linear-gradient(150deg, #321b1b 0%, #432424 45%, #321b1b 100%)",
+          }),
+        })}
       >
         <Container maxWidth="lg">
           <Box
@@ -56,7 +59,7 @@ export function ContactPage({ data }: { data: ContactPageData }) {
             <Stack spacing={2.5}>
               <Typography
                 sx={{
-                  color: "primary.main",
+                  color: "primary.dark",
                   fontWeight: 800,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",

@@ -64,6 +64,18 @@ describe("design tokens", () => {
     expect(
       contrastRatio(designTokens.color.dark.textPrimary, designTokens.color.dark.canvas),
     ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(designTokens.color.light.textSecondary, designTokens.color.light.canvas),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(designTokens.color.dark.textSecondary, designTokens.color.dark.surface),
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(
+      contrastRatio(designTokens.color.brand.primaryText, designTokens.color.light.surface),
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      contrastRatio(designTokens.color.brand.primary, designTokens.color.dark.surface),
+    ).toBeGreaterThanOrEqual(3);
   });
 
   it("keeps spacing, breakpoints, and motion ordered", () => {

@@ -118,10 +118,13 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
   return (
     <Box component="div" sx={{ bgcolor: "background.default", pb: { xs: 9, md: 14 } }}>
       <Box
-        sx={{
+        sx={(theme) => ({
           background: "linear-gradient(145deg, #fff0ee 0%, #f5eaea 58%, #faf7f5 100%)",
           overflow: "hidden",
-        }}
+          ...theme.applyStyles("dark", {
+            background: "linear-gradient(145deg, #321b1b 0%, #432424 58%, #321b1b 100%)",
+          }),
+        })}
       >
         <Container maxWidth="lg" sx={{ py: { xs: 7, md: 11 } }}>
           <Box
@@ -135,7 +138,7 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
             <Stack spacing={2.5} sx={{ maxWidth: 590 }}>
               <Typography
                 sx={{
-                  color: "primary.main",
+                  color: "primary.dark",
                   fontWeight: 800,
                   letterSpacing: "0.13em",
                   textTransform: "uppercase",
@@ -147,7 +150,7 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
                 component="h1"
                 variant="h2"
                 sx={{
-                  color: "primary.main",
+                  color: "primary.dark",
                   fontWeight: 800,
                   fontSize: { xs: "2.6rem", md: "4.5rem" },
                   lineHeight: 1.08,
@@ -349,7 +352,7 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
               component="h2"
               id="about-values-heading"
               variant="h4"
-              sx={{ color: "primary.main", fontWeight: 800, mb: 4 }}
+              sx={{ color: "primary.dark", fontWeight: 800, mb: 4 }}
             >
               {t("valuesHeading")}
             </Typography>
@@ -375,7 +378,7 @@ export function AboutPage({ content }: { content: AboutContent | null }) {
                       mb: 2,
                       borderRadius: "50%",
                       bgcolor: "#ffe7e4",
-                      color: "primary.main",
+                      color: "primary.dark",
                       overflow: "hidden",
                     }}
                   >

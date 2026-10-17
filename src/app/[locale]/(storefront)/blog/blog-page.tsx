@@ -121,11 +121,16 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
   return (
     <Box sx={{ bgcolor: "background.default", pb: { xs: 7, md: 12 } }}>
       <Box
-        sx={{
+        sx={(theme) => ({
           bgcolor: "#fff0e7",
           backgroundImage:
             "radial-gradient(circle at 15% 30%, #ffd7d0 0, transparent 24%), radial-gradient(circle at 85% 65%, #e2f0e5 0, transparent 26%)",
-        }}
+          ...theme.applyStyles("dark", {
+            bgcolor: "#321b1b",
+            backgroundImage:
+              "radial-gradient(circle at 15% 30%, #432424 0, transparent 24%), radial-gradient(circle at 85% 65%, #3a282e 0, transparent 26%)",
+          }),
+        })}
       >
         <Container maxWidth="lg" sx={{ py: { xs: 5, md: 7 } }}>
           <Box component="nav" aria-label={t("breadcrumbs")} sx={{ mb: 2 }}>
@@ -171,11 +176,14 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
                     alignItems: "flex-end",
                     p: 2.5,
                     backgroundImage: article.image
-                      ? `linear-gradient(0deg, rgba(20,20,30,.85), rgba(20,20,30,.04)), url("${article.image.url}")`
+                      ? `linear-gradient(0deg, rgba(20,20,30,.93), rgba(20,20,30,.82) 48%, rgba(20,20,30,.42)), url("${article.image.url}")`
                       : "linear-gradient(140deg, #292844, #ff6269)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    "&:focus-visible": { outline: "3px solid #ff6269", outlineOffset: 3 },
+                    "&:focus-visible": {
+                      outline: "3px solid var(--sara-palette-primary-dark)",
+                      outlineOffset: 3,
+                    },
                   }}
                 >
                   <Typography component="span" variant="h6" sx={{ fontWeight: 800, zIndex: 1 }}>

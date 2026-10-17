@@ -28,3 +28,9 @@
   color: var(--sara-palette-primary-dark);
   text-decoration: underline;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .skipLink {
+    transition: none;
+  }
+}

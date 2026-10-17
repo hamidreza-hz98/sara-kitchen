@@ -8,10 +8,11 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { DirectionalIcon } from "@/components";
+import { isRtlLocale, type SupportedLocale } from "@/constants";
 
 import type { HomeContent } from "./home-content";
 
@@ -25,6 +26,7 @@ export function HomeHero({
   fallback: { eyebrow: string; title: string; description: string; action: string };
 }) {
   const t = useTranslations("storefront.home");
+  const rtl = isRtlLocale(useLocale() as SupportedLocale);
   const [index, setIndex] = useState(0);
   const slide = slides[index] ?? null;
   const action = slide?.link;
@@ -62,8 +64,10 @@ export function HomeHero({
         sx={{
           position: "absolute",
           inset: 0,
-          background:
-            "linear-gradient(90deg, rgba(16,30,27,.86), rgba(16,30,27,.48) 62%, rgba(16,30,27,.08))",
+          background: {
+            xs: "rgba(16,30,27,.82)",
+            md: `linear-gradient(${rtl ? "270deg" : "90deg"}, rgba(16,30,27,.92), rgba(16,30,27,.76) 65%, rgba(16,30,27,.42))`,
+          },
         }}
       />
       <Stack
@@ -96,12 +100,20 @@ export function HomeHero({
         <Stack
           direction="row"
           spacing={0.5}
-          sx={{ position: "absolute", zIndex: 2, insetInlineEnd: 20, insetBlockEnd: 20 }}
+          sx={{
+            position: "absolute",
+            zIndex: 2,
+            insetInlineEnd: 20,
+            insetBlockEnd: 20,
+            bgcolor: "rgba(16,30,27,.88)",
+            borderRadius: 3,
+            px: 1,
+          }}
         >
           <IconButton
             aria-label={t("previousSlide")}
             onClick={() => setIndex((current) => (current - 1 + slides.length) % slides.length)}
-            sx={{ color: "white", bgcolor: "rgba(0,0,0,.45)" }}
+            sx={{ color: "white" }}
           >
             <DirectionalIcon mirrorInRtl>
               <ArrowBackRounded />
@@ -110,7 +122,7 @@ export function HomeHero({
           <IconButton
             aria-label={t("nextSlide")}
             onClick={() => setIndex((current) => (current + 1) % slides.length)}
-            sx={{ color: "white", bgcolor: "rgba(0,0,0,.45)" }}
+            sx={{ color: "white" }}
           >
             <DirectionalIcon mirrorInRtl>
               <ArrowForwardRounded />

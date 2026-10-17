@@ -11,7 +11,7 @@ export const colorTokens = {
     surface: "#FFFFFF",
     surfaceMuted: "#FFF1F1",
     textPrimary: "#2C2C47",
-    textSecondary: "#64748B",
+    textSecondary: "#5A6678",
     divider: "#E8DEDE",
   },
   dark: {
