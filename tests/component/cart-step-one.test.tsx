@@ -135,6 +135,7 @@ describe("cart step one", () => {
     const user = userEvent.setup();
     state.value = cartValue({ cart: populatedCart(), itemCount: 2 });
     renderPage();
+    expect(screen.getByText("Fesenjan quantity: 2")).toHaveAttribute("aria-live", "polite");
     await user.click(screen.getByRole("button", { name: "Increase Fesenjan quantity" }));
     expect(operations.updateQuantity).toHaveBeenCalledWith(DISH, 3);
 

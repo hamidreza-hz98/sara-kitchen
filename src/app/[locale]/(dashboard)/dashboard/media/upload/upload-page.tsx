@@ -388,6 +388,20 @@ export function MediaUploadPage() {
                       label={t(`stages.${row.stage}`)}
                       size="small"
                     />
+                    <Box
+                      aria-atomic="true"
+                      aria-live="polite"
+                      component="span"
+                      sx={{
+                        position: "absolute",
+                        width: 1,
+                        height: 1,
+                        overflow: "hidden",
+                        clip: "rect(0, 0, 0, 0)",
+                      }}
+                    >
+                      {t("fileStage", { name: row.file.name, stage: t(`stages.${row.stage}`) })}
+                    </Box>
                   </Stack>
                   <Typography color="text.secondary" sx={{ fontSize: 13 }}>
                     {(row.file.size / 1024 / 1024).toFixed(2)} MB ·{" "}

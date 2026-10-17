@@ -491,6 +491,7 @@
     "completed": "{done} de {total} concluídos",
     "overallProgress": "Progresso total do carregamento",
     "fileProgress": "Progresso de {name}",
+    "fileStage": "{name}: {stage}",
     "unknownType": "Tipo desconhecido",
     "altEnglish": "Texto alternativo em inglês",
     "altPortuguese": "Texto alternativo em português (opcional)",

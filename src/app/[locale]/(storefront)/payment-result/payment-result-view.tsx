@@ -35,9 +35,11 @@ type ResultEnvelope = Readonly<{ data?: PaymentResultViewModel }>;
 const MAX_AUTOMATIC_POLLS = 48;
 
 function ResultIcon({ state }: { state: PaymentResultViewModel["state"] }) {
-  if (state === "success") return <CheckCircleRounded color="success" sx={{ fontSize: 72 }} />;
-  if (state === "pending") return <HourglassTopRounded color="warning" sx={{ fontSize: 72 }} />;
-  return <CancelRounded color="error" sx={{ fontSize: 72 }} />;
+  if (state === "success")
+    return <CheckCircleRounded aria-hidden="true" color="success" sx={{ fontSize: 72 }} />;
+  if (state === "pending")
+    return <HourglassTopRounded aria-hidden="true" color="warning" sx={{ fontSize: 72 }} />;
+  return <CancelRounded aria-hidden="true" color="error" sx={{ fontSize: 72 }} />;
 }
 
 export function PaymentResultView({ initialResult }: { initialResult: PaymentResultViewModel }) {
@@ -116,6 +118,20 @@ export function PaymentResultView({ initialResult }: { initialResult: PaymentRes
             <Typography color="text.secondary" sx={{ mt: 1 }}>
               {stateDescription}
             </Typography>
+            <Box
+              aria-atomic="true"
+              aria-live="polite"
+              component="span"
+              sx={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                overflow: "hidden",
+                clip: "rect(0, 0, 0, 0)",
+              }}
+            >
+              {stateTitle}. {stateDescription}
+            </Box>
           </Box>
 
           <Paper variant="outlined" sx={{ width: "100%", p: 2.5, bgcolor: "background.default" }}>
@@ -134,10 +150,10 @@ export function PaymentResultView({ initialResult }: { initialResult: PaymentRes
           </Paper>
 
           {result.state === "pending" ? (
-            <Stack spacing={2} sx={{ alignItems: "center" }} aria-live="polite">
+            <Stack spacing={2} sx={{ alignItems: "center" }}>
               {!automaticPollingEnded ? (
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                  <CircularProgress size={22} />
+                  <CircularProgress aria-hidden="true" size={22} />
                   <Typography>{t("checking")}</Typography>
                 </Stack>
               ) : (

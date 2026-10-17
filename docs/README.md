@@ -92,6 +92,7 @@ Current records:
 - [`right-to-left.md`](./right-to-left.md) — locale direction, RTL Emotion processing, logical CSS, icon policy, and visual verification.
 - [`request-validation.md`](./request-validation.md) — transport parsing, strict Zod schemas, localized field-safe issues, and file-metadata limits.
 - [`schema-conventions.md`](./schema-conventions.md) — ObjectId, timestamps, actor provenance, soft deletion, normalized search, versions, and JSON rules.
+- [`screen-reader-audit.md`](./screen-reader-audit.md) — SK-0183 accessible-name/live-region findings, automated evidence, and remaining manual screen-reader checks.
 - [`settings-storage.md`](./settings-storage.md) — singleton section registry, staged/direct revisions, editor provenance, safe payload envelope, and sequential migrations.
 - [`settings-service.md`](./settings-service.md) — typed Settings reads/writes, authorization, staged publication, path-only audit diffs, and precise public-cache revalidation.
 - [`settings-pages.md`](./settings-pages.md) — registry-driven localized settings forms, specialized controls, previews, publication state, permissions, and unsaved-change protection.

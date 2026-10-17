@@ -491,6 +491,7 @@
     "completed": "{done} of {total} completed",
     "overallProgress": "Overall upload progress",
     "fileProgress": "Upload progress for {name}",
+    "fileStage": "{name}: {stage}",
     "unknownType": "Unknown type",
     "altEnglish": "English alternative text",
     "altPortuguese": "Portuguese alternative text (optional)",

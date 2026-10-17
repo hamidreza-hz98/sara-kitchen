@@ -214,7 +214,7 @@ export function AddressEditor({
             <Typography component="h3" variant="h6">
               {t("mapTitle")}
             </Typography>
-            <Typography color="text.secondary" variant="body2">
+            <Typography color="text.secondary" id={`${idPrefix}-map-help`} variant="body2">
               {t("mapHelp")}
             </Typography>
           </Box>
@@ -241,6 +241,7 @@ export function AddressEditor({
         )}
         <AddressMap
           ariaLabel={t("mapLabel")}
+          descriptionId={`${idPrefix}-map-help`}
           disabled={disabled}
           onPositionChange={updatePosition}
           position={position}

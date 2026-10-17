@@ -491,6 +491,7 @@
     "completed": "{done} از {total} تکمیل شده",
     "overallProgress": "پیشرفت کلی بارگذاری",
     "fileProgress": "پیشرفت بارگذاری {name}",
+    "fileStage": "{name}: {stage}",
     "unknownType": "نوع ناشناخته",
     "altEnglish": "متن جایگزین انگلیسی",
     "altPortuguese": "متن جایگزین پرتغالی (اختیاری)",

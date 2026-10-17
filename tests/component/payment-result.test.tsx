@@ -74,6 +74,10 @@ describe("payment result view", () => {
     await waitFor(() =>
       expect(screen.getByRole("heading", { name: "Payment confirmed" })).toBeInTheDocument(),
     );
+    expect(screen.getByText(/Payment confirmed\. Your order is confirmed/u)).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
     expect(fetch).toHaveBeenCalledWith(
       `/api/profile/payment-result?order=${encodeURIComponent(pending.orderCode)}`,
       { credentials: "same-origin", cache: "no-store" },

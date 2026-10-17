@@ -78,8 +78,9 @@ function CartStepper() {
 }
 
 function CartLoading() {
+  const t = useTranslations("storefront.cart");
   return (
-    <Stack aria-busy="true" aria-label="Loading cart" role="status" spacing={3}>
+    <Stack aria-busy="true" aria-label={t("loading")} role="status" spacing={3}>
       {[0, 1, 2].map((item) => (
         <Paper key={item} sx={{ p: 3, border: "1px solid", borderColor: "divider" }}>
           <Stack direction="row" spacing={3}>
@@ -442,13 +443,30 @@ export function CartStepOne() {
                               >
                                 <RemoveRounded fontSize="small" />
                               </IconButton>
-                              <Typography
-                                aria-live="polite"
-                                component="span"
-                                sx={{ minWidth: 36, textAlign: "center", fontWeight: 800 }}
-                              >
-                                {pending ? <CircularProgress size={16} /> : line.quantity}
-                              </Typography>
+                              <Box component="span" sx={{ minWidth: 36, textAlign: "center" }}>
+                                <Typography
+                                  aria-hidden="true"
+                                  component="span"
+                                  sx={{ fontWeight: 800 }}
+                                >
+                                  {pending ? <CircularProgress size={16} /> : line.quantity}
+                                </Typography>
+                                <Box
+                                  aria-live="polite"
+                                  component="span"
+                                  sx={{
+                                    position: "absolute",
+                                    width: 1,
+                                    height: 1,
+                                    overflow: "hidden",
+                                    clip: "rect(0, 0, 0, 0)",
+                                  }}
+                                >
+                                  {pending
+                                    ? t("updatingQuantity", { name })
+                                    : t("quantityStatus", { name, count: line.quantity })}
+                                </Box>
+                              </Box>
                               <IconButton
                                 aria-label={t("increase", { name })}
                                 disabled={pending || line.quantity >= maximum || !available}

@@ -7,11 +7,13 @@ vi.mock("next/dynamic", () => ({
   default: () =>
     function MapFixture(props: {
       ariaLabel: string;
+      descriptionId?: string;
       onPositionChange(position: { latitude: number; longitude: number }): void;
     }) {
       return (
         <button
           aria-label={props.ariaLabel}
+          aria-describedby={props.descriptionId}
           onClick={() => props.onPositionChange({ latitude: 41.16, longitude: -8.62 })}
           type="button"
         >
@@ -61,6 +63,9 @@ describe("AddressEditor", () => {
     render(<Harness onValue={onValue} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Delivery location map" }));
+    expect(
+      screen.getByRole("button", { name: "Delivery location map" }),
+    ).toHaveAccessibleDescription("Choose a point on the map or enter the coordinates below.");
     expect(onValue).toHaveBeenLastCalledWith(
       expect.objectContaining({ location: { type: "Point", coordinates: [-8.62, 41.16] } }),
     );

@@ -93,6 +93,7 @@ describe("media upload page", () => {
       image("a.png"),
       image("b.png"),
     ]);
+    expect(screen.getByText("a.png: Ready")).toHaveAttribute("aria-live", "polite");
     expect(screen.getByRole("button", { name: "Upload 2 files" })).toBeEnabled();
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
     await user.click(screen.getByRole("link", { name: "Back to media" }));
@@ -104,6 +105,7 @@ describe("media upload page", () => {
       ).toBeGreaterThan(0),
     );
     expect(screen.getByText("Network error. Check your connection and retry.")).toBeVisible();
+    expect(screen.getByText("b.png: Failed")).toHaveAttribute("aria-live", "polite");
     await user.click(screen.getByRole("button", { name: "Retry b.png" }));
     await waitFor(() => expect(upload).toHaveBeenCalledTimes(2));
     await waitFor(() =>

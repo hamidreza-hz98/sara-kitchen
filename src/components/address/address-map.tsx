@@ -10,6 +10,7 @@ export type AddressMapProps = Readonly<{
   position: AddressMapPosition;
   onPositionChange(position: AddressMapPosition): void;
   ariaLabel: string;
+  descriptionId?: string;
   disabled?: boolean;
 }>;
 
@@ -33,10 +34,17 @@ function Recenter({ position }: Readonly<{ position: AddressMapPosition }>) {
   return null;
 }
 
-export function AddressMap({ position, onPositionChange, ariaLabel, disabled }: AddressMapProps) {
+export function AddressMap({
+  position,
+  onPositionChange,
+  ariaLabel,
+  descriptionId,
+  disabled,
+}: AddressMapProps) {
   return (
     <Box
       aria-label={ariaLabel}
+      aria-describedby={descriptionId}
       role="region"
       sx={{
         blockSize: { xs: 280, md: 360 },
