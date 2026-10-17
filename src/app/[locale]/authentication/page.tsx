@@ -14,7 +14,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AuthenticationPage() {
   const auth = await getTranslations("dashboard.auth");
   return (
-    <Container maxWidth="sm" sx={{ minHeight: "100dvh", display: "grid", alignContent: "center" }}>
+    <Container
+      component="main"
+      maxWidth="sm"
+      sx={{ minHeight: "100dvh", display: "grid", alignContent: "center" }}
+    >
       <Box
         sx={{
           p: { xs: 4, sm: 6 },

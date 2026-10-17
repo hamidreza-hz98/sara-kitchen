@@ -661,8 +661,16 @@ export function AdminManager({
         </Stack>
       )}
 
-      <Dialog open={editing !== null} onClose={closeEditor} fullWidth maxWidth="sm">
-        <DialogTitle>{t(editing === "new" ? "createTitle" : "editTitle")}</DialogTitle>
+      <Dialog
+        open={editing !== null}
+        onClose={closeEditor}
+        fullWidth
+        maxWidth="sm"
+        aria-labelledby="admin-editor-title"
+      >
+        <DialogTitle id="admin-editor-title">
+          {t(editing === "new" ? "createTitle" : "editTitle")}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField

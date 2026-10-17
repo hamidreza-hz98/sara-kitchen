@@ -188,4 +188,50 @@ describe("administrator manager", () => {
       }),
     );
   }, 15_000);
+
+  it("supports creating an administrator without a pointer and restores focus after Escape", async () => {
+    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) =>
+      init?.method === "POST"
+        ? new Response(JSON.stringify({ data: other }), { status: 201 })
+        : response(),
+    );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+    renderManager();
+    await screen.findAllByText("Sara Kazemi");
+
+    const add = screen.getByRole("button", { name: "Add administrator" });
+    for (let index = 0; index < 30 && document.activeElement !== add; index += 1) {
+      await user.tab();
+    }
+    expect(add).toHaveFocus();
+    await user.keyboard("{Enter}");
+    const dialog = screen.getByRole("dialog", { name: "New administrator" });
+    expect(within(dialog).getByRole("textbox", { name: "First name" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await waitFor(() => expect(add).toHaveFocus());
+
+    await user.keyboard("{Enter}");
+    const reopened = screen.getByRole("dialog", { name: "New administrator" });
+    await user.keyboard("Leila{Tab}Ahmadi{Tab}leila@example.com");
+    const password = reopened.querySelector<HTMLInputElement>('input[type="password"]');
+    expect(password).not.toBeNull();
+    await user.tab();
+    await user.tab();
+    expect(password).toHaveFocus();
+    await user.keyboard("Secure password 2026");
+    const save = within(reopened).getByRole("button", { name: "Save" });
+    await user.tab();
+    expect(within(reopened).getByRole("button", { name: "Cancel" })).toHaveFocus();
+    await user.tab();
+    expect(save).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(fetcher).toHaveBeenCalledWith(
+        "/api/admins",
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+  }, 20_000);
 });
