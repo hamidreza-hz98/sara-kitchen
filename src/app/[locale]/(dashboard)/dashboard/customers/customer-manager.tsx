@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import BlockRounded from "@mui/icons-material/BlockRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import DownloadRounded from "@mui/icons-material/DownloadRounded";
@@ -322,7 +324,7 @@ export function CustomerManager({ capabilities }: { capabilities: Capabilities }
       </Stack>
 
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
+        <AdvancedFilters>
           <TextField
             fullWidth
             value={draftSearch}
@@ -367,7 +369,7 @@ export function CustomerManager({ capabilities }: { capabilities: Capabilities }
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
 
       {error ? (
