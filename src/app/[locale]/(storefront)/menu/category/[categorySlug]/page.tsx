@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 
 import { isSupportedLocale } from "@/constants";
@@ -16,6 +17,7 @@ type CategoryPageProps = Readonly<{
 }>;
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  await connection();
   const { locale, categorySlug } = await params;
   return isSupportedLocale(locale) ? entityPageMetadata("category", categorySlug, locale) : {};
 }
