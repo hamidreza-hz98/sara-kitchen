@@ -1,4 +1,12 @@
 {
+  "filters": {
+    "advanced": "فیلترهای پیشرفته",
+    "less": "فیلترهای کمتر"
+  },
+  "passwordVisibility": {
+    "show": "نمایش گذرواژه",
+    "hide": "پنهان کردن گذرواژه"
+  },
   "brandName": "آشپزخانه سارا",
   "actions": {
     "save": "ذخیره",

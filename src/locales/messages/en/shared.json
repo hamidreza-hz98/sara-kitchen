@@ -1,4 +1,12 @@
 {
+  "filters": {
+    "advanced": "Advanced filters",
+    "less": "Fewer filters"
+  },
+  "passwordVisibility": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
   "brandName": "Sara Kitchen",
   "actions": {
     "save": "Save",
