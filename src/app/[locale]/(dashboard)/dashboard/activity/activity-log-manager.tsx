@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import FactCheckOutlined from "@mui/icons-material/FactCheckOutlined";
 import FilterAltOffOutlined from "@mui/icons-material/FilterAltOffOutlined";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
@@ -239,19 +241,13 @@ export function ActivityLogManager() {
       <Paper
         component="form"
         variant="outlined"
-        sx={{ p: 2 }}
+        sx={{ p: { xs: 3, md: 4 } }}
         onSubmit={(event) => {
           event.preventDefault();
           applyFilters();
         }}
       >
-        <Box
-          sx={{
-            display: "grid",
-            gap: 2,
-            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" },
-          }}
-        >
+        <AdvancedFilters spacing={3}>
           <TextField
             type="date"
             label={t("dateFrom")}
@@ -353,8 +349,8 @@ export function ActivityLogManager() {
             onChange={(e) => setField("requestId", e.target.value)}
             sx={{ gridColumn: { lg: "span 2" } }}
           />
-        </Box>
-        <Stack direction="row" sx={{ gap: 1, justifyContent: "flex-end", mt: 2, flexWrap: "wrap" }}>
+        </AdvancedFilters>
+        <Stack direction="row" sx={{ gap: 2, justifyContent: "flex-end", mt: 3, flexWrap: "wrap" }}>
           <Button startIcon={<FilterAltOffOutlined />} onClick={clearFilters}>
             {t("clear")}
           </Button>
