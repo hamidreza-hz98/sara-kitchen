@@ -56,6 +56,7 @@ export {
 export type { DeleteMediaInput, MediaDeleteErrorCode } from "./service/delete-media";
 
 export { StorageError } from "./storage/storage-provider";
+export { createMediaStorageProvider, activeMediaBucket } from "./storage/media-provider";
 export {
   createMediaObjectKey,
   createMinioStorageProvider,

@@ -25,7 +25,7 @@ import {
   createMediaDeleteRepository,
   createMediaReadRepository,
   createMediaUpdateRepository,
-  createMinioStorageProvider,
+  createMediaStorageProvider,
   deleteMediaSafely,
   getMediaDetail,
   updateMediaMetadata,
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, context: RouteContext): Promise<
     try {
       const detail = await getMediaDetail(
         createMediaReadRepository(connection),
-        createMinioStorageProvider(),
+        createMediaStorageProvider(),
         mediaId,
       );
       if (!detail) throw ApiError.notFound("media");

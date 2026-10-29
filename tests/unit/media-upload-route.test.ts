@@ -16,7 +16,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/server/environment", () => ({
-  getServerEnvironment: () => ({ MINIO_BUCKET: "private-media" }),
+  getServerEnvironment: () => ({ MINIO_BUCKET: "private-media", MEDIA_STORAGE_PROVIDER: "minio" }),
 }));
 vi.mock("@/server/database", () => ({ connectToDatabase: state.connect }));
 vi.mock("@/server/modules/auth", () => ({
@@ -38,7 +38,8 @@ vi.mock("@/server/modules/media", async (importOriginal) => {
     listMedia: state.list,
     createMediaReadRepository: () => ({}),
     createMediaUploadRepository: () => ({}),
-    createMinioStorageProvider: () => ({}),
+    createMediaStorageProvider: () => ({}),
+    activeMediaBucket: () => "private-media",
   };
 });
 

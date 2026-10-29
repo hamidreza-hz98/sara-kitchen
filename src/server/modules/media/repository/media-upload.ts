@@ -12,6 +12,7 @@ export interface MediaUploadRecord {
   readonly originalName: string;
   readonly objectKey: string;
   readonly bucket: string;
+  readonly provider?: "minio" | "mongodb";
   readonly mimeType: string;
   readonly bytes: number;
   readonly checksum: string;
@@ -81,7 +82,7 @@ export function createMediaUploadRepository(connection: Connection): MediaUpload
     async create(record) {
       const created = await Media.create({
         source: "managed",
-        provider: "minio",
+        provider: record.provider ?? "minio",
         bucket: record.bucket,
         objectKey: record.objectKey,
         externalUrl: null,

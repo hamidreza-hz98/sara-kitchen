@@ -6,6 +6,7 @@ import { Readable } from "node:stream";
 import { Client as MinioClient, CopyDestinationOptions, CopySourceOptions } from "minio";
 
 import { getServerEnvironment } from "@/server/environment";
+import { getMinioConfiguration } from "@/validations/env/server-schema";
 
 import { isSafeMediaObjectKey } from "../validation/media-metadata";
 import type { UploadExtension } from "../validation/upload-policy";
@@ -260,14 +261,5 @@ export class MinioStorageProvider implements StorageProvider {
 }
 
 export function createMinioStorageProvider(): MinioStorageProvider {
-  const env = getServerEnvironment();
-  return new MinioStorageProvider({
-    endpoint: env.MINIO_ENDPOINT,
-    port: env.MINIO_PORT,
-    useSSL: env.MINIO_USE_SSL,
-    accessKey: env.MINIO_ACCESS_KEY,
-    secretKey: env.MINIO_SECRET_KEY,
-    bucket: env.MINIO_BUCKET,
-    region: env.MINIO_REGION,
-  });
+  return new MinioStorageProvider(getMinioConfiguration(getServerEnvironment()));
 }

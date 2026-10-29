@@ -48,7 +48,7 @@ vi.mock("@/server/modules/media", () => ({
   createMediaDeleteRepository: () => ({}),
   createMediaReadRepository: () => ({}),
   createMediaUpdateRepository: () => ({}),
-  createMinioStorageProvider: () => ({}),
+  createMediaStorageProvider: () => ({}),
   deleteMediaSafely: state.deleteMedia,
   getMediaDetail: state.detail,
   updateMediaMetadata: state.update,

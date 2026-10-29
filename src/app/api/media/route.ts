@@ -23,7 +23,8 @@ import {
   createMediaUpload,
   createMediaReadRepository,
   createMediaUploadRepository,
-  createMinioStorageProvider,
+  createMediaStorageProvider,
+  activeMediaBucket,
   listMedia,
   parseMediaListQuery,
 } from "@/server/modules/media";
@@ -130,7 +131,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     try {
       const result = await listMedia(
         createMediaReadRepository(connection),
-        createMinioStorageProvider(),
+        createMediaStorageProvider(),
         plan,
       );
       return apiSuccess(result.data, { meta: result.meta });
@@ -163,11 +164,12 @@ export async function POST(request: NextRequest): Promise<Response> {
       result = await createMediaUpload(
         {
           repository: createMediaUploadRepository(connection),
-          storage: createMinioStorageProvider(),
+          storage: createMediaStorageProvider(),
         },
         {
           actorId: actor.id,
-          bucket: getServerEnvironment().MINIO_BUCKET,
+          bucket: activeMediaBucket(),
+          provider: getServerEnvironment().MEDIA_STORAGE_PROVIDER,
           candidate: { name: file.name, blob: file },
           translations,
         },

@@ -1,6 +1,6 @@
 export const MEDIA_KINDS = ["image", "video", "pdf", "other"] as const;
 export const MEDIA_SOURCES = ["managed", "external"] as const;
-export const MEDIA_PROVIDERS = ["minio", "external"] as const;
+export const MEDIA_PROVIDERS = ["minio", "mongodb", "external"] as const;
 export const MEDIA_PROCESSING_STATES = ["pending", "processing", "ready", "failed"] as const;
 export const MEDIA_FAILURE_CODES = [
   "storage_error",
