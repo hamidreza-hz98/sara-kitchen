@@ -84,9 +84,7 @@ export function TransactionList() {
     <Stack spacing={3}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
-        alignItems={{ sm: "center" }}
-        gap={2}
+        sx={{ justifyContent: "space-between", alignItems: { sm: "center" }, gap: 2 }}
       >
         <div>
           <Typography component="h1" variant="h4">
@@ -163,7 +161,7 @@ export function TransactionList() {
               <TableBody>
                 {result.data.map((item) => (
                   <TableRow key={item.id} hover>
-                    <TableCell>{formatDateTime(item.createdAt, locale)}</TableCell>
+                    <TableCell>{formatDateTime(new Date(item.createdAt), locale)}</TableCell>
                     <TableCell sx={{ fontFamily: "monospace" }}>{item.id}</TableCell>
                     <TableCell sx={{ fontFamily: "monospace" }}>{item.orderId}</TableCell>
                     <TableCell>
