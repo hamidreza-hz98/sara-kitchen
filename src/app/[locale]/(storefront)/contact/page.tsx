@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -15,6 +16,7 @@ import { ContactPage } from "./contact-page";
 type ContactPageProps = Readonly<{ params: Promise<{ locale: string }> }>;
 
 export async function generateMetadata({ params }: ContactPageProps): Promise<Metadata> {
+  await connection();
   const { locale } = await params;
   if (!isSupportedLocale(locale)) return {};
   const t = await getTranslations({ locale, namespace: "storefront.contact" });
