@@ -1,5 +1,7 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
@@ -52,12 +54,11 @@ export function AdminLoginForm() {
       }}
     >
       <TextField autoComplete="username" label={auth("identifier")} name="identifier" required />
-      <TextField
+      <PasswordField
         autoComplete="current-password"
         label={auth("password")}
         name="password"
         required
-        type="password"
       />
       {error && (
         <Alert severity="error" role="alert">
