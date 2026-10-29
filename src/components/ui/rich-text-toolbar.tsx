@@ -43,7 +43,7 @@ export function RichTextToolbar({ editor }: { editor: Editor | null }) {
     label: string;
     icon: ReactNode;
     run: () => void;
-    active?: boolean;
+    active?: boolean | undefined;
     disabled?: boolean;
     toggle?: boolean;
   };
