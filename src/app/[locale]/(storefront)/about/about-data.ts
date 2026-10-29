@@ -7,7 +7,7 @@ import { CONTENT_REVALIDATE_SECONDS, contentItemTag } from "@/server/cache";
 import { connectToDatabase } from "@/server/database";
 import {
   createMediaReadRepository,
-  createMinioStorageProvider,
+  createMediaStorageProvider,
   getMediaDetail,
   resolveStorefrontMediaImage,
 } from "@/server/modules/media";
@@ -22,7 +22,7 @@ async function readAboutContent(locale: SupportedLocale): Promise<AboutContent |
     requestId: "about-render",
   }).getPublic("about", locale);
   if (!settings) return null;
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const images = new Map<string, Promise<AboutImage | null>>();
   const image = (id: string, alt: string): Promise<AboutImage | null> => {
     let pending = images.get(id);
