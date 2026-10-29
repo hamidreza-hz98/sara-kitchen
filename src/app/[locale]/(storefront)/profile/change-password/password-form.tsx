@@ -1,11 +1,12 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import NextLink from "next/link";
 import Link from "@mui/material/Link";
 import { useTranslations } from "next-intl";
@@ -86,28 +87,25 @@ export function ChangePasswordForm() {
         submit(event).catch(() => setResult("error"));
       }}
     >
-      <TextField
+      <PasswordField
         autoComplete="current-password"
         label={t("currentPassword")}
         name="currentPassword"
         required
-        type="password"
       />
-      <TextField
+      <PasswordField
         autoComplete="new-password"
         helperText={t("passwordHint")}
         label={t("newPassword")}
         name="newPassword"
         required
         slotProps={{ htmlInput: { minLength: 15 } }}
-        type="password"
       />
-      <TextField
+      <PasswordField
         autoComplete="new-password"
         label={t("confirmPassword")}
         name="confirmPassword"
         required
-        type="password"
       />
       <FormControlLabel
         control={<Checkbox defaultChecked name="revokeOtherSessions" />}
