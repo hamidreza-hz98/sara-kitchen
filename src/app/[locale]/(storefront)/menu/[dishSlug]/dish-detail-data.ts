@@ -20,7 +20,7 @@ import {
   createIngredientAllergenCatalog,
   createIngredientRepository,
 } from "@/server/modules/ingredients";
-import { createMinioStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
 
 import type { DishDetailContent, DishDetailImage } from "./dish-detail-content";
 
@@ -45,7 +45,7 @@ export const loadDishDetailContent = cache(async function readDishDetailContent(
     throw error;
   }
 
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const image = async (
     id: string | null,
     alt: string,
