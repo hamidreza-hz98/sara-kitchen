@@ -106,6 +106,7 @@ function DishCard({ dish, view }: { dish: MenuDish; view: MenuQuery["view"] }) {
 export function MenuPage({ content, query }: { content: MenuContent; query: MenuQuery }) {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("storefront.menu");
+  const filters = useTranslations("shared.filters");
   const title = content.selectedCategory?.name ?? t("title");
   const description = content.selectedCategory?.description || t("description");
   const pages = Array.from({ length: Math.min(content.totalPages, 5) }, (_, index) => {
@@ -168,11 +169,7 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "repeat(2, minmax(0, 1fr))",
-                md: "2fr repeat(2, minmax(0, 1fr)) auto",
-              },
+              gridTemplateColumns: "minmax(0, 1fr) auto",
               gap: 2,
               alignItems: "end",
             }}
@@ -191,36 +188,6 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
                 sx={controlStyle}
               />
             </Box>
-            <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
-              <Typography component="span" variant="body2">
-                {t("category")}
-              </Typography>
-              <Box
-                component="select"
-                name="category"
-                defaultValue={query.category}
-                sx={controlStyle}
-              >
-                <option value="">{t("allCategories")}</option>
-                {content.categories.map((category) => (
-                  <option key={category.slug} value={category.slug}>
-                    {category.name}
-                  </option>
-                ))}
-              </Box>
-            </Box>
-            <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
-              <Typography component="span" variant="body2">
-                {t("sort")}
-              </Typography>
-              <Box component="select" name="sort" defaultValue={query.sort} sx={controlStyle}>
-                {MENU_SORTS.map((sort) => (
-                  <option key={sort} value={sort}>
-                    {t(`sortOptions.${sort}`)}
-                  </option>
-                ))}
-              </Box>
-            </Box>
             <Button type="submit" variant="contained" sx={{ minHeight: 44 }}>
               {t("apply")}
             </Button>
@@ -229,7 +196,7 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
             component="details"
             sx={{ mt: 2, "& summary": { cursor: "pointer", fontWeight: 700 } }}
           >
-            <Box component="summary">{t("moreFilters")}</Box>
+            <Box component="summary">{filters("advanced")}</Box>
             <Box
               sx={{
                 display: "grid",
@@ -238,6 +205,36 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
                 pt: 2,
               }}
             >
+              <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
+                <Typography component="span" variant="body2">
+                  {t("category")}
+                </Typography>
+                <Box
+                  component="select"
+                  name="category"
+                  defaultValue={query.category}
+                  sx={controlStyle}
+                >
+                  <option value="">{t("allCategories")}</option>
+                  {content.categories.map((category) => (
+                    <option key={category.slug} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </Box>
+              </Box>
+              <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
+                <Typography component="span" variant="body2">
+                  {t("sort")}
+                </Typography>
+                <Box component="select" name="sort" defaultValue={query.sort} sx={controlStyle}>
+                  {MENU_SORTS.map((sort) => (
+                    <option key={sort} value={sort}>
+                      {t(`sortOptions.${sort}`)}
+                    </option>
+                  ))}
+                </Box>
+              </Box>
               <Box component="fieldset" sx={{ border: 0, p: 0, m: 0 }}>
                 <Typography component="legend" sx={{ fontWeight: 700, mb: 1 }}>
                   {t("availability")}
