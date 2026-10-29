@@ -223,6 +223,8 @@ describe("administrator manager", () => {
     await user.keyboard("Secure password 2026");
     const save = within(reopened).getByRole("button", { name: "Save" });
     await user.tab();
+    expect(within(reopened).getByRole("button", { name: "Show password" })).toHaveFocus();
+    await user.tab();
     expect(within(reopened).getByRole("button", { name: "Cancel" })).toHaveFocus();
     await user.tab();
     expect(save).toHaveFocus();
