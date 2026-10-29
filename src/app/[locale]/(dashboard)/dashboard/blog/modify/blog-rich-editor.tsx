@@ -4,12 +4,29 @@ import type { JSONContent } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import ToggleButton from "@mui/material/ToggleButton";
-import Tooltip from "@mui/material/Tooltip";
 import { useEffect } from "react";
 
-import type { RichTextDocument, StoredRichText } from "@/lib/rich-text";
+import { RichTextToolbar } from "@/components/ui/rich-text-toolbar";
+
+import {
+  sanitizeRichTextDocument,
+  type RichTextDocument,
+  type StoredRichText,
+} from "@/lib/rich-text";
+
+function storedDocument(node: JSONContent): RichTextDocument {
+  function clean(value: JSONContent): JSONContent {
+    const result = { ...value };
+    if (result.type === "orderedList") delete result.attrs;
+    if (result.marks)
+      result.marks = result.marks.map((mark) =>
+        mark.type === "link" ? { type: "link", attrs: { href: mark.attrs?.href } } : mark,
+      );
+    if (result.content) result.content = result.content.map(clean);
+    return result;
+  }
+  return sanitizeRichTextDocument(clean(node));
+}
 
 const EMPTY_DOCUMENT: RichTextDocument = { type: "doc", content: [] };
 
@@ -17,7 +34,6 @@ export function BlogRichEditor({
   value,
   onChange,
   labelledBy,
-  labels,
 }: {
   value: StoredRichText;
   onChange: (value: StoredRichText) => void;
@@ -44,101 +60,22 @@ export function BlogRichEditor({
     onUpdate: ({ editor: updated }) =>
       onChange({
         schemaVersion: 1,
-        document: updated.getJSON() as RichTextDocument,
+        document: storedDocument(updated.getJSON()),
       }),
   });
 
   useEffect(() => {
-    if (editor && JSON.stringify(editor.getJSON()) !== JSON.stringify(value.document)) {
+    if (
+      editor &&
+      JSON.stringify(storedDocument(editor.getJSON())) !== JSON.stringify(value.document)
+    ) {
       editor.commands.setContent(value.document as JSONContent, { emitUpdate: false });
     }
   }, [editor, value]);
 
   return (
     <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2, overflow: "hidden" }}>
-      <Stack
-        direction="row"
-        sx={{
-          p: 0.75,
-          gap: 0.5,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-          flexWrap: "wrap",
-        }}
-      >
-        <Tooltip title={labels.bold}>
-          <ToggleButton
-            size="small"
-            value="bold"
-            selected={editor?.isActive("bold") ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            aria-label={labels.bold}
-          >
-            <strong>B</strong>
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={labels.italic}>
-          <ToggleButton
-            size="small"
-            value="italic"
-            selected={editor?.isActive("italic") ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            aria-label={labels.italic}
-          >
-            <em>I</em>
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={labels.heading}>
-          <ToggleButton
-            size="small"
-            value="heading"
-            selected={editor?.isActive("heading", { level: 2 }) ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-            aria-label={labels.heading}
-          >
-            H2
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={labels.blockquote}>
-          <ToggleButton
-            size="small"
-            value="blockquote"
-            selected={editor?.isActive("blockquote") ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-            aria-label={labels.blockquote}
-          >
-            “ ”
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={labels.bulletList}>
-          <ToggleButton
-            size="small"
-            value="bullet"
-            selected={editor?.isActive("bulletList") ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            aria-label={labels.bulletList}
-          >
-            •
-          </ToggleButton>
-        </Tooltip>
-        <Tooltip title={labels.numberedList}>
-          <ToggleButton
-            size="small"
-            value="numbered"
-            selected={editor?.isActive("orderedList") ?? false}
-            disabled={!editor}
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            aria-label={labels.numberedList}
-          >
-            1.
-          </ToggleButton>
-        </Tooltip>
-      </Stack>
+      <RichTextToolbar editor={editor} />
       <Box
         sx={{
           p: 2,
