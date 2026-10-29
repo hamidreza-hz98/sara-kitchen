@@ -42,6 +42,24 @@ describe("dashboard aggregation", () => {
     await database?.stop();
   });
 
+  it("loads an empty dashboard before collections and indexes exist", async () => {
+    const fresh = new Mongoose();
+    await fresh.connect(database.uri, { dbName: "dashboard-empty", autoIndex: false });
+    try {
+      const result = await getDashboardAggregation(fresh.connection, owner, { asOf });
+      expect(result.totals).toMatchObject({
+        netSalesCents: 0,
+        ordersCreated: 0,
+        registeredCustomers: 0,
+        publishedDishes: 0,
+      });
+      expect(result.recentOrders).toEqual([]);
+      expect(result.recentActivity).toEqual([]);
+    } finally {
+      await fresh.disconnect();
+    }
+  });
+
   it("reconciles capture and refund periods, ranking, status counts and indexed sources", async () => {
     const customerId = new Types.ObjectId();
     const dishId = new Types.ObjectId();

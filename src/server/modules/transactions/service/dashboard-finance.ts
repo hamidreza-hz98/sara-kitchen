@@ -74,7 +74,7 @@ export async function readDashboardFinance(
   ];
   const rows = await getTransactionModel(connection)
     .aggregate<Row>(pipeline)
-    .hint("transaction_financial_event_period")
+
     .option({ maxTimeMS: 5_000 });
   const bucketMap = new Map<string, { grossCents: number; refundsCents: number }>();
   const customerMap = new Map<string, DashboardCustomerSpend>();

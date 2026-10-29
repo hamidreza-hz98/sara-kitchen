@@ -13,9 +13,7 @@ export async function readDashboardCustomers(
 ) {
   const Customer = getCustomerModel(connection);
   const [registered, records] = await Promise.all([
-    Customer.countDocuments({ createdAt: { $gte: period.start, $lt: period.end } }).hint(
-      "customer_registration_timeline",
-    ),
+    Customer.countDocuments({ createdAt: { $gte: period.start, $lt: period.end } }),
     includeNames && ids.length
       ? Customer.find(
           { _id: { $in: ids.slice(0, 5).map((id) => new Types.ObjectId(id)) } },

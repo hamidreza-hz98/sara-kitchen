@@ -25,7 +25,7 @@ export function countDashboardOrdersCreated(
 ): Promise<number> {
   return getOrderModel(connection)
     .countDocuments({ createdAt: { $gte: period.start, $lt: period.end } })
-    .hint("order_timeline")
+
     .exec();
 }
 
@@ -49,11 +49,11 @@ export async function readDashboardOrders(connection: Connection, period: Dashbo
     Order.aggregate<{ _id: OrderStatus; count: number }>([
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ])
-      .hint("order_status_timeline")
+
       .option({ maxTimeMS: 5_000 }),
     Order.find({}, { code: 1, status: 1, "pricing.totalCents": 1, createdAt: 1 })
       .sort({ createdAt: -1, _id: -1 })
-      .hint("order_timeline")
+
       .limit(8)
       .lean(),
     Order.aggregate<SoldRow>([
@@ -90,7 +90,7 @@ export async function readDashboardOrders(connection: Connection, period: Dashbo
         },
       },
     ] as PipelineStage[])
-      .hint("order_status_event_period")
+
       .option({ maxTimeMS: 5_000 }),
   ]);
   for (const row of statuses) statusCounts[row._id] = row.count;

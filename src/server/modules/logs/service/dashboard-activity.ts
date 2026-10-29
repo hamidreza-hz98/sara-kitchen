@@ -29,7 +29,7 @@ export async function readDashboardActivity(connection: Connection) {
       },
     )
     .sort({ occurredAt: -1, _id: -1 })
-    .hint("audit_logs_timeline")
+
     .limit(8)
     .lean<AuditLogReadRow[]>();
   return rows.map(mapAuditLogListItem);

@@ -16,16 +16,16 @@ export async function readDashboardDishes(
 ) {
   const Dish = getDishModel(connection);
   const [published, visited, viewCount] = await Promise.all([
-    Dish.countDocuments({ deletedAt: null, status: "published" }).hint("dish_popular_catalog"),
+    Dish.countDocuments({ deletedAt: null, status: "published" }),
     Dish.find({ deletedAt: null, status: "published" }, { slug: 1, translations: 1, viewCount: 1 })
       .sort({ viewCount: -1, _id: 1 })
-      .hint("dish_popular_catalog")
+
       .limit(5)
       .lean(),
     period.start.getTime() >= asOf.getTime() - 42 * 60 * 60_000
-      ? getDishViewReceiptModel(connection)
-          .countDocuments({ createdAt: { $gte: period.start, $lt: period.end } })
-          .hint("dish_view_receipt_period")
+      ? getDishViewReceiptModel(connection).countDocuments({
+          createdAt: { $gte: period.start, $lt: period.end },
+        })
       : Promise.resolve(null),
   ]);
   return {
