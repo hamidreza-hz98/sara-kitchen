@@ -12,7 +12,7 @@ import { createBlogRepository } from "@/server/modules/blogs";
 import { calculateDishPrice, createDishRepository } from "@/server/modules/dishes";
 import {
   createMediaReadRepository,
-  createMinioStorageProvider,
+  createMediaStorageProvider,
   getMediaDetail,
   resolveStorefrontMediaImage,
 } from "@/server/modules/media";
@@ -42,7 +42,7 @@ export const loadBlogDetailContent = cache(async function readBlogDetailContent(
   const translation = resolveTranslation(article.translations, locale)?.value;
   if (!translation) notFound();
   const content = sanitizeRichTextDocument(translation.content.document);
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const image = async (
     id: string | null,
     alt: string,
