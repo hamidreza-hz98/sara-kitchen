@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import AddPhotoAlternateRounded from "@mui/icons-material/AddPhotoAlternateRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
@@ -403,17 +405,7 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
       </Stack>
 
       <Paper sx={{ p: { xs: 3, md: 4 }, border: "1px solid", borderColor: "divider" }}>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "minmax(240px, 2fr) 1fr",
-              lg: "minmax(260px, 2fr) repeat(4, minmax(130px, 1fr)) auto",
-            },
-            gap: 2,
-          }}
-        >
+        <AdvancedFilters>
           <TextField
             aria-label={t("search")}
             label={t("search")}
@@ -508,6 +500,8 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
               <MenuItem value="usageCount:asc">{t("sorts.leastUsed")}</MenuItem>
             </Select>
           </FormControl>
+        </AdvancedFilters>
+        <Box sx={{ mt: 2 }}>
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <Tooltip title={t("refresh")}>
               <IconButton aria-label={t("refresh")} onClick={refresh}>
