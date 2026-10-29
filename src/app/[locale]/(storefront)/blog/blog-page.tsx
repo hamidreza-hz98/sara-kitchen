@@ -112,6 +112,7 @@ function ArticleCard({ article, view }: { article: BlogCard; view: BlogQuery["vi
 export function BlogIndexPage({ content, query }: { content: BlogIndexContent; query: BlogQuery }) {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("storefront.blog");
+  const filters = useTranslations("shared.filters");
   const featured =
     query.page === 1 && !query.search && query.sort === "newest" ? content.items.slice(0, 3) : [];
   const pages = Array.from(
@@ -204,7 +205,7 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "2fr 1fr auto" },
+              gridTemplateColumns: "minmax(0, 1fr) auto",
               gap: 2,
               alignItems: "end",
             }}
@@ -221,19 +222,27 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
                 sx={inputStyle}
               />
             </Box>
-            <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
-              <Typography component="span" variant="body2">
-                {t("sort")}
-              </Typography>
-              <Box component="select" name="sort" defaultValue={query.sort} sx={inputStyle}>
-                <option value="newest">{t("newest")}</option>
-                <option value="oldest">{t("oldest")}</option>
-                <option value="popular">{t("popular")}</option>
-              </Box>
-            </Box>
             <Button type="submit" variant="contained" sx={{ minHeight: 44 }}>
               {t("apply")}
             </Button>
+          </Box>
+          <Box
+            component="details"
+            sx={{ mt: 2, "& summary": { cursor: "pointer", fontWeight: 700 } }}
+          >
+            <Box component="summary">{filters("advanced")}</Box>
+            <Box sx={{ pt: 2, maxWidth: 300 }}>
+              <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
+                <Typography component="span" variant="body2">
+                  {t("sort")}
+                </Typography>
+                <Box component="select" name="sort" defaultValue={query.sort} sx={inputStyle}>
+                  <option value="newest">{t("newest")}</option>
+                  <option value="oldest">{t("oldest")}</option>
+                  <option value="popular">{t("popular")}</option>
+                </Box>
+              </Box>
+            </Box>
           </Box>
           {query.view !== "grid" && <input type="hidden" name="view" value={query.view} />}
         </Paper>
