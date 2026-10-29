@@ -1,5 +1,7 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -61,12 +63,11 @@ export function CustomerLoginForm() {
       }}
     >
       <TextField autoComplete="username" label={t("identifier")} name="identifier" required />
-      <TextField
+      <PasswordField
         autoComplete="current-password"
         label={t("password")}
         name="password"
         required
-        type="password"
       />
       <FormControlLabel control={<Checkbox name="persistent" />} label={t("persistent")} />
       <Link component={NextLink} href="/forgot-password">
