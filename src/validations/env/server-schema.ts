@@ -87,6 +87,7 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "MINIO_SECRET_KEY",
   "MINIO_BUCKET",
   "MINIO_REGION",
+  "MEDIA_STORAGE_PROVIDER",
   "KITCHEN_LATITUDE",
   "KITCHEN_LONGITUDE",
   "MBWAY_ENABLED",
@@ -135,26 +136,49 @@ export const serverEnvironmentSchema = z
         .regex(/^\+[1-9]\d{7,14}$/, "TWILIO_RESET_FROM_NUMBER must use E.164 format.")
         .optional(),
     ),
-    MINIO_ENDPOINT: requiredText("MINIO_ENDPOINT").refine(
-      (value) => !value.includes("://"),
-      "MINIO_ENDPOINT must be a hostname without http:// or https://.",
+    MINIO_ENDPOINT: z.preprocess(
+      emptyStringToUndefined,
+      requiredText("MINIO_ENDPOINT")
+        .refine(
+          (value) => !value.includes("://"),
+          "MINIO_ENDPOINT must be a hostname without http:// or https://.",
+        )
+        .optional(),
     ),
-    MINIO_PORT: z.coerce
-      .number({ error: "MINIO_PORT must be a number." })
-      .int("MINIO_PORT must be an integer.")
-      .min(1, "MINIO_PORT must be between 1 and 65535.")
-      .max(65_535, "MINIO_PORT must be between 1 and 65535."),
-    MINIO_USE_SSL: booleanString("MINIO_USE_SSL"),
-    MINIO_ACCESS_KEY: requiredText("MINIO_ACCESS_KEY").refine(
-      (value) => !placeholderPrefix.test(value),
-      "MINIO_ACCESS_KEY must be replaced with a real access key.",
+    MINIO_PORT: z.preprocess(
+      emptyStringToUndefined,
+      z.coerce
+        .number({ error: "MINIO_PORT must be a number." })
+        .int("MINIO_PORT must be an integer.")
+        .min(1, "MINIO_PORT must be between 1 and 65535.")
+        .max(65_535, "MINIO_PORT must be between 1 and 65535.")
+        .optional(),
     ),
-    MINIO_SECRET_KEY: requiredSecret("MINIO_SECRET_KEY", 8),
-    MINIO_BUCKET: requiredText("MINIO_BUCKET").regex(
-      /^(?!\d+\.\d+\.\d+\.\d+$)[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/,
-      "MINIO_BUCKET must be a valid 3-63 character S3 bucket name.",
+    MINIO_USE_SSL: z.preprocess(emptyStringToUndefined, booleanString("MINIO_USE_SSL").optional()),
+    MINIO_ACCESS_KEY: z.preprocess(
+      emptyStringToUndefined,
+      requiredText("MINIO_ACCESS_KEY")
+        .refine(
+          (value) => !placeholderPrefix.test(value),
+          "MINIO_ACCESS_KEY must be replaced with a real access key.",
+        )
+        .optional(),
     ),
-    MINIO_REGION: requiredText("MINIO_REGION"),
+    MINIO_SECRET_KEY: z.preprocess(
+      emptyStringToUndefined,
+      requiredSecret("MINIO_SECRET_KEY", 8).optional(),
+    ),
+    MINIO_BUCKET: z.preprocess(
+      emptyStringToUndefined,
+      requiredText("MINIO_BUCKET")
+        .regex(
+          /^(?!\d+\.\d+\.\d+\.\d+$)[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/,
+          "MINIO_BUCKET must be a valid 3-63 character S3 bucket name.",
+        )
+        .optional(),
+    ),
+    MINIO_REGION: optionalText("MINIO_REGION"),
+    MEDIA_STORAGE_PROVIDER: z.enum(["minio", "mongodb"]).default("minio"),
     KITCHEN_LATITUDE: requiredNumber("KITCHEN_LATITUDE")
       .min(-90, "KITCHEN_LATITUDE must be between -90 and 90.")
       .max(90, "KITCHEN_LATITUDE must be between -90 and 90."),
@@ -187,6 +211,24 @@ export const serverEnvironmentSchema = z
     ),
   })
   .superRefine((environment, context) => {
+    const minioFields = [
+      "MINIO_ENDPOINT",
+      "MINIO_PORT",
+      "MINIO_USE_SSL",
+      "MINIO_ACCESS_KEY",
+      "MINIO_SECRET_KEY",
+      "MINIO_BUCKET",
+      "MINIO_REGION",
+    ] as const;
+    if (
+      environment.MEDIA_STORAGE_PROVIDER === "minio" ||
+      minioFields.some((field) => environment[field] !== undefined)
+    ) {
+      for (const field of minioFields) {
+        if (environment[field] === undefined) addRequiredIssue(context, field, field);
+      }
+    }
+
     if (environment.AUTH_SESSION_SECRET === environment.AUTH_PASSWORD_RESET_SECRET) {
       context.addIssue({
         code: "custom",
@@ -266,4 +308,37 @@ export function parseServerEnvironment(source: unknown): ServerEnvironment {
   }
 
   return Object.freeze(result.data);
+}
+
+/** Require complete MinIO configuration before accessing a MinIO object. */
+export function getMinioConfiguration(env: ServerEnvironment) {
+  const {
+    MINIO_ENDPOINT,
+    MINIO_PORT,
+    MINIO_USE_SSL,
+    MINIO_ACCESS_KEY,
+    MINIO_SECRET_KEY,
+    MINIO_BUCKET,
+    MINIO_REGION,
+  } = env;
+  if (
+    MINIO_ENDPOINT === undefined ||
+    MINIO_PORT === undefined ||
+    MINIO_USE_SSL === undefined ||
+    MINIO_ACCESS_KEY === undefined ||
+    MINIO_SECRET_KEY === undefined ||
+    MINIO_BUCKET === undefined ||
+    MINIO_REGION === undefined
+  ) {
+    throw new Error("MinIO storage is not configured.");
+  }
+  return {
+    endpoint: MINIO_ENDPOINT,
+    port: MINIO_PORT,
+    useSSL: MINIO_USE_SSL,
+    accessKey: MINIO_ACCESS_KEY,
+    secretKey: MINIO_SECRET_KEY,
+    bucket: MINIO_BUCKET,
+    region: MINIO_REGION,
+  };
 }

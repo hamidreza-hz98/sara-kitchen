@@ -86,6 +86,27 @@ describe("environment validation", () => {
     ).toThrowError(/SENTRY_AUTH_TOKEN is required when the integration is enabled/);
   });
 
+  it("requires MinIO only when selected or configured", () => {
+    const mongoEnvironment = {
+      ...validEnvironment,
+      MEDIA_STORAGE_PROVIDER: "mongodb",
+      MINIO_ENDPOINT: "",
+      MINIO_PORT: "",
+      MINIO_USE_SSL: "",
+      MINIO_ACCESS_KEY: "",
+      MINIO_SECRET_KEY: "",
+      MINIO_BUCKET: "",
+      MINIO_REGION: "",
+    };
+    expect(validateEnvironment(mongoEnvironment).server.MEDIA_STORAGE_PROVIDER).toBe("mongodb");
+    expect(() =>
+      validateEnvironment({ ...mongoEnvironment, MEDIA_STORAGE_PROVIDER: "minio" }),
+    ).toThrowError(/MINIO_ENDPOINT/);
+    expect(() =>
+      validateEnvironment({ ...mongoEnvironment, MINIO_ENDPOINT: "localhost" }),
+    ).toThrowError(/MINIO_PORT/);
+  });
+
   it("rejects unknown browser-exposed variables", () => {
     expect(() =>
       validateEnvironment({

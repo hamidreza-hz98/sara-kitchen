@@ -6,16 +6,20 @@ import { validateEnvironment } from "./src/server/environment-core";
 import { createSecurityHeaders } from "./src/server/security/response-headers";
 
 const environment = validateEnvironment();
-const minioProtocol = environment.server.MINIO_USE_SSL ? "https" : "http";
-const mediaOrigin = new URL(
-  `${minioProtocol}://${environment.server.MINIO_ENDPOINT}:${environment.server.MINIO_PORT}`,
-).origin;
+const mediaOrigin =
+  environment.server.MINIO_ENDPOINT &&
+  environment.server.MINIO_PORT &&
+  environment.server.MINIO_USE_SSL !== undefined
+    ? new URL(
+        `${environment.server.MINIO_USE_SSL ? "https" : "http"}://${environment.server.MINIO_ENDPOINT}:${environment.server.MINIO_PORT}`,
+      ).origin
+    : undefined;
 const monitoringOrigin = environment.client.NEXT_PUBLIC_SENTRY_DSN
   ? new URL(environment.client.NEXT_PUBLIC_SENTRY_DSN).origin
   : undefined;
 const securityHeaders = createSecurityHeaders({
   production: process.env.NODE_ENV === "production",
-  mediaOrigin,
+  ...(mediaOrigin ? { mediaOrigin } : {}),
   ...(monitoringOrigin ? { monitoringOrigin } : {}),
 });
 
