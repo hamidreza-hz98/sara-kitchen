@@ -1,5 +1,9 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
+import { PasswordField } from "@/components/ui/password-field";
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import BlockRounded from "@mui/icons-material/BlockRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
@@ -465,7 +469,7 @@ export function AdminManager({
         </Stack>
       </Stack>
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
+        <AdvancedFilters>
           <TextField
             fullWidth
             value={draftSearch}
@@ -525,7 +529,7 @@ export function AdminManager({
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
       {error ? (
         <ErrorState
@@ -711,8 +715,7 @@ export function AdminManager({
               </Select>
             </FormControl>
             {editing === "new" && (
-              <TextField
-                type="password"
+              <PasswordField
                 label={t("password")}
                 value={form.password}
                 error={attempted && form.password.length < 12}
@@ -780,10 +783,9 @@ export function AdminManager({
           void resetCredential().catch(() => undefined);
         }}
       >
-        <TextField
+        <PasswordField
           fullWidth
           autoFocus
-          type="password"
           label={t("newPassword")}
           value={newPassword}
           error={newPassword.length > 0 && newPassword.length < 12}
