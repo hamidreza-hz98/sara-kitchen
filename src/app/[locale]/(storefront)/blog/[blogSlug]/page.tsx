@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 
 import { isSupportedLocale } from "@/constants";
@@ -15,6 +16,7 @@ import { BlogDetailPage } from "./blog-detail-page";
 type BlogPageProps = Readonly<{ params: Promise<{ locale: string; blogSlug: string }> }>;
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+  await connection();
   const { locale, blogSlug } = await params;
   if (!isSupportedLocale(locale)) return {};
   const article = await loadBlogDetailContent(blogSlug, locale);
