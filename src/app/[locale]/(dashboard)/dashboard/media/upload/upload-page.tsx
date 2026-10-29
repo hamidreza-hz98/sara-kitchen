@@ -1,5 +1,7 @@
 "use client";
 
+import { normalizeMediaFilename } from "@/lib/media-filename";
+
 import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import CloudUploadRounded from "@mui/icons-material/CloudUploadRounded";
@@ -61,7 +63,8 @@ const accept = ".jpg,.jpeg,.png,.webp,.avif";
 const locales = ["en", "pt-PT", "fa"] as const;
 
 function initialAlt(file: File): string {
-  return file.name.slice(0, file.name.lastIndexOf(".")).replaceAll(/[_-]+/gu, " ").trim();
+  const name = normalizeMediaFilename(file.name, file.type);
+  return name.slice(0, name.lastIndexOf(".")).replaceAll(/[_-]+/gu, " ").trim() || "Image";
 }
 
 function errorCode(error: string): UploadPageError {

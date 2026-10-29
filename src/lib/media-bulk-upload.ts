@@ -4,7 +4,7 @@ import { fetchCsrfToken } from "./csrf-client";
 
 export const MEDIA_BULK_UPLOAD_POLICY = {
   maxFiles: 10,
-  defaultConcurrency: 2,
+  defaultConcurrency: 1,
   maxConcurrency: 3,
   maxRetries: 2,
   retryBaseDelayMs: 250,
