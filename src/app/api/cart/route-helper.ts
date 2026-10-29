@@ -39,7 +39,7 @@ import {
   loadDishCartSources,
 } from "@/server/modules/dishes";
 import { createIngredientAllergenCatalog } from "@/server/modules/ingredients";
-import { createMinioStorageProvider, resolveSeoMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveSeoMediaImage } from "@/server/modules/media";
 
 const GUEST_CART_COOKIE_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 const PORTO_DELIVERY_BANDS = Object.freeze([
@@ -163,7 +163,7 @@ export async function cartClientProjection(
     issues.push(issue.code);
     issuesById.set(issue.dishId, issues);
   }
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const imageEntries = await Promise.all(
     presentations.map(async (item) => {
       if (!item.imageMediaId) return [item.id, null] as const;
@@ -240,7 +240,7 @@ export async function cartRecommendationProjection(
     }),
   });
   const result = await load({ currentDishIds: dishIds, locale, limit: 4 });
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const items = await Promise.all(
     result.items.map(async (item) => {
       const mediaId = item.mediaIds[0];
