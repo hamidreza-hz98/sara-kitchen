@@ -28,7 +28,7 @@ export function createContactAuditSink(
         snapshot: { displayName: null, role: null },
       },
       resource: {
-        kind: "contact_submission",
+        kind: "contact-submission",
         ref: event.contactId,
         snapshot: { code: null, label: null, status: null },
       },
