@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { PROJECT_NAME, type SupportedLocale } from "@/constants";
 import { connectToDatabase } from "@/server/database";
 import { getApplicationSiteUrl } from "@/server/environment";
-import { createMinioStorageProvider, resolveSeoMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveSeoMediaImage } from "@/server/modules/media";
 import { createApplicationLogger } from "@/server/observability";
 import {
   createFallbackNextMetadata,
@@ -48,7 +48,7 @@ async function resolveImage(
   const connection = await connectToDatabase();
   return resolveSeoMediaImage(
     connection,
-    createMinioStorageProvider(),
+    createMediaStorageProvider(),
     record.shareImageMediaId,
     locale,
   );
