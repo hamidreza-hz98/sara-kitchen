@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
 import ArticleRounded from "@mui/icons-material/ArticleRounded";
@@ -428,7 +430,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
       </Stack>
 
       <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2, flexWrap: "wrap" }}>
+        <AdvancedFilters>
           <TextField
             label={t("search")}
             value={draft ?? search}
@@ -476,7 +478,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
 
       {loading ? (
