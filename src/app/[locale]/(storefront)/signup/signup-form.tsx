@@ -1,5 +1,7 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -78,14 +80,13 @@ export function CustomerSignupForm() {
       </Stack>
       <TextField autoComplete="tel" label={t("mobile")} name="mobile" required type="tel" />
       <TextField autoComplete="email" label={t("email")} name="email" type="email" />
-      <TextField
+      <PasswordField
         autoComplete="new-password"
         helperText={t("passwordHint")}
         slotProps={{ htmlInput: { minLength: 15 } }}
         label={t("password")}
         name="password"
         required
-        type="password"
       />
       <FormControlLabel control={<Checkbox name="termsAccepted" required />} label={t("terms")} />
       <FormControlLabel control={<Checkbox name="marketingConsent" />} label={t("marketing")} />
