@@ -8,7 +8,7 @@ import { connectToDatabase } from "@/server/database";
 import { createCategoryRepository } from "@/server/modules/categories";
 import { createDishCatalogRepository, createDishCatalogService } from "@/server/modules/dishes";
 import { createIngredientAllergenCatalog } from "@/server/modules/ingredients";
-import { createMinioStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
 
 import { MENU_PAGE_SIZE, type MenuQuery } from "./menu-query";
 
@@ -70,7 +70,7 @@ export async function loadMenuContent(
             resolveTranslation(selectedCategory.translations, locale)?.value.description ?? "",
         }
       : null);
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const image = async (id: string | null, alt: string, size: "display" | "thumbnail") => {
     if (!id) return null;
     try {
