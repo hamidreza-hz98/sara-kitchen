@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
@@ -367,98 +369,102 @@ export function OrderList({ capabilities }: { capabilities: Capabilities }) {
             />
           ))}
         </Tabs>
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ p: 3, flexWrap: "wrap" }}>
-          <FormControl size="small" sx={{ minWidth: 135 }}>
-            <InputLabel id="order-search-mode">{t("searchMode")}</InputLabel>
-            <Select
-              labelId="order-search-mode"
-              label={t("searchMode")}
-              value={searchMode}
-              onChange={(event) =>
-                replaceQuery({ searchMode: event.target.value, search: null, page: 1 })
-              }
-            >
-              <MenuItem value="code">{t("code")}</MenuItem>
-              {capabilities.readSensitive ? (
-                <MenuItem value="customer">{t("customer")}</MenuItem>
-              ) : null}
-              {capabilities.readSensitive ? (
-                <MenuItem value="mobile">{t("mobile")}</MenuItem>
-              ) : null}
-            </Select>
-          </FormControl>
-          <TextField
-            size="small"
-            label={t("search")}
-            value={searchDraft ?? search}
-            onChange={(event) => setSearchDraft(event.target.value)}
-            slotProps={{
-              input: { startAdornment: <SearchRounded sx={{ mr: 1, color: "text.secondary" }} /> },
-            }}
-            sx={{ minWidth: { xs: "100%", md: 210 }, flex: 1 }}
-          />
-          <TextField
-            size="small"
-            type="date"
-            label={t("from")}
-            value={from}
-            onChange={(event) => replaceQuery({ from: event.target.value || null, page: 1 })}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-          <TextField
-            size="small"
-            type="date"
-            label={t("to")}
-            value={to}
-            onChange={(event) => replaceQuery({ to: event.target.value || null, page: 1 })}
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-          <FormControl size="small" sx={{ minWidth: 155 }}>
-            <InputLabel id="order-payment-filter">{t("payment")}</InputLabel>
-            <Select
-              labelId="order-payment-filter"
-              label={t("payment")}
-              value={payment}
-              onChange={(event) =>
-                replaceQuery({ paymentStatus: event.target.value || null, page: 1 })
-              }
-            >
-              <MenuItem value="">{t("allPayments")}</MenuItem>
-              {PAYMENTS.map((entry) => (
-                <MenuItem key={entry} value={entry}>
-                  {t(`payments.${entry}`)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 155 }}>
-            <InputLabel id="order-sort">{t("sort")}</InputLabel>
-            <Select
-              labelId="order-sort"
-              label={t("sort")}
-              value={sort}
-              onChange={(event) => replaceQuery({ sort: event.target.value, page: 1 })}
-            >
-              {SORTS.map((entry) => (
-                <MenuItem key={entry} value={entry}>
-                  {t(
-                    (
-                      {
-                        "createdAt:desc": "newest",
-                        "createdAt:asc": "oldest",
-                        "code:asc": "codeAsc",
-                        "code:desc": "codeDesc",
-                        "totalCents:asc": "amountAsc",
-                        "totalCents:desc": "amountDesc",
-                      } as const
-                    )[entry],
-                  )}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button onClick={resetFilters}>{t("clear")}</Button>
-        </Stack>
+        <Box sx={{ p: 3 }}>
+          <AdvancedFilters>
+            <TextField
+              size="small"
+              label={t("search")}
+              value={searchDraft ?? search}
+              onChange={(event) => setSearchDraft(event.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: <SearchRounded sx={{ mr: 1, color: "text.secondary" }} />,
+                },
+              }}
+              sx={{ minWidth: { xs: "100%", md: 210 }, flex: 1 }}
+            />
+            <FormControl size="small" sx={{ minWidth: 135 }}>
+              <InputLabel id="order-search-mode">{t("searchMode")}</InputLabel>
+              <Select
+                labelId="order-search-mode"
+                label={t("searchMode")}
+                value={searchMode}
+                onChange={(event) =>
+                  replaceQuery({ searchMode: event.target.value, search: null, page: 1 })
+                }
+              >
+                <MenuItem value="code">{t("code")}</MenuItem>
+                {capabilities.readSensitive ? (
+                  <MenuItem value="customer">{t("customer")}</MenuItem>
+                ) : null}
+                {capabilities.readSensitive ? (
+                  <MenuItem value="mobile">{t("mobile")}</MenuItem>
+                ) : null}
+              </Select>
+            </FormControl>
+            <TextField
+              size="small"
+              type="date"
+              label={t("from")}
+              value={from}
+              onChange={(event) => replaceQuery({ from: event.target.value || null, page: 1 })}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+            <TextField
+              size="small"
+              type="date"
+              label={t("to")}
+              value={to}
+              onChange={(event) => replaceQuery({ to: event.target.value || null, page: 1 })}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+            <FormControl size="small" sx={{ minWidth: 155 }}>
+              <InputLabel id="order-payment-filter">{t("payment")}</InputLabel>
+              <Select
+                labelId="order-payment-filter"
+                label={t("payment")}
+                value={payment}
+                onChange={(event) =>
+                  replaceQuery({ paymentStatus: event.target.value || null, page: 1 })
+                }
+              >
+                <MenuItem value="">{t("allPayments")}</MenuItem>
+                {PAYMENTS.map((entry) => (
+                  <MenuItem key={entry} value={entry}>
+                    {t(`payments.${entry}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ minWidth: 155 }}>
+              <InputLabel id="order-sort">{t("sort")}</InputLabel>
+              <Select
+                labelId="order-sort"
+                label={t("sort")}
+                value={sort}
+                onChange={(event) => replaceQuery({ sort: event.target.value, page: 1 })}
+              >
+                {SORTS.map((entry) => (
+                  <MenuItem key={entry} value={entry}>
+                    {t(
+                      (
+                        {
+                          "createdAt:desc": "newest",
+                          "createdAt:asc": "oldest",
+                          "code:asc": "codeAsc",
+                          "code:desc": "codeDesc",
+                          "totalCents:asc": "amountAsc",
+                          "totalCents:desc": "amountDesc",
+                        } as const
+                      )[entry],
+                    )}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button onClick={resetFilters}>{t("clear")}</Button>
+          </AdvancedFilters>
+        </Box>
       </Paper>
 
       {error ? (
