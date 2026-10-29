@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -19,6 +20,7 @@ type MenuPageProps = Readonly<{
 }>;
 
 export async function generateMetadata({ params }: MenuPageProps): Promise<Metadata> {
+  await connection();
   const { locale } = await params;
   if (!isSupportedLocale(locale)) return {};
   const t = await getTranslations({ locale, namespace: "storefront.menu" });
