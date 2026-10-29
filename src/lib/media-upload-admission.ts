@@ -1,3 +1,5 @@
+import { normalizeMediaFilename } from "./media-filename";
+
 export const MEDIA_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
 export const MEDIA_UPLOAD_MAX_FILES = 10;
 
@@ -14,14 +16,8 @@ export type MediaUploadAdmissionError =
 
 /** Fast browser checks; the Route Handler remains authoritative for bytes and signatures. */
 export function mediaUploadAdmission(file: File): MediaUploadAdmissionError | null {
-  if (
-    new TextEncoder().encode(file.name).length > 180 ||
-    file.name !== file.name.normalize("NFC") ||
-    !/^[\p{L}\p{N}][\p{L}\p{N} _-]*\.[a-zA-Z0-9]+$/u.test(file.name)
-  ) {
-    return "invalid_name";
-  }
-  const extension = file.name.slice(file.name.lastIndexOf(".") + 1).toLowerCase();
+  const name = normalizeMediaFilename(file.name, file.type);
+  const extension = name.slice(name.lastIndexOf(".") + 1).toLowerCase();
   if (!(extension in formats)) return "unsupported_type";
   if (file.size === 0) return "empty_file";
   if (file.size > MEDIA_UPLOAD_MAX_BYTES) return "file_too_large";

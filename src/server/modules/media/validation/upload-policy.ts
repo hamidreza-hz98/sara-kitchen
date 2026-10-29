@@ -1,3 +1,5 @@
+import { normalizeMediaFilename } from "@/lib/media-filename";
+
 import type { MediaKind } from "./media-metadata";
 
 const MiB = 1024 * 1024;
@@ -128,7 +130,8 @@ function extensionOf(name: string): UploadExtension {
 }
 
 export async function inspectUpload(candidate: UploadCandidate): Promise<InspectedUpload> {
-  const extension = extensionOf(candidate.name);
+  const name = normalizeMediaFilename(candidate.name, candidate.blob.type);
+  const extension = extensionOf(name);
   const format = UPLOAD_POLICY.formats[extension];
   const bytes = candidate.blob.size;
   if (bytes === 0) throw new UploadPolicyError("empty_file");
@@ -143,7 +146,7 @@ export async function inspectUpload(candidate: UploadCandidate): Promise<Inspect
   if (!hasSignature(extension, new Uint8Array(head), new Uint8Array(tail))) {
     throw new UploadPolicyError("invalid_signature");
   }
-  return { name: candidate.name, extension, mimeType: format.mimeType, kind: format.kind, bytes };
+  return { name, extension, mimeType: format.mimeType, kind: format.kind, bytes };
 }
 
 export async function inspectUploadBatch(

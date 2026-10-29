@@ -11,9 +11,9 @@ function file(name: string, type = "image/png", size = 1): File {
 }
 
 describe("media upload browser admission", () => {
-  it("accepts supported images and detects mismatched MIME types", () => {
+  it("accepts supported images and normalizes filenames", () => {
     expect(mediaUploadAdmission(file("sara-kitchen.png"))).toBeNull();
-    expect(mediaUploadAdmission(file("sara-kitchen.jpg", "image/png"))).toBe("type_mismatch");
+    expect(mediaUploadAdmission(file("sara-kitchen.jpg", "image/png"))).toBeNull();
   });
 
   it("rejects empty, oversized, unsupported, and double-extension files", () => {
@@ -22,7 +22,7 @@ describe("media upload browser admission", () => {
       "file_too_large",
     );
     expect(mediaUploadAdmission(file("video.mp4", "video/mp4"))).toBe("unsupported_type");
-    expect(mediaUploadAdmission(file("invoice.pdf.png"))).toBe("invalid_name");
+    expect(mediaUploadAdmission(file("invoice.pdf.png"))).toBeNull();
   });
 
   it("uses stable selection fingerprints", () => {

@@ -27,7 +27,7 @@ describe("media upload policy", () => {
     ["menu.pdf", pdf, "application/pdf", "pdf"],
   ] as const)("accepts %s with matching MIME and signature", async (name, data, type, kind) => {
     await expect(inspectUpload({ name, blob: blob(data, type) })).resolves.toMatchObject({
-      name,
+      name: name === "meal.jpeg" ? "meal.jpg" : name,
       mimeType: type,
       kind,
       bytes: data.length,
@@ -35,20 +35,26 @@ describe("media upload policy", () => {
   });
 
   it.each([
-    ["meal.php.jpg", jpeg, "image/jpeg", "invalid_name"],
-    ["meal.jpg.exe", jpeg, "image/jpeg", "invalid_name"],
-    ["../meal.jpg", jpeg, "image/jpeg", "invalid_name"],
-    ["meal%00.jpg", jpeg, "image/jpeg", "invalid_name"],
-    ["meal\u202Ejpg.png", png, "image/png", "invalid_name"],
     ["meal.svg", ascii("<svg></svg>"), "image/svg+xml", "unsupported_type"],
     ["meal.jpg", pdf, "image/jpeg", "invalid_signature"],
-    ["meal.jpg", jpeg, "application/pdf", "type_mismatch"],
     ["meal.pdf", ascii("%PDF-1.7\nwithout trailer"), "application/pdf", "invalid_signature"],
     ["meal.webp", ascii("RIFFxxxxNOTW"), "image/webp", "invalid_signature"],
     ["meal.mp4", avif, "video/mp4", "invalid_signature"],
     ["meal.jpg", new Uint8Array(), "image/jpeg", "empty_file"],
   ] as const)("rejects unsafe fixture %s (%s)", async (name, data, type, code) => {
     await expect(inspectUpload({ name, blob: blob(data, type) })).rejects.toMatchObject({ code });
+  });
+
+  it("normalizes unusual and long names while checking the file signature", async () => {
+    await expect(
+      inspectUpload({ name: "../A meal (1).png", blob: blob(png, "image/png") }),
+    ).resolves.toMatchObject({ name: "A-meal-1.png" });
+    await expect(
+      inspectUpload({ name: "x".repeat(500), blob: blob(png, "image/png") }),
+    ).resolves.toMatchObject({ extension: "png" });
+    await expect(
+      inspectUpload({ name: "image.jpg", blob: blob(jpeg, "application/pdf") }),
+    ).rejects.toMatchObject({ code: "invalid_signature" });
   });
 
   it("enforces actual Blob size rather than trusting a declared byte count", async () => {
