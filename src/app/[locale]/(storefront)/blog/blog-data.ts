@@ -4,7 +4,7 @@ import type { SupportedLocale } from "@/constants";
 import { resolveLocalizedValue } from "@/locales/translation-selection";
 import { connectToDatabase } from "@/server/database";
 import { createBlogRepository } from "@/server/modules/blogs";
-import { createMinioStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
 
 import { BLOG_PAGE_SIZE, type BlogQuery } from "./blog-query";
 
@@ -37,7 +37,7 @@ export async function loadBlogIndex(
     sortBy: query.sort === "popular" ? "viewCount" : "publishedAt",
     sortDirection: query.sort === "oldest" ? "asc" : "desc",
   });
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const items = await Promise.all(
     result.items.map(async (item) => {
       const title = resolveLocalizedValue(item.translations, "title", locale)?.value ?? item.slug;
