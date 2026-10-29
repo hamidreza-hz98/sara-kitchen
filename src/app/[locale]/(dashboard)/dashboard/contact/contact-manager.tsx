@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import ArchiveOutlined from "@mui/icons-material/ArchiveOutlined";
 import AssignmentIndOutlined from "@mui/icons-material/AssignmentIndOutlined";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
@@ -376,7 +378,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
       </Stack>
 
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Stack spacing={2}>
+        <AdvancedFilters>
           <TextField
             fullWidth
             value={draftSearch}
@@ -392,7 +394,11 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
               },
             }}
           />
-          <Stack direction="row" sx={{ gap: 1, flexWrap: "wrap" }} aria-label={t("statusFilter")}>
+          <Stack
+            direction="row"
+            sx={{ gap: 1, overflowX: "auto", whiteSpace: "nowrap" }}
+            aria-label={t("statusFilter")}
+          >
             <Button
               size="small"
               variant={status === "" ? "contained" : "outlined"}
@@ -411,7 +417,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
               </Button>
             ))}
           </Stack>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
 
       {error ? (
