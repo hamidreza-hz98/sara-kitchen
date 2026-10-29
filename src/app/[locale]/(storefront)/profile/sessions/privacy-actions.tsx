@@ -1,5 +1,7 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -7,7 +9,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
@@ -108,12 +109,11 @@ export function PrivacyActions() {
           {t("exportTitle")}
         </Typography>
         <Typography color="text.secondary">{t("exportDescription")}</Typography>
-        <TextField
+        <PasswordField
           autoComplete="current-password"
           label={t("currentPassword")}
           onChange={(event) => setExportPassword(event.target.value)}
           required
-          type="password"
           value={exportPassword}
         />
         <Button disabled={busy !== null} type="submit" variant="outlined">
@@ -144,11 +144,10 @@ export function PrivacyActions() {
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
             <Typography>{t("confirmDescription")}</Typography>
-            <TextField
+            <PasswordField
               autoComplete="current-password"
               label={t("currentPassword")}
               onChange={(event) => setDeletePassword(event.target.value)}
-              type="password"
               value={deletePassword}
             />
             {notice && notice !== "exported" && (
