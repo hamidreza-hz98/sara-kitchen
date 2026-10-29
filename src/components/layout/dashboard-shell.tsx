@@ -9,7 +9,7 @@ import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import ContactMailRounded from "@mui/icons-material/ContactMailRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import ImageRounded from "@mui/icons-material/ImageRounded";
-import LocalDiningRounded from "@mui/icons-material/LocalDiningRounded";
+import EggAltRounded from "@mui/icons-material/EggAltRounded";
 import MenuRounded from "@mui/icons-material/MenuRounded";
 import PeopleRounded from "@mui/icons-material/PeopleRounded";
 import PaymentsRounded from "@mui/icons-material/PaymentsRounded";
@@ -80,7 +80,7 @@ const itemIcons = {
   overview: <AssessmentRounded />,
   categories: <CategoryRounded />,
   dishes: <RestaurantMenuRounded />,
-  ingredients: <LocalDiningRounded />,
+  ingredients: <EggAltRounded />,
   media: <ImageRounded />,
   blogs: <ArticleRounded />,
   customers: <PeopleRounded />,
@@ -125,13 +125,25 @@ function NavigationList({
     <Box
       aria-label={shell("navigation")}
       component="nav"
-      sx={{ flexGrow: 1, overflowY: "auto", p: 3 }}
+      sx={{
+        flexGrow: 1,
+        minHeight: 0,
+        overflowY: "auto",
+        p: 2,
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(120, 120, 120, 0.45) transparent",
+        "&::-webkit-scrollbar": { width: 6 },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "rgba(120, 120, 120, 0.45)",
+          borderRadius: 8,
+        },
+      }}
     >
       {sections.map((section) => {
         const sectionItems = items.filter((item) => item.section === section);
         if (sectionItems.length === 0) return null;
         return (
-          <Box key={section} sx={{ mb: 5 }}>
+          <Box key={section} sx={{ mb: 3 }}>
             {collapsed && !mobile ? null : (
               <Typography
                 color="text.secondary"
@@ -160,7 +172,7 @@ function NavigationList({
                     onClick={() => onNavigate?.()}
                     selected={active}
                     sx={{
-                      minHeight: 44,
+                      minHeight: 40,
                       mb: 0.5,
                       px: collapsed && !mobile ? 2 : 3,
                       borderRadius: 3,
@@ -263,6 +275,15 @@ export function DashboardShell({
     <Box sx={{ display: "flex", minHeight: "100dvh", bgcolor: "background.default" }}>
       <SkipLink label={shell("skipToContent")} targetId="dashboard-main-content" />
       <Box
+        aria-hidden="true"
+        sx={{
+          display: { xs: "none", lg: "block" },
+          width: collapsed ? collapsedWidth : sidebarWidth,
+          flexShrink: 0,
+          transition: "width 200ms ease",
+        }}
+      />
+      <Box
         aria-label={shell("sidebar")}
         component="aside"
         sx={{
@@ -270,9 +291,11 @@ export function DashboardShell({
           flexDirection: "column",
           width: collapsed ? collapsedWidth : sidebarWidth,
           flexShrink: 0,
-          position: "sticky",
+          position: "fixed",
+          insetInlineStart: 0,
           top: 0,
           height: "100dvh",
+          zIndex: 1100,
           borderInlineEnd: "1px solid",
           borderColor: "divider",
           bgcolor: "background.paper",
@@ -285,7 +308,7 @@ export function DashboardShell({
             display: "flex",
             alignItems: "center",
             gap: 2,
-            minHeight: 80,
+            minHeight: 64,
             px: collapsed ? 2 : 4,
             borderBlockEnd: "1px solid",
             borderColor: "divider",
@@ -347,8 +370,8 @@ export function DashboardShell({
         >
           <Box
             sx={{
-              minHeight: 72,
-              px: { xs: 4, md: 6 },
+              minHeight: 60,
+              px: { xs: 3, md: 4 },
               display: "flex",
               alignItems: "center",
               gap: 3,
@@ -425,11 +448,27 @@ export function DashboardShell({
             width: "100%",
             maxWidth: 1600,
             mx: "auto",
-            p: { xs: 4, md: 6, xl: 8 },
+            p: { xs: 3, md: 4, xl: 5 },
             flexGrow: 1,
+            "& .MuiButton-root": {
+              minHeight: { xs: 44, md: 36 },
+              px: { md: 2 },
+              fontSize: { md: "0.8125rem" },
+            },
+            "& .MuiOutlinedInput-root": {
+              minHeight: { xs: 44, md: 38 },
+              fontSize: { md: "0.875rem" },
+            },
+            "& .MuiOutlinedInput-input": { py: { md: 1 } },
+            "& .MuiTableCell-root": {
+              py: { md: 1 },
+              px: { md: 1.5 },
+              fontSize: { md: "0.8125rem" },
+            },
+            "& .MuiCardContent-root": { p: { md: 3 }, "&:last-child": { pb: { md: 3 } } },
           }}
         >
-          <Breadcrumbs aria-label={shell("breadcrumbs")} sx={{ mb: 4 }}>
+          <Breadcrumbs aria-label={shell("breadcrumbs")} sx={{ mb: 3, fontSize: "0.875rem" }}>
             <Typography
               component={NextLink}
               href={basePath}

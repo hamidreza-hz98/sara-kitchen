@@ -44,6 +44,22 @@ for (const viewport of [
   });
 }
 
+test("desktop sidebar stays visible while the page scrolls", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 700 });
+  await page.goto(preview);
+  const sidebar = page.getByRole("complementary", { name: "Dashboard sidebar" });
+  const initial = await sidebar.boundingBox();
+  await page.getByRole("main").evaluate((main) => {
+    const spacer = document.createElement("div");
+    spacer.style.height = "2000px";
+    main.appendChild(spacer);
+  });
+  await page.evaluate(() => window.scrollTo(0, 800));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  const scrolled = await sidebar.boundingBox();
+  expect(scrolled?.y).toBe(initial?.y);
+});
+
 test("sidebar collapse persists after refresh and deep links retain active entries and breadcrumbs", async ({
   page,
 }) => {
