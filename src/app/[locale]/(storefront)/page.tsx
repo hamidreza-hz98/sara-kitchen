@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { getTranslations } from "next-intl/server";
 
 import { isSupportedLocale } from "@/constants";
@@ -10,6 +11,7 @@ import { loadHomeContent } from "./home-data";
 type HomePageProps = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: HomePageProps): Promise<Metadata> {
+  await connection();
   const { locale } = await params;
   if (!isSupportedLocale(locale)) return {};
   const translations = await getTranslations({ locale, namespace: "storefront.metadata" });
