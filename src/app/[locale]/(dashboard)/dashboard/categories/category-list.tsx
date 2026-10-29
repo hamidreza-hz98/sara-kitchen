@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import CategoryRounded from "@mui/icons-material/CategoryRounded";
 import EditRounded from "@mui/icons-material/EditRounded";
@@ -283,7 +285,7 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
         </Stack>
       </Stack>
       <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
+        <AdvancedFilters>
           <TextField
             label={t("search")}
             value={draft ?? search}
@@ -329,7 +331,7 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
       {loading ? (
         <Paper aria-label={t("loading")} sx={{ p: 3 }}>
