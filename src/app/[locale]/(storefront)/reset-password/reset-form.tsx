@@ -1,10 +1,11 @@
 "use client";
 
+import { PasswordField } from "@/components/ui/password-field";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -73,7 +74,7 @@ export function ResetPasswordForm() {
         submit(event).catch(() => setResult("error"));
       }}
     >
-      <TextField
+      <PasswordField
         autoComplete="new-password"
         disabled={!token || result === "success"}
         helperText={t("passwordHint")}
@@ -81,15 +82,13 @@ export function ResetPasswordForm() {
         name="newPassword"
         required
         slotProps={{ htmlInput: { minLength: 15 } }}
-        type="password"
       />
-      <TextField
+      <PasswordField
         autoComplete="new-password"
         disabled={!token || result === "success"}
         label={t("confirmPassword")}
         name="confirmPassword"
         required
-        type="password"
       />
       {result && (
         <Alert role="status" severity={result === "success" ? "success" : "error"}>
