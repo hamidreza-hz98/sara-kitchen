@@ -7,8 +7,8 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 
-import { AppLink } from "@/components/ui";
 import { requireAdminPage } from "@/server/auth/page-guards";
 
 import { SETTINGS_PAGE_REGISTRY, SETTINGS_PAGE_SECTIONS } from "./settings-section-registry";
@@ -31,7 +31,7 @@ export default async function SettingsIndexPage() {
             <Grid key={key} size={{ xs: 12, sm: 6, lg: 4 }}>
               <Card sx={{ height: "100%" }}>
                 <CardActionArea
-                  component={AppLink}
+                  component={Link}
                   href={`/dashboard/settings/${key}`}
                   sx={{ height: "100%" }}
                 >
