@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
 import EditRounded from "@mui/icons-material/EditRounded";
@@ -473,7 +475,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
       </Stack>
 
       <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2, flexWrap: "wrap" }}>
+        <AdvancedFilters>
           <TextField
             label={t("search")}
             value={draft ?? search}
@@ -570,7 +572,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
 
       {loading ? (
