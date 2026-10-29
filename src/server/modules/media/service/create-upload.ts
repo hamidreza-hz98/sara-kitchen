@@ -1,12 +1,13 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
+import sharp from "sharp";
 
 import { SUPPORTED_LOCALES } from "@/constants";
 import type { SupportedLocale } from "@/constants";
 
 import { processImageForRoute } from "../processing/serverless-processing";
-import type { ImageMimeType } from "../processing/image-processor";
+import { ImageProcessingError, type ImageMimeType } from "../processing/image-processor";
 import type { MediaUploadRepository } from "../repository/media-upload";
 import { createMediaObjectKey } from "../storage/minio-provider";
 import type { StorageObjectRef, StorageProvider } from "../storage/storage-provider";
@@ -24,6 +25,7 @@ export class MediaUploadError extends Error {
 }
 
 export interface CreateMediaUploadInput {
+  readonly provider?: "minio" | "mongodb";
   readonly actorId: string;
   readonly bucket: string;
   readonly candidate: UploadCandidate;
@@ -80,8 +82,19 @@ export async function createMediaUpload(
     throw new MediaUploadError("duplicate");
   }
   const processed = await processImageForRoute(data, inspected.mimeType as ImageMimeType);
+  const original = await sharp(data, { failOn: "warning", limitInputPixels: 8_000_000 })
+    .autoOrient()
+    .webp({ quality: 78, effort: 4 })
+    .timeout({ seconds: 5 })
+    .toBuffer({ resolveWithObject: true })
+    .catch(() => {
+      throw new ImageProcessingError("decode_failed");
+    });
   const derivedBytes = processed.variants.reduce((sum, variant) => sum + variant.bytes, 0);
-  if (quota.activeStorageBytes + data.length + derivedBytes > UPLOAD_POLICY.maxActiveStorageBytes) {
+  if (
+    quota.activeStorageBytes + original.data.length + derivedBytes >
+    UPLOAD_POLICY.maxActiveStorageBytes
+  ) {
     throw new MediaUploadError("quota_exceeded");
   }
 
@@ -89,14 +102,14 @@ export async function createMediaUpload(
   try {
     const originalRef = {
       bucket: input.bucket,
-      key: createMediaObjectKey("originals", inspected.extension),
+      key: createMediaObjectKey("originals", "webp"),
     };
     attempted.push(originalRef);
     await deps.storage.upload({
       ...originalRef,
-      contentLength: data.length,
-      contentType: inspected.mimeType,
-      body: bufferStream(data),
+      contentLength: original.data.length,
+      contentType: "image/webp",
+      body: bufferStream(original.data),
     });
     const variants = [];
     for (const variant of processed.variants) {
@@ -122,13 +135,14 @@ export async function createMediaUpload(
       });
     }
     const created = await deps.repository.create({
-      originalName: inspected.name,
+      ...(input.provider ? { provider: input.provider } : {}),
+      originalName: inspected.name.replace(/\.[^.]+$/u, ".webp"),
       objectKey: originalRef.key,
       bucket: input.bucket,
-      mimeType: inspected.mimeType,
-      bytes: data.length,
+      mimeType: "image/webp",
+      bytes: original.data.length,
       checksum,
-      dimensions: { width: processed.source.width, height: processed.source.height },
+      dimensions: { width: original.info.width, height: original.info.height },
       variants,
       translations: input.translations,
       uploaderId: input.actorId,

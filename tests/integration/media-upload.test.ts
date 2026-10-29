@@ -64,7 +64,7 @@ describe("media upload persistence and rollback", () => {
     return { provider, objects };
   }
 
-  it("persists one ready record after all five objects and enforces checksum uniqueness", async () => {
+  it("persists one ready record after all three objects and enforces checksum uniqueness", async () => {
     const Media = getMediaModel(client.connection);
     const repo = createMediaUploadRepository(client.connection);
     const stored = storage();
@@ -85,11 +85,11 @@ describe("media upload persistence and rollback", () => {
         translations: [{ locale: "en", alt: "Red meal" }],
       },
     );
-    expect(stored.objects.size).toBe(5);
+    expect(stored.objects.size).toBe(3);
     expect(await Media.countDocuments({ processingState: "ready" })).toBe(1);
     const persisted = await Media.findById(result.id).lean();
     expect(persisted?.checksum).toBe(result.checksum);
-    expect(persisted?.variants).toHaveLength(4);
+    expect(persisted?.variants).toHaveLength(2);
     expect((await repo.quotaUsage(actorId)).activeStorageBytes).toBeGreaterThan(
       persisted?.bytes ?? 0,
     );

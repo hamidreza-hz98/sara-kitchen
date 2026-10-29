@@ -59,6 +59,7 @@ export interface ImageProcessingOptions {
   readonly deadlineAtMs?: number;
   /** Native libvips timeout for each sequential variant. */
   readonly variantTimeoutSeconds?: number;
+  readonly webpOnly?: boolean;
 }
 
 const supportedFormats: Record<ImageMimeType, string> = {
@@ -171,6 +172,7 @@ export async function processImage(
       ["thumbnail_webp", IMAGE_PROCESSING_POLICY.thumbnailSide, "webp"],
       ["thumbnail_fallback", IMAGE_PROCESSING_POLICY.thumbnailSide, fallback],
     ] as const) {
+      if (options.webpOnly && format !== "webp") continue;
       const remainingMs = deadlineAtMs - Date.now();
       if (remainingMs <= 0) throw new ImageProcessingError("processing_timeout");
       const seconds = Math.min(variantTimeoutSeconds, Math.max(1, Math.floor(remainingMs / 1000)));

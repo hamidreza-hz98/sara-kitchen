@@ -71,21 +71,25 @@ function input(file: Awaited<ReturnType<typeof candidate>>) {
 }
 
 describe("media create/upload orchestration", () => {
-  it("stores an original and four variants before publishing one ready record", async () => {
+  it("stores a compressed WebP original and two WebP variants before publishing one ready record", async () => {
     const test = harness();
     const file = await candidate();
     const result = await createMediaUpload(test, input(file));
-    expect(result).toMatchObject({ id: "new-media", variantCount: 4 });
+    expect(result).toMatchObject({ id: "new-media", variantCount: 2 });
     expect(result.checksum).toBe(
       createHash("sha256")
         .update(Buffer.from(await file.blob.arrayBuffer()))
         .digest("hex"),
     );
-    expect(test.objects.size).toBe(5);
+    expect(test.objects.size).toBe(3);
     expect(test.records).toHaveLength(1);
-    expect(test.records[0]?.variants).toHaveLength(4);
+    expect(test.records[0]?.variants).toHaveLength(2);
     expect(test.records[0]?.objectKey).toMatch(/^originals\//u);
+    expect(test.records[0]).toMatchObject({ mimeType: "image/webp", originalName: "meal.webp" });
+    const original = test.objects.get(test.records[0]!.objectKey)!;
+    expect((await sharp(original).metadata()).format).toBe("webp");
     for (const variant of test.records[0]?.variants ?? []) {
+      expect(variant.mimeType).toBe("image/webp");
       expect(test.objects.get(variant.key)?.length).toBe(variant.bytes);
     }
   });
@@ -108,7 +112,7 @@ describe("media create/upload orchestration", () => {
     expect(test.records).toHaveLength(0);
   });
 
-  it("removes all five objects when the database write fails", async () => {
+  it("removes all objects when the database write fails", async () => {
     const test = harness({ failCreate: true });
     await expect(createMediaUpload(test, input(await candidate()))).rejects.toThrow(
       "injected database failure",

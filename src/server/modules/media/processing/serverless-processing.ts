@@ -90,6 +90,7 @@ export async function processImageForRoute(
       throw new ImageProcessingError("requires_background_processing");
     }
     return await processImage(input, mimeType, {
+      webpOnly: true,
       deadlineAtMs: startedAt + INLINE_PROCESSING_POLICY.processingBudgetMs,
       variantTimeoutSeconds: INLINE_PROCESSING_POLICY.variantTimeoutSeconds,
     });
