@@ -14,7 +14,7 @@ import {
   createDishRepository,
 } from "@/server/modules/dishes";
 import { createIngredientAllergenCatalog } from "@/server/modules/ingredients";
-import { createMinioStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
+import { createMediaStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
 import { createSettingsRuntime } from "@/server/modules/settings";
 import {
   EMPTY_HOME_CONTENT,
@@ -38,7 +38,7 @@ async function readHomeContent(locale: SupportedLocale): Promise<HomeContent> {
   );
   if (!settings) return EMPTY_HOME_CONTENT;
 
-  const storage = createMinioStorageProvider();
+  const storage = createMediaStorageProvider();
   const dishRepository = createDishRepository(connection);
   const categoryRepository = createCategoryRepository(connection);
   const blogRepository = createBlogRepository(connection);
