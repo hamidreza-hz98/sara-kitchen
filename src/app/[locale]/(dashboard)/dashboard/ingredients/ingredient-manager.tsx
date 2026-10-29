@@ -1,5 +1,7 @@
 "use client";
 
+import { AdvancedFilters } from "@/components/ui/advanced-filters";
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
@@ -500,7 +502,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
         </Stack>
       </Stack>
       <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack direction={{ xs: "column", lg: "row" }} sx={{ gap: 2 }}>
+        <AdvancedFilters>
           <TextField
             label={t("search")}
             value={searchDraft ?? search}
@@ -562,7 +564,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
               ))}
             </Select>
           </FormControl>
-        </Stack>
+        </AdvancedFilters>
       </Paper>
       {loading ? (
         <Paper aria-label={t("loading")} sx={{ p: 3 }}>
