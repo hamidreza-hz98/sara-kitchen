@@ -6,6 +6,7 @@ import { connectToDatabase } from "@/server/database";
 import { createBlogRepository } from "@/server/modules/blogs";
 import { createMediaStorageProvider, resolveStorefrontMediaImage } from "@/server/modules/media";
 
+import { getBlogCoverImage } from "./blog-cover-image";
 import { BLOG_PAGE_SIZE, type BlogQuery } from "./blog-query";
 
 export type BlogCard = Readonly<{
@@ -57,6 +58,7 @@ export async function loadBlogIndex(
           // A missing media variant must not hide a published article.
         }
       }
+      image ??= getBlogCoverImage(item.slug, locale);
       return {
         slug: item.slug,
         title,
