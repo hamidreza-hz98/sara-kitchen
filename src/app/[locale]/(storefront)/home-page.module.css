@@ -1,0 +1,639 @@
+.page {
+  min-height: 100%;
+  overflow: hidden;
+  color: #22222a;
+  background-color: #fff9f8;
+  background-image:
+    radial-gradient(circle at 0 0, rgb(255 97 97 / 5%) 1px, transparent 1.5px),
+    linear-gradient(
+      135deg,
+      transparent 48%,
+      rgb(255 97 97 / 2.8%) 49%,
+      rgb(255 97 97 / 2.8%) 51%,
+      transparent 52%
+    );
+  background-size:
+    18px 18px,
+    32px 32px;
+}
+
+.pageInner {
+  display: flex;
+  width: min(calc(100% - 32px), 1180px);
+  margin-inline: auto;
+  padding-block: 16px 100px;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.categoryPromos {
+  display: grid;
+  gap: 10px;
+}
+
+.promoPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.promoTile {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: 112px;
+  overflow: hidden;
+  align-items: flex-end;
+  padding: 14px;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 12px;
+  color: white;
+  background: #596e66;
+  box-shadow: 0 8px 22px rgb(41 34 34 / 9%);
+  isolation: isolate;
+}
+
+.promoTileWide {
+  height: 122px;
+}
+
+.promoImage,
+.promoShade,
+.featuredImage,
+.featuredShade {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 350ms ease;
+}
+
+.promoShade {
+  z-index: -1;
+  background: linear-gradient(0deg, rgb(14 20 18 / 66%), rgb(14 20 18 / 4%) 76%);
+}
+
+.promoTile:hover .promoImage {
+  transform: scale(1.04);
+}
+
+.promoTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 35%);
+}
+
+.promoTileWide .promoTitle {
+  width: 100%;
+  text-align: center;
+  font-size: clamp(1.1rem, 3.8vw, 1.7rem);
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.promoArrow {
+  width: 18px;
+  height: 18px;
+  margin-inline-start: auto;
+  opacity: 0.8;
+}
+
+.section {
+  min-width: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  min-height: 30px;
+  margin-bottom: 13px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionTitle h2 {
+  margin: 0;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.headingIcon {
+  display: inline-flex;
+  color: #ff6161;
+}
+
+.headingIcon :global(svg) {
+  width: 19px;
+  height: 19px;
+}
+
+.viewAll,
+.readPost {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  color: #ff6161;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.viewAll :global(svg),
+.readPost :global(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+.featuredRail,
+.dealsRail,
+.cultureRail {
+  display: flex;
+  overflow-x: auto;
+  margin-inline: -16px;
+  padding: 0 16px 8px;
+  gap: 12px;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.featuredRail::-webkit-scrollbar,
+.dealsRail::-webkit-scrollbar,
+.cultureRail::-webkit-scrollbar {
+  display: none;
+}
+
+.featuredCard {
+  position: relative;
+  flex: 0 0 min(74vw, 285px);
+  height: 320px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #292b29;
+  box-shadow: 0 8px 22px rgb(32 27 27 / 15%);
+  scroll-snap-align: start;
+}
+
+.featuredLink {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  color: inherit;
+  text-decoration: none;
+}
+
+.featuredImage {
+  z-index: 0;
+  object-position: center;
+}
+
+.featuredShade {
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(4 8 7 / 24%), transparent 35%, rgb(4 8 7 / 55%));
+}
+
+.pricePill,
+.salePill,
+.unavailablePill {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 13px;
+  inset-inline-start: 13px;
+  padding: 5px 9px;
+  border-radius: 5px;
+  color: #fff;
+  background: #ff6161;
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.salePill {
+  inset-block-start: 42px;
+  padding: 4px 7px;
+  color: #ff6161;
+  background: rgb(255 255 255 / 94%);
+  font-size: 0.61rem;
+}
+
+.unavailablePill {
+  inset-inline-start: auto;
+  inset-inline-end: 12px;
+  color: #303238;
+  background: rgb(255 255 255 / 94%);
+  font-size: 0.62rem;
+}
+
+.featuredInfo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: calc(100% - 20px);
+  margin: auto 10px 10px;
+  padding: 13px;
+  flex-direction: column;
+  border: 1px solid rgb(255 255 255 / 42%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 83%);
+  backdrop-filter: blur(12px);
+}
+
+.featuredInfo h3 {
+  margin: 0;
+  color: #22222a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.featuredInfo p {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 2.2em;
+  margin: 4px 0 9px;
+  color: #66636a;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cardAction {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9px;
+  color: white;
+  background: #ff6161;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.cardAction :global(svg) {
+  width: 16px;
+  height: 16px;
+}
+
+.dealCard {
+  flex: 0 0 150px;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.dealLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dealImageWrap {
+  position: relative;
+  height: 132px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #ede7e4;
+}
+
+.dealImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dealPill {
+  position: absolute;
+  inset-block-start: 7px;
+  inset-inline-end: 7px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: white;
+  background: #ff6161;
+  font-size: 0.56rem;
+  font-weight: 900;
+}
+
+.dealUnavailable {
+  position: absolute;
+  inset-inline-start: 6px;
+  inset-block-end: 6px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  color: #303238;
+  background: rgb(255 255 255 / 92%);
+  font-size: 0.55rem;
+  font-weight: 800;
+}
+
+.dealCard h3 {
+  overflow: hidden;
+  margin: 8px 0 3px;
+  font-size: 0.77rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dealPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: #ff6161;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.dealPrice s {
+  color: #9e9797;
+  font-size: 0.64rem;
+  font-weight: 500;
+}
+
+.bestSellerSection {
+  padding: 15px 14px 17px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 88%);
+}
+
+.bestSellerList {
+  display: grid;
+  gap: 11px;
+}
+
+.bestSellerRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rank {
+  color: rgb(255 97 97 / 33%);
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 900;
+}
+
+.bestSellerImage {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgb(27 22 22 / 12%);
+}
+
+.bestSellerCopy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bestSellerCopy strong,
+.bestSellerCopy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bestSellerCopy strong {
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.bestSellerCopy small {
+  color: #7c777b;
+  font-size: 0.62rem;
+}
+
+.rowArrow {
+  width: 17px;
+  height: 17px;
+  color: #c9c3c4;
+}
+
+.benefitGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.benefitCard {
+  display: flex;
+  min-height: 124px;
+  padding: 13px 10px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 75%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 60%);
+  text-align: center;
+}
+
+.benefitIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 7px;
+  place-items: center;
+  border-radius: 8px;
+  color: #ff6161;
+  background: rgb(255 97 97 / 10%);
+}
+
+.benefitIcon :global(svg) {
+  width: 21px;
+  height: 21px;
+}
+
+.benefitCard h2 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.benefitCard p {
+  max-width: 190px;
+  margin: 4px 0 0;
+  color: #817c80;
+  font-size: 0.59rem;
+  line-height: 1.4;
+}
+
+.cultureRail {
+  gap: 13px;
+}
+
+.cultureCard {
+  flex: 0 0 min(82vw, 300px);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 82%);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 82%);
+  box-shadow: 0 7px 18px rgb(35 27 27 / 7%);
+  scroll-snap-align: start;
+}
+
+.cultureImageLink {
+  position: relative;
+  display: block;
+  height: 145px;
+  overflow: hidden;
+  background: #e8e4df;
+}
+
+.cultureImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.readTime {
+  position: absolute;
+  inset-block-start: 9px;
+  inset-inline-start: 9px;
+  padding: 4px 7px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 5px;
+  color: #343137;
+  background: rgb(255 255 255 / 82%);
+  font-size: 0.59rem;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+.cultureCopy {
+  padding: 13px 14px 15px;
+}
+
+.cultureCopy h3 {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 2.5em;
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cultureCopy p {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 2.8em;
+  margin: 7px 0 12px;
+  color: #7c777b;
+  font-size: 0.66rem;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.readPost {
+  justify-content: flex-end;
+  width: 100%;
+  font-size: 0.63rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 700px) {
+  .pageInner {
+    padding-block-start: 28px;
+    gap: 42px;
+  }
+
+  .categoryPromos {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .promoTile,
+  .promoTileWide {
+    height: 180px;
+    border-radius: 14px;
+  }
+
+  .promoPair {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .featuredRail,
+  .dealsRail,
+  .cultureRail {
+    margin-inline: 0;
+    padding-inline: 0;
+    gap: 18px;
+  }
+
+  .featuredCard {
+    flex-basis: 270px;
+    height: 370px;
+  }
+
+  .dealCard {
+    flex-basis: 185px;
+  }
+
+  .dealImageWrap {
+    height: 160px;
+  }
+
+  .bestSellerSection {
+    padding: 20px;
+  }
+
+  .bestSellerList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .bestSellerRow {
+    padding: 11px;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .benefitGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .benefitCard {
+    min-height: 155px;
+  }
+
+  .cultureCard {
+    flex-basis: 310px;
+  }
+
+  .cultureImageLink {
+    height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promoImage {
+    transition: none;
+  }
+}
