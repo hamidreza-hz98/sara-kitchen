@@ -10,7 +10,7 @@ const safeReference = z
   .string()
   .min(1)
   .max(128)
-  .regex(/^(?!.*\d{12,})[A-Za-z0-9._:-]+$/u);
+  .regex(/^[A-Za-z0-9._:-]+$/u);
 const safeResponseCode = z
   .string()
   .min(1)
