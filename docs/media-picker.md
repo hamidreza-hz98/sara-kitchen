@@ -33,5 +33,5 @@ edit forms do not exist yet; their implementation tasks should connect these
 controlled values to form validation, saved media references, and usage counts.
 The picker does not bypass server authorization: browsing needs media read access
 and inline upload needs `media:create`. Inline upload currently supports images
-only, up to 3 MiB. Video/PDF items may be selected if they already exist and
+only, up to 10 MiB. Video/PDF items may be selected if they already exist and
 the field permits their kind.
