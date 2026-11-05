@@ -1,8 +1,7 @@
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+import { AuthenticationFrame } from "@/components/authentication/authentication-frame";
 
 import { ForgotPasswordForm } from "./request-form";
 
@@ -14,24 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ForgotPasswordPage() {
   const t = await getTranslations("storefront.forgotPassword");
   return (
-    <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
-      <Box
-        sx={{
-          bgcolor: "background.paper",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: 4,
-          p: { xs: 4, sm: 6 },
-        }}
-      >
-        <Typography component="h1" variant="h2" sx={{ mb: 2 }}>
-          {t("title")}
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: 4 }}>
-          {t("description")}
-        </Typography>
-        <ForgotPasswordForm />
-      </Box>
-    </Container>
+    <AuthenticationFrame title={t("title")} description={t("description")}>
+      <ForgotPasswordForm />
+    </AuthenticationFrame>
   );
 }
