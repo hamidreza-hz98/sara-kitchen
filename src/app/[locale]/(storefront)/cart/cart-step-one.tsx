@@ -429,7 +429,7 @@ export function CartStepOne() {
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                borderRadius: 999,
+                                borderRadius: 2,
                                 p: 0.5,
                               }}
                             >
