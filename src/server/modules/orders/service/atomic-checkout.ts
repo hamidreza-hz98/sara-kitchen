@@ -25,6 +25,7 @@ import {
 } from "@/server/modules/settings";
 import {
   createCheckoutTransaction,
+  persistMbWaySandboxSession,
   persistMbWaySandboxInitiation,
   runIdempotentOperation,
   type PaymentProvider,
@@ -392,6 +393,13 @@ export async function submitAtomicCheckout(
         currency: "EUR",
         idempotencyKey: providerKey,
         payerMobile: order.customerSnapshot.mobile,
+        onSessionCreated: ({ providerPaymentId, providerRequestId }) =>
+          persistMbWaySandboxSession(connection, {
+            transactionId: result.transactionId,
+            idempotencyKey: providerKey,
+            providerPaymentId,
+            providerRequestId,
+          }),
       });
       await persistMbWaySandboxInitiation(connection, {
         transactionId: result.transactionId,
