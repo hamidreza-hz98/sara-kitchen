@@ -378,7 +378,7 @@ export function OrderList({ capabilities }: { capabilities: Capabilities }) {
               onChange={(event) => setSearchDraft(event.target.value)}
               slotProps={{
                 input: {
-                  startAdornment: <SearchRounded sx={{ mr: 1, color: "text.secondary" }} />,
+                  startAdornment: <SearchRounded sx={{ me: 1, color: "text.secondary" }} />,
                 },
               }}
               sx={{ minWidth: { xs: "100%", md: 210 }, flex: 1 }}
