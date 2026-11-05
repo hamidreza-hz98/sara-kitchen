@@ -75,21 +75,23 @@ export async function StorefrontFooter() {
             gap: { xs: 9, md: 10 },
           }}
         >
-          <Stack
-            spacing={3}
-            sx={{
-              alignItems: { xs: "center", md: "flex-start" },
-              textAlign: { xs: "center", md: "start" },
-            }}
-          >
-            <BrandMark size={64} symbolOnly={locale === "fa"} />
-            <Typography color="primary.dark" variant="h2">
-              {shared("brandName")}
-            </Typography>
-            <Typography color="text.secondary" sx={{ maxWidth: 420 }}>
-              {shell("footerTagline")}
-            </Typography>
-          </Stack>
+          <Link className={styles.footerBrand} href="/">
+            <Stack
+              spacing={3}
+              sx={{
+                alignItems: { xs: "center", md: "flex-start" },
+                textAlign: { xs: "center", md: "start" },
+              }}
+            >
+              <BrandMark size={64} symbolOnly={locale === "fa"} />
+              <Typography color="primary.dark" variant="h2">
+                {shared("brandName")}
+              </Typography>
+              <Typography color="text.secondary" sx={{ maxWidth: 420 }}>
+                {shell("footerTagline")}
+              </Typography>
+            </Stack>
+          </Link>
           <FooterLinkGroup title={shell("quickLinks")}>
             {quickLinks.map((item) => (
               <Link className={styles.footerLink} href={item.href} key={item.key}>
