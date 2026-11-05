@@ -19,5 +19,12 @@ export default async function SettingsSectionPage({ params }: PageProps) {
         ? "settings:update-content"
         : "settings:update-operations";
   const canEdit = hasAdminPermission({ role: admin.role, active: true }, permission);
-  return <SettingsSectionEditor canEdit={canEdit} definition={SETTINGS_PAGE_REGISTRY[section]} />;
+  const canUploadMedia = hasAdminPermission({ role: admin.role, active: true }, "media:create");
+  return (
+    <SettingsSectionEditor
+      canEdit={canEdit}
+      canUploadMedia={canUploadMedia}
+      definition={SETTINGS_PAGE_REGISTRY[section]}
+    />
+  );
 }
