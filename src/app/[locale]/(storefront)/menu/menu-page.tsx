@@ -7,10 +7,10 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
 import type { SupportedLocale } from "@/constants";
+import Link from "@/components/ui/client-next-link";
 import { formatNumber } from "@/locales/formatters";
 import { radiusTokens } from "@/theme";
 
