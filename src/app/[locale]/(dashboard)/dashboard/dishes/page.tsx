@@ -9,6 +9,7 @@ export default async function DashboardDishesPage() {
       canCreate={admin.permissions.includes("dishes:create")}
       canReadCategories={admin.permissions.includes("categories:read")}
       canRestore={admin.permissions.includes("dishes:delete")}
+      canDelete={admin.permissions.includes("dishes:delete")}
       canUpdate={admin.permissions.includes("dishes:update")}
     />
   );
