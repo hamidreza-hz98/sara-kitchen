@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
+
 import type { Connection } from "mongoose";
 
 import { withMongoTransaction } from "@/server/database/transaction-boundary";
@@ -139,7 +141,7 @@ export async function processReceivedMbWayWebhook(
         },
         {
           kind: mapMbWaySandboxEvent(inbox.code),
-          eventKey: `provider:${inbox.providerEventId}`,
+          eventKey: `provider:${createHash("sha256").update(inbox.providerEventId).digest("hex").slice(0, 40)}`,
           providerEventId: inbox.providerEventId,
           amountCents: inbox.amountCents,
           responseCode: inbox.responseCode,
