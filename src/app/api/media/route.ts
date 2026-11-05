@@ -104,6 +104,9 @@ function translateUploadError(error: unknown): never {
   if (error instanceof UploadPolicyError) throw fileError(error.code);
   if (error instanceof ImageProcessingError) {
     if (error.code === "processing_busy") throw ApiError.rateLimit(5);
+    if (error.code === "processing_timeout") {
+      throw ApiError.serviceUnavailable("Image processing timed out. Please retry.");
+    }
     throw fileError(error.code);
   }
   if (error instanceof MediaUploadError) {
