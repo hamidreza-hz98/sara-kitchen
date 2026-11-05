@@ -1,7 +1,7 @@
 # Media bulk upload
 
 Bulk upload is a browser-side coordinator over the atomic `POST /api/media` endpoint. It deliberately
-does not proxy many files through one Vercel Function: that would violate the approved 3.5 MiB request,
+does not proxy many files through one Vercel Function: that would violate the application request-body,
 single-image processing slot, memory, and execution-duration limits.
 
 ## Contract
