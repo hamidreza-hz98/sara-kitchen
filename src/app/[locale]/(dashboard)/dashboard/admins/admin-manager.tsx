@@ -694,6 +694,7 @@ export function AdminManager({
             />
             <TextField
               label={t("identifier")}
+              slotProps={{ htmlInput: { dir: "ltr" } }}
               value={form.identifier}
               error={attempted && !form.identifier.trim()}
               required
