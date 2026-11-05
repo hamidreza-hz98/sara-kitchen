@@ -4,6 +4,7 @@ import { API_ERROR_DEFINITIONS } from "./api-contract";
 import type {
   ApiErrorBody,
   ApiErrorPayload,
+  ApiRawSuccessResult,
   ApiSuccessBody,
   ApiSuccessResult,
 } from "./api-contract";
@@ -42,8 +43,14 @@ function responseHeaders(requestId: string, custom?: HeadersInit): Headers {
 
 function successResponse<Data, Meta>(
   requestId: string,
-  result: ApiSuccessResult<Data, Meta>,
+  result: ApiSuccessResult<Data, Meta> | ApiRawSuccessResult,
 ): Response {
+  if ("rawJson" in result) {
+    return Response.json(result.body, {
+      headers: responseHeaders(requestId, result.headers),
+      status: result.status,
+    });
+  }
   const body = {
     data: result.data,
     ok: true,
@@ -92,12 +99,15 @@ async function reportInternalError(
   }
 }
 
-/** Execute a JSON Route Handler with one request-ID, success, and safe error boundary. */
+/** Execute a Route Handler with one request-ID and safe error boundary. */
 export async function handleApiRoute<Data, Meta = never>(
   request: Request,
   handler: (
     context: ApiRouteContext,
-  ) => ApiSuccessResult<Data, Meta> | Promise<ApiSuccessResult<Data, Meta>>,
+  ) =>
+    | ApiSuccessResult<Data, Meta>
+    | ApiRawSuccessResult
+    | Promise<ApiSuccessResult<Data, Meta> | ApiRawSuccessResult>,
   options: HandleApiRouteOptions = {},
 ): Promise<Response> {
   const requestId = resolveRequestId(request);
@@ -109,7 +119,8 @@ export async function handleApiRoute<Data, Meta = never>(
   const logger = createApplicationLogger({ module: "http", requestId });
 
   try {
-    const response = successResponse(requestId, await handler({ requestId }));
+    const result = await handler({ requestId });
+    const response = successResponse(requestId, result);
     const durationMs = performance.now() - startedAt;
     logger.info({
       action: "request.completed",
