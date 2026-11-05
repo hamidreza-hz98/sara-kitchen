@@ -1,8 +1,8 @@
 .page {
   min-height: 100%;
   overflow: hidden;
-  color: #22222a;
-  background-color: #fff9f8;
+  color: var(--sara-palette-text-primary);
+  background-color: var(--sara-palette-background-default);
   background-image:
     radial-gradient(circle at 0 0, rgb(255 97 97 / 5%) 1px, transparent 1.5px),
     linear-gradient(
@@ -245,13 +245,13 @@
   flex-direction: column;
   border: 1px solid rgb(255 255 255 / 42%);
   border-radius: 10px;
-  background: rgb(255 255 255 / 83%);
+  background: rgb(var(--sara-palette-background-paperChannel) / 83%);
   backdrop-filter: blur(12px);
 }
 
 .featuredInfo h3 {
   margin: 0;
-  color: #22222a;
+  color: var(--sara-palette-text-primary);
   font-size: 1rem;
   font-weight: 800;
 }
@@ -261,7 +261,7 @@
   overflow: hidden;
   min-height: 2.2em;
   margin: 4px 0 9px;
-  color: #66636a;
+  color: var(--sara-palette-text-secondary);
   font-size: 0.68rem;
   line-height: 1.45;
   -webkit-box-orient: vertical;
@@ -302,7 +302,7 @@
   height: 132px;
   overflow: hidden;
   border-radius: 9px;
-  background: #ede7e4;
+  background: var(--sara-palette-background-paper);
 }
 
 .dealImage {
@@ -330,8 +330,8 @@
   inset-block-end: 6px;
   padding: 3px 5px;
   border-radius: 4px;
-  color: #303238;
-  background: rgb(255 255 255 / 92%);
+  color: var(--sara-palette-text-primary);
+  background: rgb(var(--sara-palette-background-paperChannel) / 92%);
   font-size: 0.55rem;
   font-weight: 800;
 }
@@ -356,7 +356,7 @@
 }
 
 .dealPrice s {
-  color: #9e9797;
+  color: var(--sara-palette-text-secondary);
   font-size: 0.64rem;
   font-weight: 500;
 }
@@ -364,7 +364,7 @@
 .bestSellerSection {
   padding: 15px 14px 17px;
   border-radius: 10px;
-  background: rgb(255 255 255 / 88%);
+  background: rgb(var(--sara-palette-background-paperChannel) / 88%);
 }
 
 .bestSellerList {
@@ -418,7 +418,7 @@
 }
 
 .bestSellerCopy small {
-  color: #7c777b;
+  color: var(--sara-palette-text-secondary);
   font-size: 0.62rem;
 }
 
@@ -441,9 +441,9 @@
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  border: 1px solid rgb(255 255 255 / 75%);
+  border: 1px solid var(--sara-palette-divider);
   border-radius: 10px;
-  background: rgb(255 255 255 / 60%);
+  background: rgb(var(--sara-palette-background-paperChannel) / 60%);
   text-align: center;
 }
 
@@ -472,7 +472,7 @@
 .benefitCard p {
   max-width: 190px;
   margin: 4px 0 0;
-  color: #817c80;
+  color: var(--sara-palette-text-secondary);
   font-size: 0.59rem;
   line-height: 1.4;
 }
@@ -484,9 +484,9 @@
 .cultureCard {
   flex: 0 0 min(82vw, 300px);
   overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 82%);
+  border: 1px solid var(--sara-palette-divider);
   border-radius: 10px;
-  background: rgb(255 255 255 / 82%);
+  background: rgb(var(--sara-palette-background-paperChannel) / 82%);
   box-shadow: 0 7px 18px rgb(35 27 27 / 7%);
   scroll-snap-align: start;
 }
@@ -496,7 +496,7 @@
   display: block;
   height: 145px;
   overflow: hidden;
-  background: #e8e4df;
+  background: var(--sara-palette-background-paper);
 }
 
 .cultureImage {
@@ -540,7 +540,7 @@
   overflow: hidden;
   min-height: 2.8em;
   margin: 7px 0 12px;
-  color: #7c777b;
+  color: var(--sara-palette-text-secondary);
   font-size: 0.66rem;
   line-height: 1.4;
   -webkit-box-orient: vertical;
@@ -611,7 +611,7 @@
   .bestSellerRow {
     padding: 11px;
     border-radius: 8px;
-    background: #fff;
+    background: var(--sara-palette-background-paper);
   }
 
   .benefitGrid {
