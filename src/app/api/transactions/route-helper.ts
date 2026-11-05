@@ -15,7 +15,7 @@ import {
 } from "@/server/modules/auth";
 import { OrderPaymentSyncError } from "@/server/modules/orders";
 import {
-  getLocalMbWaySandboxProvider,
+  createConfiguredSibsMbWaySandboxProvider,
   MbWaySandboxError,
   PaymentProviderError,
   TransactionManagementError,
@@ -44,11 +44,11 @@ export async function transactionRequestContext(
   }
 }
 
-export function localPaymentProvider() {
+export function configuredMbWayPaymentProvider() {
   const env = getServerEnvironment();
-  if (process.env.NODE_ENV === "production" || !env.MBWAY_ENABLED || !env.MBWAY_WEBHOOK_SECRET)
+  if (!env.MBWAY_ENABLED)
     throw ApiError.serviceUnavailable("Payment actions require an approved provider.");
-  return getLocalMbWaySandboxProvider(env.MBWAY_WEBHOOK_SECRET);
+  return createConfiguredSibsMbWaySandboxProvider(env);
 }
 
 export function transactionActionKey(request: NextRequest): string {
