@@ -1,6 +1,15 @@
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import ViewAgendaOutlinedIcon from "@mui/icons-material/ViewAgendaOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -13,73 +22,184 @@ import { formatDate, formatNumber } from "@/locales/formatters";
 import type { BlogCard, BlogIndexContent } from "./blog-data";
 import { blogHref, type BlogQuery } from "./blog-query";
 
-const inputStyle = {
-  minHeight: 44,
-  width: "100%",
-  border: "1px solid #d9cec8",
-  borderRadius: 2,
-  backgroundColor: "white",
-  paddingInline: 12,
-  font: "inherit",
-} as const;
+function categoryLabel(tags: readonly string[]) {
+  const tag = tags[0];
+  if (!tag) return "";
+  return tag
+    .split(/[-_\s]+/u)
+    .filter(Boolean)
+    .map((word) => `${word.charAt(0).toLocaleUpperCase()}${word.slice(1)}`)
+    .join(" ");
+}
+
+function StoryTile({ article, featured }: { article: BlogCard; featured: boolean }) {
+  return (
+    <Box
+      component={Link}
+      href={`/blog/${article.slug}`}
+      aria-label={article.title}
+      sx={{
+        position: "relative",
+        display: "flex",
+        minHeight: featured ? { xs: 340, md: 382 } : { xs: 165, md: 185 },
+        alignItems: "flex-end",
+        overflow: "hidden",
+        borderRadius: 2,
+        color: "common.white",
+        textDecoration: "none",
+        bgcolor: "#252a28",
+        backgroundImage: article.image
+          ? `linear-gradient(0deg, rgba(16,20,20,.82), rgba(16,20,20,.06) 76%), url("${article.image.url}")`
+          : "linear-gradient(140deg, #6c453c, #d96d60)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        transition: "transform .2s ease, box-shadow .2s ease",
+        "&:hover": { transform: "translateY(-2px)", boxShadow: "0 16px 34px #251b1730" },
+        "&:focus-visible": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 3 },
+      }}
+    >
+      <Stack spacing={0.75} sx={{ p: { xs: 1.75, md: 2.25 }, zIndex: 1 }}>
+        {categoryLabel(article.tags) && (
+          <Typography
+            component="span"
+            sx={{
+              color: "#ffd5cb",
+              fontSize: ".68rem",
+              fontWeight: 800,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+            }}
+          >
+            {categoryLabel(article.tags)}
+          </Typography>
+        )}
+        <Typography
+          component="span"
+          sx={{
+            fontWeight: 800,
+            fontSize: featured ? { xs: "1.15rem", md: "1.45rem" } : "1rem",
+            lineHeight: 1.25,
+          }}
+        >
+          {article.title}
+        </Typography>
+      </Stack>
+    </Box>
+  );
+}
 
 function ArticleCard({ article, view }: { article: BlogCard; view: BlogQuery["view"] }) {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("storefront.blog");
+  const publishedDate = article.publishedAt ? new Date(article.publishedAt) : null;
+  const dateLabel =
+    publishedDate && !Number.isNaN(publishedDate.getTime())
+      ? formatDate(publishedDate, locale)
+      : null;
+  const category = categoryLabel(article.tags);
+
   return (
     <Paper
       component="article"
-      variant="outlined"
+      elevation={0}
       sx={{
         overflow: "hidden",
-        borderRadius: 4,
-        height: "100%",
-        display: view === "list" ? { xs: "block", sm: "flex" } : "block",
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
+        display: view === "list" ? { xs: "block", md: "flex" } : "block",
+        minWidth: 0,
+        transition: "box-shadow .2s ease, transform .2s ease",
+        "&:hover": { boxShadow: "0 14px 34px #2a21191a", transform: "translateY(-2px)" },
       }}
     >
-      {article.image ? (
-        <Box
-          component="img"
-          src={article.image.url}
-          alt={article.image.alt}
-          loading="lazy"
-          decoding="async"
+      <Box
+        component={Link}
+        href={`/blog/${article.slug}`}
+        aria-label={`${t("readPost")}: ${article.title}`}
+        sx={{
+          position: "relative",
+          display: "block",
+          width: view === "list" ? { xs: "100%", md: 290 } : "100%",
+          height: view === "list" ? { xs: 205, md: 230 } : { xs: 205, sm: 220 },
+          flexShrink: 0,
+          bgcolor: "#ece4dc",
+          overflow: "hidden",
+        }}
+      >
+        {article.image ? (
+          <Box
+            component="img"
+            src={article.image.url}
+            alt={article.image.alt || article.title}
+            loading="lazy"
+            decoding="async"
+            sx={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <Box
+            aria-hidden="true"
+            sx={{
+              width: "100%",
+              height: "100%",
+              background: "linear-gradient(135deg, #ffe0d9, #fff8ef 55%, #ddece5)",
+            }}
+          />
+        )}
+        {category && (
+          <Typography
+            component="span"
+            sx={{
+              position: "absolute",
+              insetBlockStart: 12,
+              insetInlineEnd: 12,
+              px: 1.1,
+              py: 0.55,
+              bgcolor: "rgba(255,255,255,.92)",
+              color: "primary.dark",
+              borderRadius: 1,
+              fontSize: ".66rem",
+              fontWeight: 800,
+              letterSpacing: ".05em",
+              textTransform: "uppercase",
+            }}
+          >
+            {category}
+          </Typography>
+        )}
+      </Box>
+      <Stack spacing={1.2} sx={{ p: { xs: 1.75, md: 2.25 }, flex: 1, minWidth: 0 }}>
+        <Stack
+          direction="row"
           sx={{
-            display: "block",
-            width: view === "list" ? { xs: "100%", sm: 280 } : "100%",
-            height: 220,
-            objectFit: "cover",
-            flexShrink: 0,
+            alignItems: "center",
+            flexWrap: "wrap",
+            columnGap: 1.4,
+            rowGap: 0.65,
+            color: "text.secondary",
           }}
-        />
-      ) : (
-        <Box
-          aria-hidden="true"
-          sx={{
-            width: view === "list" ? { xs: "100%", sm: 280 } : "100%",
-            height: 220,
-            flexShrink: 0,
-            background: "linear-gradient(135deg, #ffe0d9, #fff8ef 55%, #ddece5)",
-          }}
-        />
-      )}
-      <Stack spacing={1.25} sx={{ p: 2.5, flex: 1 }}>
-        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", color: "text.secondary" }}>
-          <Typography variant="caption">{article.author}</Typography>
-          <Typography variant="caption" aria-hidden="true">
-            ·
-          </Typography>
-          <Typography variant="caption">
-            {formatDate(new Date(article.publishedAt), locale)}
-          </Typography>
-          <Typography variant="caption" aria-hidden="true">
-            ·
-          </Typography>
-          <Typography variant="caption">
-            {t("readTime", { minutes: article.readTimeMinutes })}
-          </Typography>
+        >
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+            <PersonOutlineRoundedIcon sx={{ fontSize: 16 }} />
+            <Typography variant="caption">{article.author}</Typography>
+          </Stack>
+          {dateLabel && (
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+              <CalendarMonthRoundedIcon sx={{ fontSize: 15 }} />
+              <Typography variant="caption">{dateLabel}</Typography>
+            </Stack>
+          )}
+          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+            <AccessTimeRoundedIcon sx={{ fontSize: 15 }} />
+            <Typography variant="caption">
+              {t("readTime", { minutes: article.readTimeMinutes })}
+            </Typography>
+          </Stack>
         </Stack>
-        <Typography component="h2" variant="h6" sx={{ fontWeight: 800 }}>
+        <Typography
+          component="h2"
+          sx={{ fontSize: { xs: "1.2rem", md: "1.3rem" }, fontWeight: 800, lineHeight: 1.35 }}
+        >
           {article.title}
         </Typography>
         {article.excerpt && (
@@ -87,20 +207,31 @@ function ArticleCard({ article, view }: { article: BlogCard; view: BlogQuery["vi
             color="text.secondary"
             sx={{
               display: "-webkit-box",
-              WebkitLineClamp: 3,
+              WebkitLineClamp: { xs: 2, md: 3 },
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
+              lineHeight: 1.7,
             }}
           >
             {article.excerpt}
           </Typography>
         )}
         <Button
-          component="a"
+          component={Link}
           href={`/blog/${article.slug}`}
           variant="contained"
-          sx={{ alignSelf: "flex-start", mt: "auto !important" }}
+          endIcon={
+            <ArrowForwardRoundedIcon sx={{ transform: "scaleX(var(--sk-direction-scale, 1))" }} />
+          }
           aria-label={`${t("readPost")}: ${article.title}`}
+          sx={{
+            mt: "auto !important",
+            width: { xs: "100%", md: "auto" },
+            alignSelf: { md: "flex-start" },
+            minHeight: 43,
+            borderRadius: 1.25,
+            boxShadow: "none",
+          }}
         >
           {t("readPost")}
         </Button>
@@ -112,184 +243,250 @@ function ArticleCard({ article, view }: { article: BlogCard; view: BlogQuery["vi
 export function BlogIndexPage({ content, query }: { content: BlogIndexContent; query: BlogQuery }) {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("storefront.blog");
-  const filters = useTranslations("shared.filters");
   const featured =
     query.page === 1 && !query.search && query.sort === "newest" ? content.items.slice(0, 3) : [];
+  const mosaic = featured.length >= 3;
   const pages = Array.from(
     { length: Math.min(content.totalPages, 5) },
     (_, index) => Math.max(1, Math.min(query.page - 2, content.totalPages - 4)) + index,
   );
+
   return (
-    <Box sx={{ bgcolor: "background.default", pb: { xs: 7, md: 12 } }}>
-      <Box
-        sx={{
-          bgcolor: "#fff0e7",
-          backgroundImage:
-            "radial-gradient(circle at 15% 30%, #ffd7d0 0, transparent 24%), radial-gradient(circle at 85% 65%, #e2f0e5 0, transparent 26%)",
-          "html.dark &": {
-            bgcolor: "#321b1b",
-            backgroundImage:
-              "radial-gradient(circle at 15% 30%, #432424 0, transparent 24%), radial-gradient(circle at 85% 65%, #3a282e 0, transparent 26%)",
-          },
-        }}
-      >
-        <Container maxWidth="lg" sx={{ py: { xs: 5, md: 7 } }}>
-          <Box component="nav" aria-label={t("breadcrumbs")} sx={{ mb: 2 }}>
-            <Link href="/">{t("home")}</Link>
-            <span aria-hidden="true"> / </span>
-            <span aria-current="page">{t("title")}</span>
-          </Box>
-          <Typography component="h1" variant="h2" sx={{ fontWeight: 800, maxWidth: 750 }}>
+    <Box sx={{ bgcolor: "background.default", pb: { xs: 8, md: 12 } }}>
+      <Container maxWidth="lg" sx={{ pt: { xs: 3, md: 5 } }}>
+        <Box
+          component="nav"
+          aria-label={t("breadcrumbs")}
+          sx={{ mb: { xs: 2, md: 2.5 }, color: "text.secondary", fontSize: ".82rem" }}
+        >
+          <Link href="/" style={{ color: "inherit" }}>
+            {t("home")}
+          </Link>
+          <span aria-hidden="true"> / </span>
+          <Typography component="span" aria-current="page" variant="inherit" color="text.primary">
             {t("title")}
           </Typography>
-          <Typography color="text.secondary" sx={{ mt: 2, maxWidth: 650 }}>
+        </Box>
+        <Box sx={{ mb: { xs: 2.5, md: 4 } }}>
+          <Typography
+            component="h1"
+            sx={{
+              color: "primary.dark",
+              fontWeight: 800,
+              fontSize: { xs: "1.8rem", md: "2.8rem" },
+              lineHeight: 1.15,
+              letterSpacing: "-.03em",
+            }}
+          >
+            {t("title")}
+          </Typography>
+          <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 680, lineHeight: 1.75 }}>
             {t("description")}
           </Typography>
-        </Container>
-      </Box>
-      <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 6 } }}>
+        </Box>
+
         {featured.length > 0 && (
-          <Box component="section" aria-label={t("featured")} sx={{ mb: 5 }}>
-            <Typography component="h2" variant="h5" sx={{ mb: 2, fontWeight: 800 }}>
-              {t("featured")}
-            </Typography>
+          <Box component="section" aria-label={t("featured")} sx={{ mb: { xs: 3, md: 5 } }}>
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 1fr))" },
-                gap: 2,
+                gridTemplateColumns: mosaic
+                  ? {
+                      xs: "repeat(2, minmax(0, 1fr))",
+                      md: "minmax(0, 1.25fr) minmax(0, .9fr) minmax(0, .9fr)",
+                    }
+                  : { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+                gridTemplateRows: mosaic
+                  ? { xs: "repeat(2, minmax(0, 170px))", md: "repeat(2, minmax(0, 185px))" }
+                  : undefined,
+                gap: { xs: 1.25, md: 1.75 },
               }}
             >
-              {featured.map((article) => (
+              {featured.map((article, index) => (
                 <Box
                   key={article.slug}
-                  component="a"
-                  href={`/blog/${article.slug}`}
-                  sx={{
-                    position: "relative",
-                    minHeight: { xs: 190, sm: 230 },
-                    borderRadius: 4,
-                    overflow: "hidden",
-                    color: "white",
-                    textDecoration: "none",
-                    bgcolor: "#272742",
-                    display: "flex",
-                    alignItems: "flex-end",
-                    p: 2.5,
-                    backgroundImage: article.image
-                      ? `linear-gradient(0deg, rgba(20,20,30,.93), rgba(20,20,30,.82) 48%, rgba(20,20,30,.42)), url("${article.image.url}")`
-                      : "linear-gradient(140deg, #292844, #ff6269)",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    "&:focus-visible": {
-                      outline: "3px solid var(--sara-palette-primary-dark)",
-                      outlineOffset: 3,
-                    },
-                  }}
+                  sx={
+                    mosaic && index === 0
+                      ? { gridColumn: { xs: "auto", md: "span 2" }, gridRow: "span 2" }
+                      : undefined
+                  }
                 >
-                  <Typography component="span" variant="h6" sx={{ fontWeight: 800, zIndex: 1 }}>
-                    {article.title}
-                  </Typography>
+                  <StoryTile article={article} featured={mosaic && index === 0} />
                 </Box>
               ))}
             </Box>
           </Box>
         )}
+
         <Paper
-          component="form"
-          action="/blog"
-          method="get"
-          variant="outlined"
-          sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, mb: 3 }}
+          elevation={0}
+          sx={{
+            p: { xs: 1.25, md: 1.75 },
+            mb: 2,
+            borderRadius: 1.75,
+            border: "1px solid",
+            borderColor: "divider",
+            bgcolor: "background.paper",
+          }}
         >
+          <Stack
+            direction="row"
+            sx={{ alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap" }}
+          >
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center", minWidth: 0 }}>
+              <TuneRoundedIcon color="primary" sx={{ fontSize: 21 }} />
+              <Typography
+                component="h2"
+                sx={{ fontWeight: 800, fontSize: { xs: ".98rem", md: "1.05rem" } }}
+              >
+                {t("latest")}
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
+              <Typography
+                component="span"
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  px: 1,
+                  py: 0.6,
+                  borderRadius: 1,
+                  bgcolor: "action.hover",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t("found", { count: formatNumber(content.total, locale) })}
+              </Typography>
+              <IconButton
+                component={Link}
+                href={blogHref(query, { view: "grid", page: 1 })}
+                aria-label={t("grid")}
+                aria-current={query.view === "grid" ? "true" : undefined}
+                size="small"
+                sx={{
+                  color: query.view === "grid" ? "primary.main" : "text.secondary",
+                  bgcolor: query.view === "grid" ? "action.hover" : "transparent",
+                  borderRadius: 1,
+                }}
+              >
+                <GridViewRoundedIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                component={Link}
+                href={blogHref(query, { view: "list", page: 1 })}
+                aria-label={t("list")}
+                aria-current={query.view === "list" ? "true" : undefined}
+                size="small"
+                sx={{
+                  color: query.view === "list" ? "primary.main" : "text.secondary",
+                  bgcolor: query.view === "list" ? "action.hover" : "transparent",
+                  borderRadius: 1,
+                }}
+              >
+                <ViewAgendaOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          </Stack>
           <Box
+            component="details"
             sx={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) auto",
-              gap: 2,
-              alignItems: "end",
+              mt: 1.25,
+              "& summary": {
+                display: "flex",
+                alignItems: "center",
+                gap: 0.75,
+                width: "fit-content",
+                cursor: "pointer",
+                color: "text.secondary",
+                fontSize: ".85rem",
+                fontWeight: 700,
+                listStyle: "none",
+                "&::-webkit-details-marker": { display: "none" },
+              },
             }}
           >
-            <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
-              <Typography component="span" variant="body2">
-                {t("search")}
-              </Typography>
+            <Box component="summary">
+              <SearchRoundedIcon sx={{ fontSize: 18 }} />
+              {t("search")}
+            </Box>
+            <Box
+              component="form"
+              action="/blog"
+              method="get"
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) 180px auto" },
+                gap: 1,
+                mt: 1.25,
+              }}
+            >
               <Box
                 component="input"
                 type="search"
                 name="q"
                 defaultValue={query.search}
-                sx={inputStyle}
+                placeholder={t("search")}
+                aria-label={t("search")}
+                sx={{
+                  minHeight: 42,
+                  minWidth: 0,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  bgcolor: "background.default",
+                  px: 1.25,
+                  font: "inherit",
+                }}
               />
-            </Box>
-            <Button type="submit" variant="contained" sx={{ minHeight: 44 }}>
-              {t("apply")}
-            </Button>
-          </Box>
-          <Box
-            component="details"
-            sx={{ mt: 2, "& summary": { cursor: "pointer", fontWeight: 700 } }}
-          >
-            <Box component="summary">{filters("advanced")}</Box>
-            <Box sx={{ pt: 2, maxWidth: 300 }}>
-              <Box component="label" sx={{ display: "grid", gap: 0.75 }}>
-                <Typography component="span" variant="body2">
-                  {t("sort")}
-                </Typography>
-                <Box component="select" name="sort" defaultValue={query.sort} sx={inputStyle}>
-                  <option value="newest">{t("newest")}</option>
-                  <option value="oldest">{t("oldest")}</option>
-                  <option value="popular">{t("popular")}</option>
-                </Box>
+              <Box
+                component="select"
+                name="sort"
+                defaultValue={query.sort}
+                aria-label={t("sort")}
+                sx={{
+                  minHeight: 42,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  bgcolor: "background.default",
+                  px: 1.25,
+                  font: "inherit",
+                }}
+              >
+                <option value="newest">{t("newest")}</option>
+                <option value="oldest">{t("oldest")}</option>
+                <option value="popular">{t("popular")}</option>
               </Box>
+              {query.view !== "grid" && <input type="hidden" name="view" value={query.view} />}
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ minHeight: 42, borderRadius: 1, px: 2 }}
+              >
+                {t("apply")}
+              </Button>
             </Box>
           </Box>
-          {query.view !== "grid" && <input type="hidden" name="view" value={query.view} />}
         </Paper>
-        <Stack
-          direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 2,
-            flexWrap: "wrap",
-            mb: 2,
-          }}
-        >
-          <Typography component="h2" variant="h5" sx={{ fontWeight: 800 }}>
-            {t("latest")}
-          </Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-              {t("found", { count: formatNumber(content.total, locale) })}
-            </Typography>
-            <Button
-              component="a"
-              href={blogHref(query, { view: "grid", page: 1 })}
-              aria-current={query.view === "grid" ? "true" : undefined}
-              variant={query.view === "grid" ? "contained" : "outlined"}
-              size="small"
-            >
-              {t("grid")}
-            </Button>
-            <Button
-              component="a"
-              href={blogHref(query, { view: "list", page: 1 })}
-              aria-current={query.view === "list" ? "true" : undefined}
-              variant={query.view === "list" ? "contained" : "outlined"}
-              size="small"
-            >
-              {t("list")}
-            </Button>
-          </Stack>
-        </Stack>
+
         {content.items.length === 0 ? (
-          <Paper variant="outlined" sx={{ p: 5, textAlign: "center", borderRadius: 4 }}>
-            <Typography variant="h6">{t("empty")}</Typography>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              textAlign: "center",
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              {t("empty")}
+            </Typography>
             <Typography color="text.secondary" sx={{ mt: 1, mb: 2 }}>
               {t("emptyHint")}
             </Typography>
-            <Button component="a" href="/blog" variant="outlined">
+            <Button component={Link} href="/blog" variant="outlined" sx={{ borderRadius: 1.25 }}>
               {t("clearFilters")}
             </Button>
           </Paper>
@@ -300,8 +497,8 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
               gridTemplateColumns:
                 query.view === "list"
                   ? "1fr"
-                  : { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))" },
-              gap: 3,
+                  : { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" },
+              gap: { xs: 1.75, md: 2.5 },
             }}
           >
             {content.items.map((article) => (
@@ -309,40 +506,50 @@ export function BlogIndexPage({ content, query }: { content: BlogIndexContent; q
             ))}
           </Box>
         )}
+
         {content.totalPages > 1 && (
           <Box
             component="nav"
             aria-label={t("pagination")}
-            sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 1, mt: 5 }}
+            sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 0.75, mt: 4 }}
           >
             {query.page > 1 && (
               <Button
-                component="a"
+                component={Link}
                 href={blogHref(query, { page: query.page - 1 })}
                 variant="outlined"
+                aria-label={t("previous")}
+                sx={{ minWidth: 42, borderRadius: 1.1 }}
               >
-                {t("previous")}
+                <ArrowForwardRoundedIcon
+                  sx={{ transform: "rotate(180deg) scaleX(var(--sk-direction-scale, 1))" }}
+                />
               </Button>
             )}
             {pages.map((page) => (
               <Button
                 key={page}
-                component="a"
+                component={Link}
                 href={blogHref(query, { page })}
                 variant={page === query.page ? "contained" : "outlined"}
                 aria-current={page === query.page ? "page" : undefined}
                 aria-label={t("page", { page })}
+                sx={{ minWidth: 42, borderRadius: 1.1 }}
               >
                 {formatNumber(page, locale)}
               </Button>
             ))}
             {query.page < content.totalPages && (
               <Button
-                component="a"
+                component={Link}
                 href={blogHref(query, { page: query.page + 1 })}
                 variant="outlined"
+                aria-label={t("next")}
+                sx={{ minWidth: 42, borderRadius: 1.1 }}
               >
-                {t("next")}
+                <ArrowForwardRoundedIcon
+                  sx={{ transform: "scaleX(var(--sk-direction-scale, 1))" }}
+                />
               </Button>
             )}
           </Box>
