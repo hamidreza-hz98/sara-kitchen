@@ -4,8 +4,6 @@ import AccountCircleRounded from "@mui/icons-material/AccountCircleRounded";
 import ArticleRounded from "@mui/icons-material/ArticleRounded";
 import HomeRounded from "@mui/icons-material/HomeRounded";
 import InfoRounded from "@mui/icons-material/InfoRounded";
-import LanguageRounded from "@mui/icons-material/LanguageRounded";
-import LoginRounded from "@mui/icons-material/LoginRounded";
 import LogoutRounded from "@mui/icons-material/LogoutRounded";
 import MenuRounded from "@mui/icons-material/MenuRounded";
 import PersonRounded from "@mui/icons-material/PersonRounded";
@@ -32,10 +30,11 @@ import { AppDrawer, AppLink } from "@/components/ui";
 import { useCustomerAuth, useFeedback } from "@/hooks";
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
-import { saveBrowserLocalePreference } from "@/locales/client-preference";
 import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
+import { LocaleSelector } from "./locale-selector";
+import { ThemeSwitcher } from "./theme-switcher";
 
 type NavigationItem = {
   href: string;
@@ -58,6 +57,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 function BrandLink() {
+  const locale = useLocale();
   const shared = useTranslations("shared");
   const shell = useTranslations("storefront.shell");
 
@@ -67,7 +67,7 @@ function BrandLink() {
       underline="none"
       sx={{ display: "inline-flex", alignItems: "center", gap: 2, color: "text.primary" }}
     >
-      <BrandMark />
+      <BrandMark symbolOnly={locale === "fa"} />
       <Box>
         <Typography component="span" sx={{ display: "block", fontWeight: 800, lineHeight: 1.15 }}>
           {shared("brandName")}
@@ -82,57 +82,6 @@ function BrandLink() {
         </Typography>
       </Box>
     </AppLink>
-  );
-}
-
-function LocaleSelector() {
-  const locale = useLocale();
-  const shell = useTranslations("storefront.shell");
-  const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null);
-  const open = anchorElement !== null;
-
-  const selectLocale = (nextLocale: string) => {
-    saveBrowserLocalePreference(nextLocale as "en" | "pt-PT" | "fa");
-    window.location.reload();
-  };
-
-  return (
-    <>
-      <Button
-        aria-controls={open ? "storefront-language-menu" : undefined}
-        aria-expanded={open ? "true" : undefined}
-        aria-haspopup="menu"
-        aria-label={shell("language")}
-        startIcon={
-          <LanguageRounded fontSize="small" sx={{ display: { xs: "none", lg: "block" }, me: 1 }} />
-        }
-        variant="outlined"
-        onClick={(event) => setAnchorElement(event.currentTarget)}
-        sx={{
-          minWidth: { xs: 72, lg: 118 },
-          borderRadius: 999,
-          bgcolor: "background.paper",
-        }}
-      >
-        {locale === "pt-PT" ? "PT" : locale === "fa" ? "فا" : "EN"}
-      </Button>
-      <Menu
-        anchorEl={anchorElement}
-        id="storefront-language-menu"
-        open={open}
-        onClose={() => setAnchorElement(null)}
-      >
-        <MenuItem lang="en" selected={locale === "en"} onClick={() => selectLocale("en")}>
-          English
-        </MenuItem>
-        <MenuItem lang="pt-PT" selected={locale === "pt-PT"} onClick={() => selectLocale("pt-PT")}>
-          Português
-        </MenuItem>
-        <MenuItem dir="rtl" lang="fa" selected={locale === "fa"} onClick={() => selectLocale("fa")}>
-          فارسی
-        </MenuItem>
-      </Menu>
-    </>
   );
 }
 
@@ -191,6 +140,14 @@ function AccountMenu() {
     }
   };
 
+  if (!auth.authenticated) {
+    return (
+      <IconButton aria-label={navigation("signIn")} component={NextLink} href="/login">
+        <AccountCircleRounded />
+      </IconButton>
+    );
+  }
+
   return (
     <>
       <IconButton
@@ -208,36 +165,24 @@ function AccountMenu() {
         open={open}
         slotProps={{ list: { "aria-label": shell("accountNavigation") } }}
         onClose={handleClose}
+        sx={{ "& .MuiMenuItem-root": { gap: 1 } }}
       >
         <MenuItem component={NextLink} href="/profile" onClick={handleClose}>
-          <PersonRounded fontSize="small" sx={{ me: 2 }} />
+          <PersonRounded fontSize="small" />
           {navigation("profile")}
         </MenuItem>
         <MenuItem component={NextLink} href="/profile/orders" onClick={handleClose}>
-          <ReceiptLongRounded fontSize="small" sx={{ me: 2 }} />
+          <ReceiptLongRounded fontSize="small" />
           {navigation("orders")}
         </MenuItem>
-        {auth.authenticated ? (
-          <MenuItem
-            onClick={() => {
-              signOut().catch(() => undefined);
-            }}
-          >
-            <LogoutRounded fontSize="small" sx={{ me: 2 }} />
-            {shell("signOut")}
-          </MenuItem>
-        ) : (
-          [
-            <MenuItem component={NextLink} href="/login" onClick={handleClose} key="login">
-              <LoginRounded fontSize="small" sx={{ me: 2 }} />
-              {navigation("signIn")}
-            </MenuItem>,
-            <MenuItem component={NextLink} href="/signup" onClick={handleClose} key="signup">
-              <PersonRounded fontSize="small" sx={{ me: 2 }} />
-              {shell("createAccount")}
-            </MenuItem>,
-          ]
-        )}
+        <MenuItem
+          onClick={() => {
+            signOut().catch(() => undefined);
+          }}
+        >
+          <LogoutRounded fontSize="small" />
+          {shell("signOut")}
+        </MenuItem>
       </Menu>
     </>
   );
@@ -254,15 +199,26 @@ export function StorefrontHeader({ cartItemCount }: { cartItemCount: number }) {
       <AppBar position="sticky" sx={{ zIndex: (theme) => theme.zIndex.appBar }}>
         <Container maxWidth="xl" disableGutters>
           <Toolbar
-            sx={{ minHeight: { xs: 68, lg: 76 }, gap: { xs: 2, lg: 5 }, px: { xs: 4, lg: 6 } }}
+            sx={{
+              minHeight: { xs: 68, lg: 76 },
+              gap: { xs: 2, lg: 5 },
+              px: { xs: 2, lg: 6 },
+              justifyContent: { xs: "space-between", lg: "initial" },
+            }}
           >
-            <BrandLink />
+            <Box sx={{ flexShrink: 0, me: { xs: 0, lg: "auto" } }}>
+              <BrandLink />
+            </Box>
             <Stack
               aria-label={shell("primaryNavigation")}
               component="nav"
               direction="row"
-              spacing={1}
-              sx={{ display: { xs: "none", lg: "flex" }, flexGrow: 1, justifyContent: "center" }}
+              sx={{
+                display: { xs: "none", lg: "flex" },
+                gap: 1,
+                flexGrow: 1,
+                justifyContent: "center",
+              }}
             >
               {primaryItems.map((item) => {
                 const active = isActivePath(pathname, item.href);
@@ -280,7 +236,19 @@ export function StorefrontHeader({ cartItemCount }: { cartItemCount: number }) {
                 );
               })}
             </Stack>
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center", ms: "auto" }}>
+            <Stack
+              direction="row"
+              sx={{
+                alignItems: "center",
+                gap: { xs: 0.5, lg: 1 },
+                ms: { xs: 0, lg: "auto" },
+                px: { xs: 0.75, lg: 0 },
+                py: { xs: 0.5, lg: 0 },
+                borderRadius: { xs: 2, lg: 0 },
+                bgcolor: { xs: "action.hover", lg: "transparent" },
+              }}
+            >
+              <ThemeSwitcher />
               <LocaleSelector />
               <Box sx={{ display: { xs: "none", lg: "block" } }}>
                 <CartButton count={cartItemCount} />
@@ -336,6 +304,7 @@ export function StorefrontMobileNavigation({ cartItemCount }: { cartItemCount: n
   const pathname = usePathname();
   const navigation = useTranslations("shared.navigation");
   const shell = useTranslations("storefront.shell");
+  const auth = useCustomerAuth();
 
   return (
     <Box
@@ -355,7 +324,7 @@ export function StorefrontMobileNavigation({ cartItemCount }: { cartItemCount: n
         py: 1.5,
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: 999,
+        borderRadius: 2,
         bgcolor: "rgba(var(--sara-palette-background-paperChannel) / 0.94)",
         boxShadow: 5,
         backdropFilter: "blur(14px)",
@@ -380,10 +349,10 @@ export function StorefrontMobileNavigation({ cartItemCount }: { cartItemCount: n
         label={navigation(mobileItems[2].key)}
       />
       <MobileNavigationLink
-        active={isActivePath(pathname, "/profile")}
-        href="/profile"
+        active={isActivePath(pathname, auth.authenticated ? "/profile" : "/login")}
+        href={auth.authenticated ? "/profile" : "/login"}
         icon={<PersonRounded />}
-        label={navigation("profile")}
+        label={navigation(auth.authenticated ? "profile" : "signIn")}
       />
     </Box>
   );
