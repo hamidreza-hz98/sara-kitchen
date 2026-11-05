@@ -30,7 +30,7 @@ import { SlugPolicyError } from "@/server/slugs";
 
 export type CategoryMutationServices = Pick<
   ReturnType<typeof createCategoryServices>,
-  "create" | "update" | "archive"
+  "create" | "update" | "archive" | "delete"
 >;
 
 export async function categoryRequestContext(
