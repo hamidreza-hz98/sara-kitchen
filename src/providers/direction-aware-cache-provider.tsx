@@ -13,7 +13,7 @@ export function DirectionAwareCacheProvider({
   direction,
 }: DirectionAwareCacheProviderProps) {
   return (
-    <AppRouterCacheProvider options={getEmotionCacheOptions(direction)}>
+    <AppRouterCacheProvider key={direction} options={getEmotionCacheOptions(direction)}>
       {children}
     </AppRouterCacheProvider>
   );
