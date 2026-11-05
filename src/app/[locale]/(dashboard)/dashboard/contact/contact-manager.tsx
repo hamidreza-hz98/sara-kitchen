@@ -1,7 +1,6 @@
 "use client";
 
-import { AdvancedFilters } from "@/components/ui/advanced-filters";
-
+import FilterListRounded from "@mui/icons-material/FilterListRounded";
 import ArchiveOutlined from "@mui/icons-material/ArchiveOutlined";
 import AssignmentIndOutlined from "@mui/icons-material/AssignmentIndOutlined";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
@@ -103,6 +102,7 @@ function responseData<T>(body: unknown): T | undefined {
 
 export function ContactManager({ capabilities }: { capabilities: Capabilities }) {
   const t = useTranslations("dashboard.contacts");
+  const filterLabels = useTranslations("shared.filters");
   const locale = useLocale() as SupportedLocale;
   const feedback = useFeedback();
   const router = useRouter();
@@ -127,6 +127,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
     totalItems: 0,
     totalPages: 0,
   });
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [reload, setReload] = useState(0);
@@ -377,8 +378,8 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
         </Button>
       </Stack>
 
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <AdvancedFilters>
+      <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
+        <Stack direction="row" sx={{ gap: 2, alignItems: "center", minWidth: 0 }}>
           <TextField
             fullWidth
             value={draftSearch}
@@ -394,9 +395,34 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
               },
             }}
           />
+          <Button
+            type="button"
+            variant="outlined"
+            startIcon={<FilterListRounded />}
+            aria-expanded={filtersOpen}
+            aria-label={filtersOpen ? filterLabels("less") : filterLabels("advanced")}
+            aria-controls="contact-status-filters"
+            onClick={() => setFiltersOpen((open) => !open)}
+            sx={{
+              flexShrink: 0,
+              whiteSpace: "nowrap",
+              minWidth: { xs: 44, sm: "auto" },
+              px: { xs: 1.5, sm: 3 },
+              "&& .MuiButton-startIcon": { marginInlineEnd: { xs: 0, sm: "0.5rem" } },
+            }}
+          >
+            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+              {filtersOpen ? filterLabels("less") : filterLabels("advanced")}
+            </Box>
+          </Button>
+        </Stack>
+        {status && !filtersOpen && (
+          <Chip size="small" label={t(`statuses.${status as ContactStatus}`)} sx={{ mt: 2 }} />
+        )}
+        <Box id="contact-status-filters" hidden={!filtersOpen}>
           <Stack
             direction="row"
-            sx={{ gap: 1, overflowX: "auto", whiteSpace: "nowrap" }}
+            sx={{ gap: 1.5, flexWrap: "wrap", mt: 2 }}
             aria-label={t("statusFilter")}
           >
             <Button
@@ -417,7 +443,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
               </Button>
             ))}
           </Stack>
-        </AdvancedFilters>
+        </Box>
       </Paper>
 
       {error ? (
@@ -574,7 +600,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
               closeMenu();
             }}
           >
-            <ArchiveOutlined fontSize="small" sx={{ mr: 1 }} />
+            <ArchiveOutlined fontSize="small" sx={{ me: 1 }} />
             {t("archive")}
           </MenuItem>
         )}
@@ -588,7 +614,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
                 closeMenu();
               }}
             >
-              <DeleteOutlineRounded fontSize="small" sx={{ mr: 1 }} />
+              <DeleteOutlineRounded fontSize="small" sx={{ me: 1 }} />
               {t("delete")}
             </MenuItem>
           )}
@@ -711,7 +737,7 @@ export function ContactManager({ capabilities }: { capabilities: Capabilities })
                       label={t("assignee")}
                       value={assigneeDraft}
                       onChange={(event) => setAssigneeDraft(event.target.value)}
-                      startAdornment={<AssignmentIndOutlined sx={{ mr: 1 }} />}
+                      startAdornment={<AssignmentIndOutlined sx={{ me: 1 }} />}
                     >
                       <MenuItem value="">{t("unassigned")}</MenuItem>
                       {assignees.map((assignee) => (
