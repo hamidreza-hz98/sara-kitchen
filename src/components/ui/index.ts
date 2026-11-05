@@ -2,6 +2,7 @@ export { ActionButton, type ActionButtonProps } from "./action-button";
 export { AppImage, type AppImageProps } from "./app-image";
 export { AppLink, type AppLinkProps } from "./app-link";
 export { AppPagination, type AppPaginationProps } from "./app-pagination";
+export { LiquidGlass, type LiquidGlassProps } from "./liquid-glass";
 export {
   FormField,
   SelectField,
