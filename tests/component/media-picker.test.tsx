@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MediaPicker } from "@/components/media";
 import { PROJECT_TIME_ZONE } from "@/constants";
 import messages from "@/locales/messages/en";
+import persianMessages from "@/locales/messages/fa";
 import { appTheme } from "@/theme";
 
 const upload = vi.hoisted(() => vi.fn());
@@ -101,6 +102,32 @@ describe("reusable media picker", () => {
     },
   );
 
+  it("hides upload without permission", async () => {
+    const user = userEvent.setup();
+    renderForm(<SingleForm label="Category banner" />);
+    await user.click(screen.getByRole("button", { name: "Browse media" }));
+    expect(screen.queryByRole("button", { name: "Upload new image" })).not.toBeInTheDocument();
+  });
+
+  it("shows the upload action in Persian", async () => {
+    const user = userEvent.setup();
+    render(
+      <NextIntlClientProvider locale="fa" messages={persianMessages} timeZone={PROJECT_TIME_ZONE}>
+        <ThemeProvider theme={appTheme}>
+          <MediaPicker
+            label="تصویر"
+            value={null}
+            onChange={() => {}}
+            canUpload
+            allowedKinds={["image"]}
+          />
+        </ThemeProvider>
+      </NextIntlClientProvider>,
+    );
+    await user.click(screen.getByRole("button", { name: "مرور رسانه‌ها" }));
+    expect(screen.getByRole("button", { name: "بارگذاری تصویر جدید" })).toBeVisible();
+  });
+
   it("binds multiple dish images and supports inline image upload", async () => {
     const user = userEvent.setup();
     upload.mockResolvedValue({
@@ -121,11 +148,23 @@ describe("reusable media picker", () => {
         expect.anything(),
       ),
     );
+    const notice = vi.fn();
+    window.addEventListener("sara-media-uploaded", notice, { once: true });
     await user.upload(
       within(dialog).getByLabelText("Choose image to upload"),
       new File([new Uint8Array([1])], "new.png", { type: "image/png" }),
     );
     await waitFor(() => expect(upload).toHaveBeenCalledOnce());
+    await waitFor(() => expect(notice).toHaveBeenCalledOnce());
+    await waitFor(() =>
+      expect(within(dialog).getByRole("textbox", { name: "Search media" })).toHaveValue(""),
+    );
+    await waitFor(() =>
+      expect(fetch).toHaveBeenLastCalledWith(
+        expect.not.stringContaining("search=saffron"),
+        expect.anything(),
+      ),
+    );
     await waitFor(() => expect(within(dialog).getByText("1 item selected")).toBeVisible());
     await user.click(within(dialog).getByRole("button", { name: "Use selection" }));
     expect(screen.getByText(image.id)).toBeVisible();
