@@ -24,6 +24,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { uploadMediaBatch } from "@/lib/media-bulk-upload";
+import { notifyMediaUploaded } from "@/lib/media-change";
+import { normalizeMediaFilename } from "@/lib/media-filename";
 import { mediaUploadAdmission } from "@/lib/media-upload-admission";
 
 export type MediaKind = "image" | "video" | "pdf";
@@ -205,27 +207,34 @@ export function MediaPicker(props: MediaPickerProps) {
   const upload = async (file: File) => {
     if (props.multiple === true && props.maxItems && selection.length >= props.maxItems) {
       setError(t("maxItems", { count: props.maxItems }));
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
     const issue = mediaUploadAdmission(file);
     if (issue) {
       setError(t(`uploadErrors.${issue}`));
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
+    const normalizedName = normalizeMediaFilename(file.name, file.type);
+    const alt =
+      normalizedName
+        .replace(/\.[^.]+$/u, "")
+        .replaceAll(/[_-]+/gu, " ")
+        .trim() || "Image";
     const controller = new AbortController();
     abortRef.current = controller;
     setUploading(true);
     setUploadProgress(0);
     setError(null);
+    let uploaded = false;
     try {
       const report = await uploadMediaBatch(
         [
           {
             clientId: crypto.randomUUID(),
             file,
-            translations: [
-              { locale: "en", alt: file.name.replace(/\.[^.]+$/u, "").replaceAll(/[_-]+/gu, " ") },
-            ],
+            translations: [{ locale: "en", alt }],
           },
         ],
         { signal: controller.signal, onProgress: (event) => setUploadProgress(event.progress) },
@@ -235,7 +244,14 @@ export function MediaPicker(props: MediaPickerProps) {
         setError(t(result?.error?.code === "CONFLICT" ? "duplicateUpload" : "uploadError"));
         return;
       }
-      const response = await fetch(`/api/media/${result.media.id}`);
+      uploaded = true;
+      notifyMediaUploaded();
+      setSearch("");
+      setSearchDraft("");
+      setKind("all");
+      setPage(1);
+      setReload((current) => current + 1);
+      const response = await fetch(`/api/media/${result.media.id}`, { signal: controller.signal });
       if (!response.ok) throw new Error("media_detail_failed");
       const detail = (await response.json()) as Readonly<{ data?: MediaPickerItem }>;
       if (!detail.data || !allowedKinds.includes(detail.data.kind))
@@ -244,10 +260,10 @@ export function MediaPicker(props: MediaPickerProps) {
       setSelection((current) =>
         props.multiple === true ? [...new Set([...current, detail.data!.id])] : [detail.data!.id],
       );
-      setPage(1);
-      setReload((current) => current + 1);
     } catch {
-      setError(controller.signal.aborted ? t("uploadCanceled") : t("uploadError"));
+      setError(
+        controller.signal.aborted ? t("uploadCanceled") : t(uploaded ? "readError" : "uploadError"),
+      );
     } finally {
       abortRef.current = null;
       setUploading(false);
@@ -338,7 +354,11 @@ export function MediaPicker(props: MediaPickerProps) {
               </FormControl>
             </Stack>
             {props.canUpload && allowedKinds.includes("image") && (
-              <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ alignItems: "center", flexWrap: "wrap", rowGap: 1 }}
+              >
                 <input
                   accept=".jpg,.jpeg,.png,.webp,.avif"
                   aria-label={t("uploadPicker")}
@@ -424,7 +444,7 @@ export function MediaPicker(props: MediaPickerProps) {
                         <InsertDriveFileRounded />
                       )}
                     </Box>
-                    <Stack direction="row" sx={{ alignItems: "center" }}>
+                    <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
                       {selection.includes(item.id) ? (
                         <CheckCircleRounded color="primary" />
                       ) : (
