@@ -141,7 +141,7 @@ function hasTranslation(value: LocalFields): boolean {
 }
 
 function completeTranslation(value: LocalFields): boolean {
-  return Boolean(value.title.trim() && value.excerpt.trim());
+  return Boolean(value.title.trim());
 }
 
 function fromDetail(item: BlogDetail): FormValues {
@@ -344,11 +344,14 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
     if (!dirty || window.confirm(t("leaveWarning"))) router.push("/dashboard/blog");
   };
 
-  const tags = () =>
-    values.tags
-      .split(",")
-      .map((value) => previewSlug(value.trim()))
-      .filter(Boolean);
+  const tags = () => [
+    ...new Set(
+      values.tags
+        .split(",")
+        .map((value) => previewSlug(value.trim()))
+        .filter(Boolean),
+    ),
+  ];
 
   const buildPayload = () => ({
     translations: LANGUAGES.flatMap((language) => {
@@ -386,7 +389,29 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
     const invalidSlug =
       Boolean(values.slugOverride) && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(values.slugOverride);
     if (!parsed.success || invalidSlug || !slug) {
-      setServerError(t("validationError"));
+      const issues: string[] = [];
+      if (!values.translations.en.title.trim()) issues.push(t("issueEnglishTitle"));
+      else if (invalidSlug || !slug) issues.push(t("issueSlug"));
+      if (!parsed.success) {
+        for (const issue of parsed.error.issues) {
+          const [field, index, part] = issue.path;
+          if (field === "translations" && typeof index === "number") {
+            const language = payload.translations[index]?.locale;
+            const label = language ? t(`language.${language}`) : "";
+            if (part === "title") issues.push(t("issueTitle", { language: label }));
+            else if (part === "excerpt") issues.push(t("issueExcerpt", { language: label }));
+            else if (part === "content") issues.push(t("issueContent", { language: label }));
+            else issues.push(t("issueTranslation", { language: label }));
+          } else if (field === "readTimeMinutes") issues.push(t("issueReadTime"));
+          else if (field === "tags") issues.push(t("issueTags"));
+          else if (field === "imageMediaId" || field === "bannerMediaId")
+            issues.push(t("issueMedia"));
+          else if (field === "relatedDishIds" || field === "relatedBlogIds")
+            issues.push(t("issueRelations"));
+          else if (field !== "translations") issues.push(t("validationError"));
+        }
+      }
+      setServerError([...new Set(issues)].join(" ") || t("validationError"));
       return null;
     }
     setSaving(true);
@@ -398,7 +423,25 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
         body: JSON.stringify(parsed.data),
       });
       if (!response.ok) {
-        setServerError(response.status === 409 ? t("conflict") : t("saveError"));
+        if (response.status === 400) {
+          const body = (await response.json().catch(() => null)) as {
+            error?: { details?: { issues?: { code?: string; path?: (string | number)[] }[] } };
+          } | null;
+          const messages = (body?.error?.details?.issues ?? []).map((issue) => {
+            const field = issue.path?.[0];
+            if (field === "imageMediaId" || field === "bannerMediaId") return t("issueMedia");
+            if (
+              field === "relatedDishIds" ||
+              field === "relatedBlogIds" ||
+              issue.code === "circular_relationship" ||
+              issue.code === "self_relationship"
+            )
+              return t("issueRelations");
+            if (field === "slugOverride") return t("issueSlug");
+            return t("serverValidationError");
+          });
+          setServerError([...new Set(messages)].join(" ") || t("serverValidationError"));
+        } else setServerError(response.status === 409 ? t("conflict") : t("saveError"));
         return null;
       }
       const body = (await response.json()) as Envelope<BlogDetail>;
@@ -427,14 +470,6 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
   const lifecycle = async (action: "publish" | "schedule" | "unpublish") => {
     setServerError("");
     if (!canPublish) return;
-    if (
-      action !== "unpublish" &&
-      LANGUAGES.some((language) => !completeTranslation(values.translations[language]))
-    ) {
-      setAttempted(true);
-      setServerError(t("publishRequirements"));
-      return;
-    }
     const saved = dirty || !detail ? await persist(true) : detail;
     if (!saved) return;
     if (action === "schedule") {
@@ -544,7 +579,8 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
     );
 
   const current = values.translations[tab];
-  const fieldError = attempted && hasTranslation(current) && !completeTranslation(current);
+  const fieldError =
+    attempted && (tab === "en" || hasTranslation(current)) && !current.title.trim();
   const previewTranslation = preview
     ? (preview.translations.find((entry) => entry.locale === locale) ??
       preview.translations.find((entry) => entry.locale === "en") ??
@@ -676,18 +712,16 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
             disabled={!editable || status === "archived"}
             error={fieldError}
             onChange={(event) => updateTranslation(tab, { title: event.target.value })}
-            slotProps={{ htmlInput: { maxLength: 180 } }}
+            slotProps={{ htmlInput: { maxLength: 180, dir: tab === "fa" ? "rtl" : "ltr" } }}
           />
           <TextField
             label={t("excerpt")}
             value={current.excerpt}
-            required={tab === "en"}
             disabled={!editable || status === "archived"}
-            error={fieldError}
             multiline
             minRows={3}
             onChange={(event) => updateTranslation(tab, { excerpt: event.target.value })}
-            slotProps={{ htmlInput: { maxLength: 500 } }}
+            slotProps={{ htmlInput: { maxLength: 500, dir: tab === "fa" ? "rtl" : "ltr" } }}
             helperText={`${current.excerpt.length}/500`}
           />
           <Box
@@ -705,6 +739,7 @@ export function BlogEditor({ canCreate, canPublish, canUpdate, canUploadMedia }:
               {t("richContent")}
             </Typography>
             <BlogRichEditor
+              direction={tab === "fa" ? "rtl" : "ltr"}
               value={current.content}
               onChange={(content) => updateTranslation(tab, { content })}
               labelledBy={`blog-content-${tab}`}
