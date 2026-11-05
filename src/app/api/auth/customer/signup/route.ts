@@ -9,7 +9,13 @@ import {
   handleApiRoute,
   parseJsonRequest,
 } from "@/server/http";
-import { isSameOriginMutation, limitSignupIdentity, limitSignupIp } from "@/server/modules/auth";
+import {
+  createCustomerMobileVerification,
+  isSameOriginMutation,
+  limitSignupIdentity,
+  limitSignupIp,
+  mobileVerificationDevelopmentCodeEnabled,
+} from "@/server/modules/auth";
 import { customerSignupSchema, registerCustomer } from "@/server/modules/customers";
 
 export const runtime = "nodejs";
@@ -27,7 +33,14 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
     await limitSignupIdentity(connection, input.mobile);
     if (input.email) await limitSignupIdentity(connection, input.email, "email");
-    await registerCustomer(connection, input);
+    const customerId = await registerCustomer(connection, input);
+    if (customerId && mobileVerificationDevelopmentCodeEnabled()) {
+      const mobileVerification = await createCustomerMobileVerification(connection, {
+        customerId,
+        mobile: input.mobile,
+      });
+      return apiSuccess({ accepted: true as const, mobileVerification }, { status: 202 });
+    }
     return apiSuccess({ accepted: true as const }, { status: 202 });
   });
 }
