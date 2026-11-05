@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { ThemeSwitcher } from "@/components/layout/theme-switcher";
+
 import { AdminLoginForm } from "./admin-login-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,26 +16,34 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AuthenticationPage() {
   const auth = await getTranslations("dashboard.auth");
   return (
-    <Container
-      component="main"
-      maxWidth="sm"
-      sx={{ minHeight: "100dvh", display: "grid", alignContent: "center" }}
-    >
+    <Box sx={{ position: "relative", minHeight: "100dvh" }}>
       <Box
-        sx={{
-          p: { xs: 4, sm: 6 },
-          bgcolor: "background.paper",
-          borderRadius: 4,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
+        component="header"
+        sx={{ position: "absolute", insetBlockStart: 1, insetInlineEnd: 2, zIndex: 1 }}
       >
-        <Typography component="h1" variant="h2" sx={{ mb: 2 }}>
-          {auth("title")}
-        </Typography>
-        <Typography sx={{ mb: 4, color: "text.secondary" }}>{auth("description")}</Typography>
-        <AdminLoginForm />
+        <ThemeSwitcher />
       </Box>
-    </Container>
+      <Container
+        component="main"
+        maxWidth="sm"
+        sx={{ minHeight: "100dvh", display: "grid", alignContent: "center" }}
+      >
+        <Box
+          sx={{
+            p: { xs: 4, sm: 6 },
+            bgcolor: "background.paper",
+            borderRadius: 4,
+            border: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <Typography component="h1" variant="h2" sx={{ mb: 2 }}>
+            {auth("title")}
+          </Typography>
+          <Typography sx={{ mb: 4, color: "text.secondary" }}>{auth("description")}</Typography>
+          <AdminLoginForm />
+        </Box>
+      </Container>
+    </Box>
   );
 }
