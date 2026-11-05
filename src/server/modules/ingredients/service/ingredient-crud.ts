@@ -256,8 +256,8 @@ export function createIngredientServices(deps: IngredientServiceDependencies) {
         if (!current) throw new IngredientServiceError("not_found");
         if (current.status !== "archived") throw new IngredientServiceError("not_archived");
         if (await deps.countDishReferences(id)) throw new IngredientServiceError("referenced");
-        const deleted = await deps.repository.softDelete(current, actor.id, new Date());
-        return { value: deleted, id, changed: true };
+        await deps.repository.hardDeleteArchived(current);
+        return { value: current, id, changed: true };
       });
     },
   };
