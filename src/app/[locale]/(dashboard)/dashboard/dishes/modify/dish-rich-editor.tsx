@@ -16,10 +16,12 @@ export function DishRichEditor({
   value,
   onChange,
   labelledBy,
+  direction,
 }: {
   value: RichDocument | null;
   onChange: (value: RichDocument) => void;
   labelledBy: string;
+  direction: "ltr" | "rtl";
   labels: Readonly<{ bold: string; italic: string; bulletList: string; numberedList: string }>;
 }) {
   const editor = useEditor({
@@ -53,7 +55,9 @@ export function DishRichEditor({
           "& .tiptap ul, & .tiptap ol": { ps: 3 },
         }}
       >
-        <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        <Box dir={direction}>
+          <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        </Box>
       </Box>
     </Box>
   );
