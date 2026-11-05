@@ -27,7 +27,15 @@ import {
 } from "../repository/blog";
 
 export type BlogAction =
-  "create" | "read" | "update" | "preview" | "schedule" | "publish" | "unpublish" | "archive";
+  | "create"
+  | "read"
+  | "update"
+  | "preview"
+  | "schedule"
+  | "publish"
+  | "unpublish"
+  | "archive"
+  | "delete";
 export type BlogActor = Readonly<{ id: string; displayName: string; role: AdminRole }>;
 export type BlogAuditEvent = Readonly<{
   action: BlogAction;
@@ -121,7 +129,7 @@ const objectId = z.string().regex(/^[a-f\d]{24}$/iu);
 const translation = z.strictObject({
   locale: z.enum(SUPPORTED_LOCALES),
   title: z.string().trim().min(1).max(180),
-  excerpt: z.string().trim().min(1).max(500),
+  excerpt: z.string().trim().max(500),
   content: z.custom<BlogTranslation["content"]>(isStoredRichText),
 });
 const inputSchema = z.strictObject({
@@ -160,7 +168,7 @@ function unique(values: readonly string[]): boolean {
 function validateInput(value: BlogInput): void {
   if (
     validateTranslationValues<BlogTranslation>(value.translations, {
-      canonicalTextFields: ["title", "excerpt"],
+      canonicalTextFields: ["title"],
     }).length > 0 ||
     value.translations.some((item) => !isStoredRichText(item.content)) ||
     !unique(value.tags ?? []) ||
@@ -245,7 +253,7 @@ function requirePermission(actor: BlogActor, action: BlogAction): void {
         ? "blogs:read"
         : action === "publish" || action === "unpublish" || action === "schedule"
           ? "blogs:publish"
-          : action === "archive"
+          : action === "archive" || action === "delete"
             ? "blogs:delete"
             : "blogs:update";
   if (!hasAdminPermission({ role: actor.role, active: true }, permission)) {
@@ -319,12 +327,12 @@ function publicValue(
   const title = resolveLocalizedValue(value.translations, "title", locale);
   const excerpt = resolveLocalizedValue(value.translations, "excerpt", locale);
   const content = resolveLocalizedValue(value.translations, "content", locale);
-  if (!title || !excerpt || !content || !value.publishedAt) throw new BlogServiceError("not_found");
+  if (!title || !content || !value.publishedAt) throw new BlogServiceError("not_found");
   const common: BlogPublicItem = {
     id: value.id,
     slug: value.slug,
     title: title.value,
-    excerpt: excerpt.value,
+    excerpt: excerpt?.value ?? "",
     resolvedLocale: title.resolvedLocale,
     direction: title.direction,
     imageMediaId: value.imageMediaId,
@@ -473,8 +481,6 @@ export function createBlogServices(deps: BlogServiceDependencies) {
       return execute(deps, actor, "schedule", async () => {
         const current = await deps.repository.findById(id);
         if (!current || current.status === "archived") throw new BlogServiceError("not_found");
-        if (current.translations.length !== SUPPORTED_LOCALES.length)
-          throw new BlogServiceError("invalid_input");
         if (!Number.isFinite(publishAt.getTime()) || publishAt.getTime() <= now().getTime())
           throw new BlogServiceError("invalid_input");
         const write = {
@@ -495,8 +501,6 @@ export function createBlogServices(deps: BlogServiceDependencies) {
       return execute(deps, actor, "publish", async () => {
         const current = await deps.repository.findById(id);
         if (!current || current.status === "archived") throw new BlogServiceError("not_found");
-        if (current.translations.length !== SUPPORTED_LOCALES.length)
-          throw new BlogServiceError("invalid_input");
         const write = {
           ...blogWriteFromSnapshot(current),
           status: "published" as const,
@@ -556,6 +560,21 @@ export function createBlogServices(deps: BlogServiceDependencies) {
           id,
           changedIds: [id, current.slug, ...affectedBlogs],
         };
+      });
+    },
+    async delete(actor: BlogActor, id: string): Promise<BlogSnapshot> {
+      return execute(deps, actor, "delete", async () => {
+        const current = await deps.repository.findById(id);
+        if (!current) throw new BlogServiceError("not_found");
+        if (current.status !== "archived") throw new BlogServiceError("invalid_transition");
+        try {
+          await deps.seo.remove(current);
+          await deps.repository.hardDeleteArchived(current);
+          return { value: current, id, changedIds: [id, current.slug] };
+        } catch (error) {
+          if (error instanceof BlogRepositoryConflictError) throw new BlogServiceError("conflict");
+          throw error;
+        }
       });
     },
     async listPublic(
