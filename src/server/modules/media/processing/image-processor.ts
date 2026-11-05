@@ -60,6 +60,7 @@ export interface ImageProcessingOptions {
   /** Native libvips timeout for each sequential variant. */
   readonly variantTimeoutSeconds?: number;
   readonly webpOnly?: boolean;
+  readonly webpEffort?: 2 | 5;
 }
 
 const supportedFormats: Record<ImageMimeType, string> = {
@@ -83,6 +84,7 @@ async function renderVariant(
   side: number,
   format: "webp" | "jpeg" | "png",
   timeoutSeconds: number,
+  webpEffort: 2 | 5,
 ): Promise<ImageVariantOutput> {
   let pipeline = decoder(input)
     .autoOrient()
@@ -90,7 +92,7 @@ async function renderVariant(
     .timeout({ seconds: timeoutSeconds });
 
   if (format === "webp") {
-    pipeline = pipeline.webp({ quality: IMAGE_PROCESSING_POLICY.webpQuality, effort: 5 });
+    pipeline = pipeline.webp({ quality: IMAGE_PROCESSING_POLICY.webpQuality, effort: webpEffort });
   } else if (format === "jpeg") {
     pipeline = pipeline.jpeg({ quality: IMAGE_PROCESSING_POLICY.jpegQuality, mozjpeg: true });
   } else {
@@ -176,7 +178,9 @@ export async function processImage(
       const remainingMs = deadlineAtMs - Date.now();
       if (remainingMs <= 0) throw new ImageProcessingError("processing_timeout");
       const seconds = Math.min(variantTimeoutSeconds, Math.max(1, Math.floor(remainingMs / 1000)));
-      variants.push(await renderVariant(input, role, side, format, seconds));
+      variants.push(
+        await renderVariant(input, role, side, format, seconds, options.webpEffort ?? 5),
+      );
     }
     if (Date.now() >= deadlineAtMs) throw new ImageProcessingError("processing_timeout");
   } catch (error) {
