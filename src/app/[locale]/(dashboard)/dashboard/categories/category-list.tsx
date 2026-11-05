@@ -3,7 +3,9 @@
 import { AdvancedFilters } from "@/components/ui/advanced-filters";
 
 import AddRounded from "@mui/icons-material/AddRounded";
+import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
 import CategoryRounded from "@mui/icons-material/CategoryRounded";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import EditRounded from "@mui/icons-material/EditRounded";
 import ImageNotSupportedRounded from "@mui/icons-material/ImageNotSupportedRounded";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
@@ -39,6 +41,9 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AppPagination, EmptyState, ErrorState } from "@/components/ui";
+import { ConfirmationDialog } from "@/components/feedback";
+import { useFeedback } from "@/hooks";
+import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { usePathname, useRouter } from "@/locales/navigation";
 
 type Translation = Readonly<{ locale: string; name: string; description: string }>;
@@ -122,7 +127,15 @@ function CategoryImage({ id, alt }: { id: string | null; alt: string }) {
   );
 }
 
-export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; canUpdate: boolean }) {
+export function CategoryList({
+  canCreate,
+  canUpdate,
+  canDelete = false,
+}: {
+  canCreate: boolean;
+  canUpdate: boolean;
+  canDelete?: boolean;
+}) {
   const t = useTranslations("dashboard.categories");
   const locale = useLocale();
   const router = useRouter();
@@ -130,13 +143,15 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
   const searchParams = useSearchParams();
   const raw = searchParams.toString();
   const query = useMemo(() => new URLSearchParams(raw), [raw]);
+  const isTrash = query.get("trash") === "1";
   const page = Math.max(1, Number(query.get("page")) || 1);
   const pageSize = PAGE_SIZES.includes(Number(query.get("pageSize")) as (typeof PAGE_SIZES)[number])
     ? Number(query.get("pageSize"))
     : 10;
-  const status = ["draft", "published", "archived"].includes(query.get("status") ?? "")
-    ? (query.get("status") ?? "")
-    : "";
+  const status =
+    !isTrash && ["draft", "published"].includes(query.get("status") ?? "")
+      ? (query.get("status") ?? "")
+      : "";
   const sort = SORTS.includes(query.get("sort") as (typeof SORTS)[number])
     ? (query.get("sort") ?? SORTS[0])
     : SORTS[0];
@@ -153,6 +168,12 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
   const [error, setError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selected, setSelected] = useState<Category | null>(null);
+  const [confirmAction, setConfirmAction] = useState<Readonly<{
+    action: "archive" | "delete";
+    item: Category;
+  }> | null>(null);
+  const [mutating, setMutating] = useState(false);
+  const feedback = useFeedback();
 
   const updateQuery = useCallback(
     (patch: Record<string, string | number | null>) => {
@@ -180,7 +201,8 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (status) params.set("status", status);
+    if (isTrash) params.set("status", "archived");
+    else if (status) params.set("status", status);
     if (search.length >= 2) params.set("search", search);
     const [sortBy, sortDirection] = sort.split(":");
     params.set("sortBy", sortBy ?? "sortOrder");
@@ -208,7 +230,7 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [page, pageSize, refreshKey, search, sort, status]);
+  }, [isTrash, page, pageSize, refreshKey, search, sort, status]);
 
   const translation = (item: Category) =>
     item.translations.find((value) => value.locale === locale) ??
@@ -237,7 +259,7 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
   const actionButtons = (item: Category) => (
     <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
       {viewButton(item)}
-      {canUpdate ? (
+      {!isTrash && canUpdate ? (
         <Tooltip title={t("edit")}>
           <IconButton
             aria-label={t("editCategory", { name: translation(item)?.name ?? item.slug })}
@@ -247,8 +269,60 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
           </IconButton>
         </Tooltip>
       ) : null}
+      {!isTrash && canUpdate && item.status !== "archived" ? (
+        <Tooltip title={t("archive")}>
+          <IconButton
+            aria-label={t("archiveCategory", { name: translation(item)?.name ?? item.slug })}
+            onClick={() => setConfirmAction({ action: "archive", item })}
+          >
+            <ArchiveRounded />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+      {isTrash && canDelete ? (
+        <Tooltip title={t("delete")}>
+          <IconButton
+            color="error"
+            aria-label={t("deleteCategory", { name: translation(item)?.name ?? item.slug })}
+            onClick={() => setConfirmAction({ action: "delete", item })}
+          >
+            <DeleteOutlineRounded />
+          </IconButton>
+        </Tooltip>
+      ) : null}
     </Stack>
   );
+
+  const runConfirmedAction = async () => {
+    if (!confirmAction) return;
+    setMutating(true);
+    try {
+      const response = await fetch(
+        confirmAction.action === "archive"
+          ? `/api/categories/${confirmAction.item.id}/archive`
+          : `/api/categories/${confirmAction.item.id}`,
+        {
+          method: confirmAction.action === "archive" ? "POST" : "DELETE",
+          credentials: "same-origin",
+          headers: await csrfJsonHeaders("admin"),
+          ...(confirmAction.action === "archive" ? { body: "{}" } : {}),
+        },
+      );
+      if (!response.ok) throw new Error("category_action_failed");
+      feedback.notify({
+        message: t(confirmAction.action === "archive" ? "archiveSuccess" : "deleteSuccess"),
+        severity: "success",
+      });
+      setConfirmAction(null);
+      setSelected(null);
+      setLoading(true);
+      setRefreshKey((value) => value + 1);
+    } catch {
+      feedback.notify({ message: t("actionError"), severity: "error" });
+    } finally {
+      setMutating(false);
+    }
+  };
 
   return (
     <Stack spacing={3}>
@@ -258,11 +332,22 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
       >
         <Box>
           <Typography component="h1" variant="h4">
-            {t("title")}
+            {t(isTrash ? "trashTitle" : "title")}
           </Typography>
-          <Typography color="text.secondary">{t("description")}</Typography>
+          <Typography color="text.secondary">
+            {t(isTrash ? "trashDescription" : "description")}
+          </Typography>
         </Box>
         <Stack direction="row" sx={{ gap: 1 }}>
+          <Tooltip title={t(isTrash ? "hideTrash" : "showTrash")}>
+            <IconButton
+              aria-label={t(isTrash ? "hideTrash" : "showTrash")}
+              color={isTrash ? "error" : "default"}
+              onClick={() => updateQuery({ trash: isTrash ? null : 1, status: null, page: 1 })}
+            >
+              <DeleteOutlineRounded />
+            </IconButton>
+          </Tooltip>
           <Button
             variant="outlined"
             startIcon={<RefreshRounded />}
@@ -273,7 +358,7 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
           >
             {t("refresh")}
           </Button>
-          {canCreate ? (
+          {!isTrash && canCreate ? (
             <Button
               variant="contained"
               startIcon={<AddRounded />}
@@ -302,20 +387,21 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
               },
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel id="category-status-label">{t("status")}</InputLabel>
-            <Select
-              labelId="category-status-label"
-              label={t("status")}
-              value={status}
-              onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
-            >
-              <MenuItem value="">{t("allStatuses")}</MenuItem>
-              <MenuItem value="draft">{t("statuses.draft")}</MenuItem>
-              <MenuItem value="published">{t("statuses.published")}</MenuItem>
-              <MenuItem value="archived">{t("statuses.archived")}</MenuItem>
-            </Select>
-          </FormControl>
+          {!isTrash ? (
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel id="category-status-label">{t("status")}</InputLabel>
+              <Select
+                labelId="category-status-label"
+                label={t("status")}
+                value={status}
+                onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
+              >
+                <MenuItem value="">{t("allStatuses")}</MenuItem>
+                <MenuItem value="draft">{t("statuses.draft")}</MenuItem>
+                <MenuItem value="published">{t("statuses.published")}</MenuItem>
+              </Select>
+            </FormControl>
+          ) : null}
           <FormControl size="small" sx={{ minWidth: 185 }}>
             <InputLabel id="category-sort-label">{t("sort")}</InputLabel>
             <Select
@@ -511,6 +597,27 @@ export function CategoryList({ canCreate, canUpdate }: { canCreate: boolean; can
           </Stack>
         </DialogContent>
       </Dialog>
+      <ConfirmationDialog
+        open={confirmAction !== null}
+        title={t(confirmAction?.action === "delete" ? "deleteTitle" : "archiveTitle")}
+        description={t(
+          confirmAction?.action === "delete" ? "deleteDescription" : "archiveDescription",
+          {
+            name: confirmAction
+              ? (translation(confirmAction.item)?.name ?? confirmAction.item.slug)
+              : "",
+          },
+        )}
+        confirmLabel={t(confirmAction?.action === "delete" ? "delete" : "archive")}
+        cancelLabel={t("cancel")}
+        closeLabel={t("close")}
+        danger={confirmAction?.action === "delete"}
+        loading={mutating}
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          void runConfirmedAction().catch(() => undefined);
+        }}
+      />
     </Stack>
   );
 }
