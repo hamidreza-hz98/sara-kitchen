@@ -157,6 +157,21 @@ export function translateBlogError(error: unknown): never {
     if (error.code === "not_found") throw ApiError.notFound("blog");
     if (error.code === "conflict" || error.code === "invalid_transition")
       throw ApiError.conflict({ resource: "blog" });
+    if (error.issues.length) {
+      const fields = {
+        image_media: "imageMediaId",
+        banner_media: "bannerMediaId",
+        dish: "relatedDishIds",
+        blog: "relatedBlogIds",
+      } as const;
+      throw ApiError.validation(
+        error.issues.map((issue) => ({
+          code: error.code,
+          message: "A selected item is missing or unavailable.",
+          path: [fields[issue.kind]],
+        })),
+      );
+    }
     throw ApiError.validation([
       { code: error.code, message: "The blog data is not accepted.", path: [] },
     ]);
