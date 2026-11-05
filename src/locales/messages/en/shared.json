@@ -8,6 +8,10 @@
     "hide": "Hide password"
   },
   "brandName": "Sara Kitchen",
+  "theme": {
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
+  },
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
