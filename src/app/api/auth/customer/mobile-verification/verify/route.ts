@@ -13,9 +13,12 @@ import {
 } from "@/server/http";
 import {
   CustomerMobileVerificationRejectedError,
+  createVerifiedCustomerSession,
+  customerCookieName,
   isSameOriginMutation,
   limitVerificationAttempt,
   mobileVerificationDevelopmentCodeEnabled,
+  serializeCustomerCookie,
   verifyCustomerMobile,
 } from "@/server/modules/auth";
 
@@ -27,7 +30,8 @@ const schema = z.strictObject({
 });
 
 export async function POST(request: NextRequest): Promise<Response> {
-  return handleApiRoute(request, async () => {
+  let cookie: string | undefined;
+  const response = await handleApiRoute(request, async () => {
     if (!isSameOriginMutation(request)) throw ApiError.authorization();
     if (!mobileVerificationDevelopmentCodeEnabled()) throw ApiError.serviceUnavailable();
     const locale = resolveLocalePreference(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
@@ -39,7 +43,18 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
     await limitVerificationAttempt(connection, request, input.challengeToken);
     try {
-      await verifyCustomerMobile(connection, input);
+      const customerId = await verifyCustomerMobile(connection, input);
+      const result = await createVerifiedCustomerSession(connection, {
+        customerId,
+        priorToken: request.cookies.get(customerCookieName())?.value ?? null,
+        userAgent: request.headers.get("user-agent")?.slice(0, 512) ?? null,
+      });
+      cookie = serializeCustomerCookie(
+        result.session.token,
+        result.session.expiresAt,
+        result.persistent,
+      );
+      return apiSuccess({ authenticated: true as const, verified: true as const });
     } catch (error) {
       if (error instanceof CustomerMobileVerificationRejectedError) {
         const t = await getTranslations({ locale, namespace: "storefront.mobileVerification" });
@@ -50,6 +65,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       }
       throw error;
     }
-    return apiSuccess({ verified: true as const });
   });
+  if (cookie && response.ok) response.headers.append("set-cookie", cookie);
+  return response;
 }

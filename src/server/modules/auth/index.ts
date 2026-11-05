@@ -57,6 +57,7 @@ export {
 } from "./service/authentication-limit";
 export {
   CustomerLoginRejectedError,
+  createVerifiedCustomerSession,
   loginCustomer,
   logoutCustomer,
   resolveCustomerActor,

@@ -8,7 +8,9 @@ export { markCustomerMobileVerified } from "./service/mobile-verification";
 export {
   findCustomerForLogin,
   getActiveCustomerIdentity,
+  isActiveCustomerMobileVerified,
   type ActiveCustomerIdentity,
+  type CustomerLoginCandidate,
   type CustomerLoginIdentity,
 } from "./service/customer-login";
 export { customerSignupSchema } from "./validation/signup";

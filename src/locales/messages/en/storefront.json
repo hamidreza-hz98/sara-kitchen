@@ -489,7 +489,7 @@
     "marketing": "Send me occasional offers (optional)",
     "submit": "Create account",
     "submitting": "Creating account…",
-    "accepted": "If these details are eligible, your account is ready. You can now sign in.",
+
     "existingCustomer": "Already have an account?",
     "loginLink": "Sign in",
     "validationError": "Please check your details and try again.",
@@ -514,7 +514,7 @@
     "title": "Verify your mobile number",
     "description": "Enter the six-digit code to confirm the mobile number on your new account.",
     "code": "One-time code",
-    "developmentCode": "Development code (local only):",
+    "developmentCode": "Development code (local or private QA):",
     "invalid": "That code is incorrect or expired. Try the displayed code or generate a new one.",
     "error": "We couldn't verify your mobile number. Please try again.",
     "resendError": "We couldn't generate a new code. Please try again.",
@@ -522,8 +522,8 @@
     "verifying": "Verifying…",
     "resendCode": "Generate a new code",
     "resending": "Generating…",
-    "success": "Your mobile number has been verified.",
-    "continueToLogin": "Continue to sign in",
+    "success": "Your account has been created and you are signed in.",
+    "continueToProfile": "Go to my profile",
     "noChallenge": "There is no active verification in this browser. Create an account to start again.",
     "signUp": "Create an account",
     "wrongNumber": "Entered the wrong number?"

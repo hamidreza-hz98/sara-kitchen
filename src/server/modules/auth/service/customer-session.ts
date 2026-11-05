@@ -5,6 +5,7 @@ import type { Connection } from "mongoose";
 import {
   findCustomerForLogin,
   getActiveCustomerIdentity,
+  isActiveCustomerMobileVerified,
   verifyCustomerPasswordForLogin,
   type ActiveCustomerIdentity,
 } from "@/server/modules/customers";
@@ -56,9 +57,12 @@ export async function loginCustomer(
     await consumeDummyVerification(input.password);
     throw new CustomerLoginRejectedError();
   }
-  if (!(await verifyCustomerPasswordForLogin(connection, candidate.id, input.password))) {
-    throw new CustomerLoginRejectedError();
-  }
+  const passwordValid = await verifyCustomerPasswordForLogin(
+    connection,
+    candidate.id,
+    input.password,
+  );
+  if (!passwordValid || !candidate.mobileVerified) throw new CustomerLoginRejectedError();
   const customer = await getActiveCustomerIdentity(connection, candidate.id);
   if (!customer || customer.passwordVersion !== candidate.passwordVersion) {
     throw new CustomerLoginRejectedError();
@@ -78,6 +82,29 @@ export async function loginCustomer(
     userAgent: input.userAgent ?? null,
   });
   return { customer, session, persistent: input.persistent };
+}
+
+/** Issues a standard customer session after the customer's signup mobile is verified. */
+export async function createVerifiedCustomerSession(
+  connection: Connection,
+  input: { customerId: string; priorToken?: string | null; userAgent?: string | null },
+): Promise<CustomerLoginResult> {
+  const customer = await getActiveCustomerIdentity(connection, input.customerId);
+  if (!customer || !(await isActiveCustomerMobileVerified(connection, customer.id))) {
+    throw new CustomerLoginRejectedError();
+  }
+  if (input.priorToken)
+    await revokeSession(connection, input.priorToken, "customer", "login-rotation");
+  const now = new Date();
+  const session = await issueSession(connection, {
+    actorKind: "customer",
+    actorId: customer.id,
+    passwordVersion: customer.passwordVersion,
+    persistent: false,
+    expiresAt: new Date(now.getTime() + STANDARD_LIFETIME_MS),
+    userAgent: input.userAgent ?? null,
+  });
+  return { customer, session, persistent: false };
 }
 
 export async function resolveCustomerActor(

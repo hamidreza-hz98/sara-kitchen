@@ -69,6 +69,11 @@ requires every value in its group:
 - WhatsApp: `WHATSAPP_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, and
   `WHATSAPP_EMPLOYER_NUMBER` in E.164 format.
 
+CUSTOMER_MOBILE_VERIFICATION_DEVELOPMENT_CODE_ENABLED defaults to false. It enables the
+generated six-digit signup verification code in a private QA deployment before a WhatsApp sender is
+configured. The code is returned to the browser for that challenge, so leave this setting disabled
+on any public production storefront. Local development and test environments enable the code.
+
 `RESET_SMS_ENABLED` defaults to `false`. Customer password recovery is intentionally unavailable
 until it is enabled with `TWILIO_RESET_ACCOUNT_SID`, `TWILIO_RESET_AUTH_TOKEN`, and
 `TWILIO_RESET_FROM_NUMBER` (E.164). Set these only in the deployment secret manager. The reset

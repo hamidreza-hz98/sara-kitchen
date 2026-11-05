@@ -24,7 +24,7 @@ import { Link as LocalizedLink, useRouter } from "@/locales/navigation";
 import { storeCustomerMobileVerification } from "@/lib/customer-mobile-verification";
 import { parseCustomerMobile } from "@/validations/customer-identity";
 
-type Result = "accepted" | "validationError" | "rateLimited" | "networkError" | null;
+type Result = "validationError" | "rateLimited" | "networkError" | null;
 
 function countryFlag(country: CountryCode) {
   return String.fromCodePoint(
@@ -102,7 +102,6 @@ export function CustomerSignupForm() {
           /^[A-Za-z0-9_-]{43}$/u.test(verification.challengeToken)
         ) {
           const developmentCode =
-            process.env.NODE_ENV === "development" &&
             typeof verification.developmentCode === "string" &&
             /^\d{6}$/u.test(verification.developmentCode)
               ? verification.developmentCode
@@ -116,13 +115,11 @@ export function CustomerSignupForm() {
         }
       }
       setResult(
-        response.ok
-          ? "accepted"
-          : response.status === 400
-            ? "validationError"
-            : response.status === 429
-              ? "rateLimited"
-              : "networkError",
+        response.status === 400
+          ? "validationError"
+          : response.status === 429
+            ? "rateLimited"
+            : "networkError",
       );
     } catch {
       setResult("networkError");
@@ -277,16 +274,11 @@ export function CustomerSignupForm() {
         sx={signupCheckboxLabelSx}
       />
       {result && (
-        <Alert role="status" severity={result === "accepted" ? "success" : "error"}>
+        <Alert role="status" severity="error">
           {t(result)}
         </Alert>
       )}
-      <Button
-        disabled={pending || result === "accepted"}
-        fullWidth
-        type="submit"
-        variant="contained"
-      >
+      <Button disabled={pending} fullWidth type="submit" variant="contained">
         {pending ? t("submitting") : t("submit")}
       </Button>
       <Stack

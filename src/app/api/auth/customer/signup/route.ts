@@ -33,8 +33,9 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
     await limitSignupIdentity(connection, input.mobile);
     if (input.email) await limitSignupIdentity(connection, input.email, "email");
+    if (!mobileVerificationDevelopmentCodeEnabled()) throw ApiError.serviceUnavailable();
     const customerId = await registerCustomer(connection, input);
-    if (customerId && mobileVerificationDevelopmentCodeEnabled()) {
+    if (customerId) {
       const mobileVerification = await createCustomerMobileVerification(connection, {
         customerId,
         mobile: input.mobile,

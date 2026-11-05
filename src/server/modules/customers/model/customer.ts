@@ -29,6 +29,7 @@ export type CustomerRecord = BaseDocumentFields &
     email: string | null;
     passwordHash: string;
     mobileVerifiedAt: Date | null;
+    mobileVerificationPendingAt: Date | null;
     emailVerifiedAt: Date | null;
     passwordVersion: number;
     marketingConsent: boolean;
@@ -79,6 +80,7 @@ const customerSchema = createBaseSchema<CustomerRecord>(
       validate: { validator: isPasswordHash, message: "An Argon2id hash is required." },
     },
     mobileVerifiedAt: { type: Date, default: null },
+    mobileVerificationPendingAt: { type: Date, default: null },
     emailVerifiedAt: { type: Date, default: null },
     passwordVersion: {
       type: Number,
@@ -123,6 +125,12 @@ customerSchema.index({ createdAt: -1, _id: -1 }, { name: "customer_registration_
 customerSchema.pre("validate", function validateCustomerState() {
   if (!this.email && this.emailVerifiedAt) {
     this.invalidate("emailVerifiedAt", "An email is required before email verification.");
+  }
+  if (this.mobileVerificationPendingAt && this.mobileVerifiedAt) {
+    this.invalidate(
+      "mobileVerificationPendingAt",
+      "A verified mobile number cannot remain pending verification.",
+    );
   }
   if (this.marketingConsent !== Boolean(this.marketingConsentAt)) {
     this.invalidate("marketingConsentAt", "Consent and its timestamp must agree.");

@@ -42,7 +42,10 @@ function hashCode(token: string, code: string): string {
 }
 
 export function mobileVerificationDevelopmentCodeEnabled(): boolean {
-  return process.env.NODE_ENV === "development";
+  return (
+    process.env.NODE_ENV !== "production" ||
+    getServerEnvironment().CUSTOMER_MOBILE_VERIFICATION_DEVELOPMENT_CODE_ENABLED
+  );
 }
 
 export async function createCustomerMobileVerification(
@@ -91,7 +94,7 @@ export async function resendCustomerMobileVerification(
 export async function verifyCustomerMobile(
   connection: Connection,
   input: { challengeToken: string; code: string },
-): Promise<void> {
+): Promise<string> {
   const challengeHash = hashChallengeToken(input.challengeToken);
   if (!challengeHash || !CODE_PATTERN.test(input.code)) {
     throw new CustomerMobileVerificationRejectedError();
@@ -143,4 +146,5 @@ export async function verifyCustomerMobile(
     now,
   );
   if (!marked) throw new CustomerMobileVerificationRejectedError();
+  return verification.customerId.toHexString();
 }

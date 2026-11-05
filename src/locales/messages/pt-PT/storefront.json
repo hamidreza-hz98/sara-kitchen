@@ -489,7 +489,7 @@
     "marketing": "Quero receber ofertas ocasionais (opcional)",
     "submit": "Criar conta",
     "submitting": "A criar conta…",
-    "accepted": "Se estes dados forem elegíveis, a sua conta está pronta. Já pode iniciar sessão.",
+
     "existingCustomer": "Já tem uma conta?",
     "loginLink": "Iniciar sessão",
     "validationError": "Verifique os seus dados e tente novamente.",
@@ -514,7 +514,7 @@
     "title": "Verifique o seu número de telemóvel",
     "description": "Introduza o código de seis dígitos para confirmar o número de telemóvel da sua nova conta.",
     "code": "Código de utilização única",
-    "developmentCode": "Código de desenvolvimento (apenas local):",
+    "developmentCode": "Código de desenvolvimento (local ou QA privado):",
     "invalid": "O código está incorreto ou expirou. Introduza o código apresentado ou gere um novo.",
     "error": "Não foi possível verificar o seu número. Tente novamente.",
     "resendError": "Não foi possível gerar um novo código. Tente novamente.",
@@ -522,8 +522,8 @@
     "verifying": "A verificar…",
     "resendCode": "Gerar novo código",
     "resending": "A gerar…",
-    "success": "O seu número de telemóvel foi verificado.",
-    "continueToLogin": "Continuar para iniciar sessão",
+    "success": "A sua conta foi criada e a sessão foi iniciada.",
+    "continueToProfile": "Ir para o meu perfil",
     "noChallenge": "Não existe uma verificação ativa neste navegador. Crie uma conta para começar de novo.",
     "signUp": "Criar conta",
     "wrongNumber": "Introduziu o número errado?"

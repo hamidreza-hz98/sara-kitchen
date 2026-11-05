@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { useState, useSyncExternalStore, type FormEvent } from "react";
 
 import { Link as LocalizedLink } from "@/locales/navigation";
+import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import {
   clearCustomerMobileVerification,
   getCustomerMobileVerificationSnapshot,
@@ -20,7 +21,6 @@ import {
 } from "@/lib/customer-mobile-verification";
 
 type Failure = "invalid" | "error" | "resendError" | null;
-const SHOW_DEVELOPMENT_CODE = process.env.NODE_ENV === "development";
 const SERVER_STORAGE_SNAPSHOT = "__server-render__";
 
 export function MobileVerificationForm() {
@@ -57,6 +57,7 @@ export function MobileVerificationForm() {
       });
       if (response.ok) {
         clearCustomerMobileVerification();
+        broadcastCustomerAuthChange();
         setVerified(true);
       } else {
         setFailure(response.status === 400 ? "invalid" : "error");
@@ -102,8 +103,8 @@ export function MobileVerificationForm() {
     return (
       <Stack spacing={2}>
         <Alert severity="success">{t("success")}</Alert>
-        <Button component={LocalizedLink} href="/login" variant="contained">
-          {t("continueToLogin")}
+        <Button component={LocalizedLink} href="/profile" variant="contained">
+          {t("continueToProfile")}
         </Button>
       </Stack>
     );
@@ -146,7 +147,7 @@ export function MobileVerificationForm() {
         slotProps={{ htmlInput: { inputMode: "numeric", maxLength: 6, pattern: "[0-9]{6}" } }}
         value={code}
       />
-      {SHOW_DEVELOPMENT_CODE && pendingVerification.developmentCode && (
+      {pendingVerification.developmentCode && (
         <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <Typography color="text.secondary" variant="body2">
             {t("developmentCode")}
@@ -156,7 +157,7 @@ export function MobileVerificationForm() {
           </Typography>
         </Stack>
       )}
-      {SHOW_DEVELOPMENT_CODE && (
+      {pendingVerification.developmentCode && (
         <Button
           disabled={resending || pending}
           onClick={() => {

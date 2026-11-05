@@ -28,6 +28,7 @@ export async function registerCustomer(
       marketingConsent: input.marketingConsent,
       marketingConsentAt: input.marketingConsent ? now : null,
       mobileVerifiedAt: null,
+      mobileVerificationPendingAt: now,
       emailVerifiedAt: null,
     });
     return customer._id.toHexString();

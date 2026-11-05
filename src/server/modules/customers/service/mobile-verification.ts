@@ -19,8 +19,9 @@ export async function markCustomerMobileVerified(
       status: "active",
       deletedAt: null,
       mobileVerifiedAt: null,
+      mobileVerificationPendingAt: { $ne: null },
     },
-    { $set: { mobileVerifiedAt: now } },
+    { $set: { mobileVerifiedAt: now, mobileVerificationPendingAt: null } },
   );
   return result.modifiedCount === 1;
 }
