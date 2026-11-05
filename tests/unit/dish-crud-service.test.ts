@@ -95,6 +95,9 @@ function harness() {
       return record;
     },
     rollbackCreate: async (current) => records.delete(current.id),
+    hardDeleteArchived: async (current) => {
+      records.delete(current.id);
+    },
     removeInboundRelationships: async (dishId) => {
       const affected: string[] = [];
       for (const [id, record] of records) {
@@ -241,11 +244,17 @@ describe("Dish CRUD services", () => {
     expect(test.inspectReferences).toHaveBeenCalled();
   });
 
-  it("enforces publication requirements and never uses UI permissions as authorization", async () => {
+  it("allows publication with optional references and enforces authorization", async () => {
     const test = harness();
     await expect(
-      test.services.create(actor, { ...input, status: "published" }),
-    ).rejects.toMatchObject({ code: "invalid_input" });
+      test.services.create(actor, {
+        ...input,
+        mediaIds: [],
+        categoryIds: [],
+        ingredients: [],
+        status: "published",
+      }),
+    ).resolves.toMatchObject({ status: "published" });
     await expect(test.services.create({ ...actor, role: "viewer" }, input)).rejects.toBeInstanceOf(
       DishServiceError,
     );
