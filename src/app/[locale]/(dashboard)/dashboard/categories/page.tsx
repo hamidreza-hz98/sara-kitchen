@@ -8,6 +8,7 @@ export default async function DashboardCategoriesPage() {
     <CategoryList
       canCreate={admin.permissions.includes("categories:create")}
       canUpdate={admin.permissions.includes("categories:update")}
+      canDelete={admin.permissions.includes("categories:delete")}
     />
   );
 }
