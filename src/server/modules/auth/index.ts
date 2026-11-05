@@ -29,6 +29,13 @@ export {
   PasswordResetRejectedError,
   PASSWORD_RESET_LIFETIME_MS,
 } from "./service/customer-password-reset";
+export {
+  createCustomerMobileVerification,
+  resendCustomerMobileVerification,
+  verifyCustomerMobile,
+  mobileVerificationDevelopmentCodeEnabled,
+  CustomerMobileVerificationRejectedError,
+} from "./service/customer-mobile-verification";
 export { resetSmsEnabled, sendResetSms } from "./service/reset-sms";
 export {
   changeCurrentCustomerPassword,
