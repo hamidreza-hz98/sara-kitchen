@@ -84,11 +84,15 @@ export async function createMediaUpload(
   const processed = await processImageForRoute(data, inspected.mimeType as ImageMimeType);
   const original = await sharp(data, { failOn: "warning", limitInputPixels: 8_000_000 })
     .autoOrient()
-    .webp({ quality: 78, effort: 4 })
+    .webp({ quality: 78, effort: 2 })
     .timeout({ seconds: 5 })
     .toBuffer({ resolveWithObject: true })
-    .catch(() => {
-      throw new ImageProcessingError("decode_failed");
+    .catch((error: unknown) => {
+      throw new ImageProcessingError(
+        error instanceof Error && /timeout/iu.test(error.message)
+          ? "processing_timeout"
+          : "decode_failed",
+      );
     });
   const derivedBytes = processed.variants.reduce((sum, variant) => sum + variant.bytes, 0);
   if (
