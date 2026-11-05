@@ -208,13 +208,15 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
   const searchParams = useSearchParams();
   const rawQuery = searchParams.toString();
   const query = useMemo(() => new URLSearchParams(rawQuery), [rawQuery]);
+  const isTrash = query.get("trash") === "1";
   const page = Math.max(1, Number(query.get("page")) || 1);
   const pageSize = PAGE_SIZES.includes(Number(query.get("pageSize")) as (typeof PAGE_SIZES)[number])
     ? Number(query.get("pageSize"))
     : 10;
-  const status = ["draft", "published", "archived"].includes(query.get("status") ?? "")
-    ? (query.get("status") ?? "")
-    : "";
+  const status =
+    !isTrash && ["draft", "published"].includes(query.get("status") ?? "")
+      ? (query.get("status") ?? "")
+      : "";
   const allergen = ALLERGENS.includes(query.get("allergen") as Allergen)
     ? (query.get("allergen") ?? "")
     : "";
@@ -272,7 +274,8 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (status) params.set("status", status);
+    if (isTrash) params.set("status", "archived");
+    else if (status) params.set("status", status);
     if (allergen) params.set("allergen", allergen);
     if (search.length >= 2) params.set("search", search);
     const [sortBy, sortDirection] = sort.split(":");
@@ -301,7 +304,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [allergen, page, pageSize, reload, search, sort, status]);
+  }, [allergen, isTrash, page, pageSize, reload, search, sort, status]);
 
   const refresh = () => {
     setLoading(true);
@@ -440,7 +443,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
     );
   const actions = (item: Ingredient) => (
     <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
-      {capabilities.update && item.status !== "archived" ? (
+      {!isTrash && capabilities.update && item.status !== "archived" ? (
         <Tooltip title={t("edit")}>
           <IconButton
             aria-label={t("editIngredient", { name: localizedName(item, locale) })}
@@ -450,7 +453,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
           </IconButton>
         </Tooltip>
       ) : null}
-      {capabilities.update && item.status !== "archived" ? (
+      {!isTrash && capabilities.update && item.status !== "archived" ? (
         <Tooltip title={t("archive")}>
           <IconButton
             aria-label={t("archiveIngredient", { name: localizedName(item, locale) })}
@@ -460,7 +463,7 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
           </IconButton>
         </Tooltip>
       ) : null}
-      {capabilities.delete && item.status === "archived" ? (
+      {isTrash && capabilities.delete && item.status === "archived" ? (
         <Tooltip title={t("delete")}>
           <IconButton
             color="error"
@@ -482,15 +485,28 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
       >
         <Box>
           <Typography component="h1" variant="h4">
-            {t("title")}
+            {t(isTrash ? "trashTitle" : "title")}
           </Typography>
-          <Typography color="text.secondary">{t("description")}</Typography>
+          <Typography color="text.secondary">
+            {t(isTrash ? "trashDescription" : "description")}
+          </Typography>
         </Box>
         <Stack direction="row" sx={{ gap: 1 }}>
+          <Tooltip title={t(isTrash ? "hideTrash" : "showTrash")}>
+            <IconButton
+              aria-label={t(isTrash ? "hideTrash" : "showTrash")}
+              color={isTrash ? "error" : "default"}
+              onClick={() =>
+                replaceQuery({ trash: isTrash ? null : 1, status: null, allergen: null, page: 1 })
+              }
+            >
+              <DeleteOutlineRounded />
+            </IconButton>
+          </Tooltip>
           <Button variant="outlined" startIcon={<RefreshRounded />} onClick={refresh}>
             {t("refresh")}
           </Button>
-          {capabilities.create ? (
+          {!isTrash && capabilities.create ? (
             <Button
               variant="contained"
               startIcon={<AddRounded />}
@@ -519,20 +535,21 @@ export function IngredientManager({ capabilities }: { capabilities: Capabilities
               },
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel id="ingredient-status-filter">{t("status")}</InputLabel>
-            <Select
-              labelId="ingredient-status-filter"
-              label={t("status")}
-              value={status}
-              onChange={(event) => replaceQuery({ status: event.target.value || null, page: 1 })}
-            >
-              <MenuItem value="">{t("allStatuses")}</MenuItem>
-              <MenuItem value="draft">{t("statuses.draft")}</MenuItem>
-              <MenuItem value="published">{t("statuses.published")}</MenuItem>
-              <MenuItem value="archived">{t("statuses.archived")}</MenuItem>
-            </Select>
-          </FormControl>
+          {!isTrash ? (
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel id="ingredient-status-filter">{t("status")}</InputLabel>
+              <Select
+                labelId="ingredient-status-filter"
+                label={t("status")}
+                value={status}
+                onChange={(event) => replaceQuery({ status: event.target.value || null, page: 1 })}
+              >
+                <MenuItem value="">{t("allStatuses")}</MenuItem>
+                <MenuItem value="draft">{t("statuses.draft")}</MenuItem>
+                <MenuItem value="published">{t("statuses.published")}</MenuItem>
+              </Select>
+            </FormControl>
+          ) : null}
           <FormControl size="small" sx={{ minWidth: 170 }}>
             <InputLabel id="ingredient-allergen-filter">{t("allergen")}</InputLabel>
             <Select
