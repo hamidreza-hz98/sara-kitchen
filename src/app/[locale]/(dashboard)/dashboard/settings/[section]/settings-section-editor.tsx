@@ -1,6 +1,5 @@
 "use client";
 
-import AddRounded from "@mui/icons-material/AddRounded";
 import CloudDoneRounded from "@mui/icons-material/CloudDoneRounded";
 import PreviewRounded from "@mui/icons-material/PreviewRounded";
 import PublishRounded from "@mui/icons-material/PublishRounded";
@@ -23,15 +22,21 @@ import Typography from "@mui/material/Typography";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { MediaPicker } from "@/components/media";
 import { ErrorState } from "@/components/ui";
 import { csrfJsonHeaders } from "@/lib/csrf-client";
+import type {
+  HomepageSettingsData,
+  HomepageSettingsTranslationValue,
+} from "@/server/modules/settings";
 
 import {
   createInitialSettingsPayload,
   type SettingsPageDefinition,
   type SettingsPageSection,
 } from "../settings-section-registry";
+import { HomepageSettingsEditor, HomepageTranslationsEditor } from "./homepage-settings-editor";
+import { SettingsDataForm } from "./settings-data-forms";
+import { SettingsTranslationForm } from "./settings-translation-forms";
 
 type Locale = "en" | "pt-PT" | "fa";
 type JsonObject = Record<string, unknown>;
@@ -51,6 +56,13 @@ type PolicySnapshot = Readonly<{
 }>;
 
 const LOCALES: readonly Locale[] = ["en", "pt-PT", "fa"];
+const POLICY_TYPE_TRANSLATIONS = {
+  "terms-of-service": "forms.policyTypes.terms-of-service",
+  "privacy-policy": "forms.policyTypes.privacy-policy",
+  "marketing-consent": "forms.policyTypes.marketing-consent",
+  "delivery-policy": "forms.policyTypes.delivery-policy",
+  "refund-policy": "forms.policyTypes.refund-policy",
+} as const;
 
 function asObject(value: unknown): JsonObject {
   return value !== null && typeof value === "object" && !Array.isArray(value)
@@ -151,9 +163,11 @@ function stableKey(state: ReturnType<typeof initialDraft>): string {
 
 export function SettingsSectionEditor({
   canEdit,
+  canUploadMedia = false,
   definition,
 }: {
   canEdit: boolean;
+  canUploadMedia?: boolean;
   definition: SettingsPageDefinition;
 }) {
   const t = useTranslations("dashboard.settingsEditor");
@@ -175,7 +189,6 @@ export function SettingsSectionEditor({
   const apply = useCallback((patch: Partial<typeof state>) => {
     setState((current) => ({ ...current, ...patch }));
   }, []);
-  const setData = useCallback((data: JsonObject) => apply({ dataText: pretty(data) }), [apply]);
   const setTranslation = useCallback(
     (target: Locale, value: JsonObject) =>
       setState((current) => ({
@@ -183,6 +196,166 @@ export function SettingsSectionEditor({
         translations: { ...current.translations, [target]: pretty(value) },
       })),
     [],
+  );
+  const setHomepageData = useCallback((data: HomepageSettingsData) => {
+    setState((current) => {
+      const fields = [
+        [
+          "heroSlides",
+          "id",
+          (id: string) => ({ id, title: "", description: "", ctaLabel: "", imageAlt: "" }),
+        ],
+        ["linkedBanners", "id", (id: string) => ({ id, title: "", imageAlt: "" })],
+        ["benefits", "id", (id: string) => ({ id, title: "", description: "" })],
+        ["testimonials", "id", (id: string) => ({ id, authorName: "", authorRole: "", quote: "" })],
+        [
+          "categoryBanners",
+          "categoryId",
+          (categoryId: string) => ({ categoryId, title: "", imageAlt: "" }),
+        ],
+      ] as const;
+      const translations = { ...current.translations };
+      const english = readJson(translations.en) ?? {};
+      for (const language of LOCALES) {
+        const localized = readJson(translations[language]);
+        if (!localized && language !== "en") continue;
+        const target = localized ?? english;
+        for (const [key, idField, createTranslation] of fields) {
+          const configuredItems = data[key] as unknown as readonly JsonObject[];
+          const ids = new Set(configuredItems.map((item) => String(item[idField] ?? "")));
+          const existingRows = Array.isArray(target[key]) ? (target[key] as unknown[]) : [];
+          const retainedRows = existingRows.filter((item) =>
+            ids.has(String(asObject(item)[idField] ?? "")),
+          );
+          target[key] =
+            language === "en"
+              ? [
+                  ...retainedRows,
+                  ...configuredItems
+                    .filter(
+                      (item) =>
+                        !existingRows.some(
+                          (row) =>
+                            String(asObject(row)[idField] ?? "") === String(item[idField] ?? ""),
+                        ),
+                    )
+                    .map((item) => createTranslation(String(item[idField]))),
+                ]
+              : retainedRows;
+        }
+        if (language === "en") {
+          translations.en = pretty(target);
+        } else if (localized) {
+          translations[language] = pretty(target);
+        }
+      }
+      return { ...current, dataText: pretty(data), translations };
+    });
+  }, []);
+  const setStructuredData = useCallback(
+    (data: JsonObject) => {
+      setState((current) => {
+        const collectionConfigs = {
+          contact: [["phones", "phoneLabels", "id", (id: string) => ({ id, label: "" })]],
+          social: [["links", "labels", "id", (id: string) => ({ id, label: "" })]],
+          about: [
+            [
+              "kitchenMediaIds",
+              "kitchenMedia",
+              "mediaId",
+              (mediaId: string) => ({ mediaId, alt: "" }),
+            ],
+            [
+              "teamMembers",
+              "teamMembers",
+              "id",
+              (id: string) => ({ id, name: "", role: "", bio: "", portraitAlt: "" }),
+            ],
+            ["values", "values", "id", (id: string) => ({ id, title: "", description: "" })],
+            [
+              "storySections",
+              "storySections",
+              "id",
+              (id: string) => ({
+                id,
+                title: "",
+                content: { schemaVersion: 1, document: { type: "doc", content: [] } },
+                mediaAlt: "",
+              }),
+            ],
+            ["callsToAction", "callsToAction", "id", (id: string) => ({ id, label: "" })],
+          ],
+          faq: [["entries", "entries", "id", (id: string) => ({ id, question: "", answer: "" })]],
+        } as const;
+        const config = collectionConfigs[definition.key as keyof typeof collectionConfigs];
+        if (!config) return { ...current, dataText: pretty(data) };
+        const translations = { ...current.translations };
+        for (const language of LOCALES) {
+          const existing = readJson(translations[language]);
+          if (!existing && language !== "en") continue;
+          const target = existing ?? {};
+          for (const [dataKey, translationKey, idKey, createTranslation] of config) {
+            const rawItems = data[dataKey];
+            const items = Array.isArray(rawItems)
+              ? rawItems.map((item) =>
+                  dataKey === "kitchenMediaIds" ? { [idKey]: String(item) } : asObject(item),
+                )
+              : [];
+            const expectedIds = new Set(items.map((item) => String(item[idKey] ?? "")));
+            const existingRows = Array.isArray(target[translationKey])
+              ? (target[translationKey] as unknown[])
+              : [];
+            const retained = existingRows.filter((item) =>
+              expectedIds.has(String(asObject(item)[idKey] ?? "")),
+            );
+            target[translationKey] =
+              language === "en"
+                ? [
+                    ...retained,
+                    ...items
+                      .filter(
+                        (item) =>
+                          !existingRows.some(
+                            (row) =>
+                              String(asObject(row)[idKey] ?? "") === String(item[idKey] ?? ""),
+                          ),
+                      )
+                      .map((item) => createTranslation(String(item[idKey] ?? ""))),
+                  ]
+                : retained;
+          }
+          translations[language] = pretty(target);
+        }
+        return { ...current, dataText: pretty(data), translations };
+      });
+    },
+    [definition.key],
+  );
+  const setStructuredTranslation = useCallback(
+    (target: Locale, value: JsonObject) => {
+      setState((current) => {
+        const translations = { ...current.translations, [target]: pretty(value) };
+        if (definition.key === "terms" && target === "en") {
+          const ids = new Set(
+            (Array.isArray(value.sections) ? value.sections : []).map((item) =>
+              String(asObject(item).id ?? ""),
+            ),
+          );
+          for (const language of LOCALES.filter((item) => item !== "en")) {
+            const localized = readJson(translations[language]);
+            if (!localized || !Array.isArray(localized.sections)) continue;
+            translations[language] = pretty({
+              ...localized,
+              sections: localized.sections.filter((item) =>
+                ids.has(String(asObject(item).id ?? "")),
+              ),
+            });
+          }
+        }
+        return { ...current, translations };
+      });
+    },
+    [definition.key],
   );
 
   const load = useCallback(async () => {
@@ -331,101 +504,6 @@ export function SettingsSectionEditor({
     }
   }
 
-  function setPrimaryMedia(mediaId: string | null) {
-    if (!parsedData) return;
-    if (definition.key === "about") {
-      setData({ ...parsedData, heroMediaId: mediaId });
-      return;
-    }
-    if (definition.key !== "homepage") return;
-    const slides = Array.isArray(parsedData.heroSlides) ? [...parsedData.heroSlides] : [];
-    if (!mediaId) slides.splice(0, 1);
-    else {
-      slides[0] = {
-        ...asObject(slides[0]),
-        id: "primary-hero",
-        imageMediaId: mediaId,
-        mobileImageMediaId: null,
-        href: "/menu",
-        openInNewTab: false,
-        enabled: true,
-      };
-    }
-    setData({ ...parsedData, heroSlides: slides });
-    for (const language of LOCALES) {
-      const translation = readJson(state.translations[language]);
-      if (!translation) continue;
-      const localizedSlides = Array.isArray(translation.heroSlides)
-        ? [...translation.heroSlides]
-        : [];
-      if (!mediaId) localizedSlides.splice(0, 1);
-      else {
-        localizedSlides[0] = {
-          ...asObject(localizedSlides[0]),
-          id: "primary-hero",
-          title: String(asObject(localizedSlides[0]).title ?? "Sara Kitchen"),
-          description: String(asObject(localizedSlides[0]).description ?? ""),
-          ctaLabel: String(asObject(localizedSlides[0]).ctaLabel ?? "View menu"),
-          imageAlt: String(asObject(localizedSlides[0]).imageAlt ?? "Sara Kitchen Persian food"),
-        };
-      }
-      setTranslation(language, { ...translation, heroSlides: localizedSlides });
-    }
-  }
-
-  function addFaq() {
-    if (!parsedData) return;
-    const id = `question-${Date.now().toString(36)}`;
-    const entries = Array.isArray(parsedData.entries) ? [...parsedData.entries] : [];
-    entries.push({ id, active: true, order: entries.length });
-    setData({ ...parsedData, entries });
-    for (const language of LOCALES) {
-      const translation = readJson(state.translations[language]);
-      if (!translation) continue;
-      const localized = Array.isArray(translation.entries) ? [...translation.entries] : [];
-      localized.push({ id, question: "New question", answer: "New answer" });
-      setTranslation(language, { ...translation, entries: localized });
-    }
-  }
-
-  function addSocialLink() {
-    if (!parsedData) return;
-    const id = `social-${Date.now().toString(36)}`;
-    const links = Array.isArray(parsedData.links) ? [...parsedData.links] : [];
-    links.push({
-      id,
-      platform: "instagram",
-      destination: { type: "handle", handle: "sara_kitchenpt" },
-      iconKey: "instagram",
-      active: true,
-      order: links.length,
-    });
-    setData({ ...parsedData, links });
-    for (const language of LOCALES) {
-      const translation = readJson(state.translations[language]);
-      if (!translation) continue;
-      const labels = Array.isArray(translation.labels) ? [...translation.labels] : [];
-      labels.push({ id, label: "Sara Kitchen on Instagram" });
-      setTranslation(language, { ...translation, labels });
-    }
-  }
-
-  function setLocaleVisibility(target: Locale, visibility: string) {
-    if (!parsedData) return;
-    const locales = Array.isArray(parsedData.locales)
-      ? parsedData.locales.map((entry) =>
-          asObject(entry).locale === target ? { ...asObject(entry), visibility } : entry,
-        )
-      : [];
-    const active = locales
-      .filter((entry) => asObject(entry).visibility === "active")
-      .map((entry) => asObject(entry).locale);
-    const defaultLocale = active.includes(parsedData.defaultLocale)
-      ? parsedData.defaultLocale
-      : active[0];
-    setData({ ...parsedData, locales, defaultLocale, fallbackOrder: active });
-  }
-
   if (loading)
     return (
       <Stack sx={{ alignItems: "center", p: 8 }}>
@@ -450,14 +528,6 @@ export function SettingsSectionEditor({
     );
   }
 
-  const primaryMedia =
-    definition.key === "about"
-      ? typeof parsedData?.heroMediaId === "string"
-        ? parsedData.heroMediaId
-        : null
-      : definition.key === "homepage" && Array.isArray(parsedData?.heroSlides)
-        ? String(asObject(parsedData.heroSlides[0]).imageMediaId ?? "") || null
-        : null;
   const currentPreview = parsedTranslation ?? {};
 
   return (
@@ -517,243 +587,118 @@ export function SettingsSectionEditor({
 
       {definition.key === "terms" ? (
         <Paper sx={{ p: { xs: 2, md: 3 } }}>
-          <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel id="policy-document-type">{t("documentType")}</InputLabel>
-              <Select
-                labelId="policy-document-type"
-                label={t("documentType")}
-                value={state.documentType}
-                onChange={(event) => apply({ documentType: event.target.value })}
-                disabled={!canEdit || Boolean(state.policyId)}
-              >
-                {[
-                  "terms-of-service",
-                  "privacy-policy",
-                  "marketing-consent",
-                  "delivery-policy",
-                  "refund-policy",
-                ].map((value) => (
-                  <MenuItem key={value} value={value}>
-                    {value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              fullWidth
-              type="number"
-              label={t("version")}
-              value={state.version}
-              onChange={(event) => apply({ version: event.target.value })}
-              disabled={!canEdit || Boolean(state.policyId)}
-              slotProps={{ htmlInput: { min: 1, step: 1 } }}
-            />
-            <TextField
-              fullWidth
-              type="date"
-              label={t("effectiveAt")}
-              value={state.effectiveAt}
-              onChange={(event) => apply({ effectiveAt: event.target.value })}
-              disabled={!canEdit || Boolean(state.policyId)}
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Stack>
-        </Paper>
-      ) : (
-        <Paper sx={{ p: { xs: 2, md: 3 } }}>
-          <Stack spacing={2}>
-            <Typography variant="h6">{t("sectionData")}</Typography>
-            {definition.supportsMedia ? (
-              <MediaPicker
-                label={t("primaryMedia")}
-                allowedKinds={["image"]}
-                value={primaryMedia}
-                onChange={setPrimaryMedia}
-                disabled={!canEdit}
-              />
-            ) : null}
-            {definition.key === "contact" && parsedData ? (
-              <Stack sx={{ gap: 2 }}>
-                <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
-                  <TextField
-                    label={t("email")}
-                    value={String(parsedData.email ?? "")}
-                    onChange={(event) => setData({ ...parsedData, email: event.target.value })}
-                    disabled={!canEdit}
-                    fullWidth
-                  />
-                  <TextField
-                    label={t("latitude")}
-                    value={String(asObject(parsedData.location).latitude ?? "")}
-                    onChange={(event) =>
-                      setData({
-                        ...parsedData,
-                        location: {
-                          ...asObject(parsedData.location),
-                          latitude: Number(event.target.value),
-                        },
-                      })
-                    }
-                    disabled={!canEdit}
-                    fullWidth
-                  />
-                  <TextField
-                    label={t("longitude")}
-                    value={String(asObject(parsedData.location).longitude ?? "")}
-                    onChange={(event) =>
-                      setData({
-                        ...parsedData,
-                        location: {
-                          ...asObject(parsedData.location),
-                          longitude: Number(event.target.value),
-                        },
-                      })
-                    }
-                    disabled={!canEdit}
-                    fullWidth
-                  />
-                </Stack>
-                <Typography component="h3" variant="h6">
-                  {t("deliveryBands")}
-                </Typography>
-                <Typography color="text.secondary" variant="body2">
-                  {t("deliveryBandsHelp")}
-                </Typography>
-                {Array.isArray(parsedData.deliveryBands)
-                  ? parsedData.deliveryBands.map((entry, index) => {
-                      const band = asObject(entry);
-                      const updateBand = (field: "maxDistanceMeters" | "feeCents", value: number) =>
-                        setData({
-                          ...parsedData,
-                          deliveryBands: (parsedData.deliveryBands as unknown[]).map(
-                            (current, position) =>
-                              position === index
-                                ? { ...asObject(current), [field]: value }
-                                : current,
-                          ),
-                        });
-                      return (
-                        <Stack key={index} direction={{ xs: "column", sm: "row" }} sx={{ gap: 2 }}>
-                          <TextField
-                            disabled={!canEdit}
-                            fullWidth
-                            label={t("deliveryBandMeters", { number: index + 1 })}
-                            onChange={(event) =>
-                              updateBand("maxDistanceMeters", Number(event.target.value))
-                            }
-                            slotProps={{ htmlInput: { min: 1, step: 1 } }}
-                            type="number"
-                            value={String(band.maxDistanceMeters ?? "")}
-                          />
-                          <TextField
-                            disabled={!canEdit}
-                            fullWidth
-                            label={t("deliveryBandCents", { number: index + 1 })}
-                            onChange={(event) => updateBand("feeCents", Number(event.target.value))}
-                            slotProps={{ htmlInput: { min: 0, step: 1 } }}
-                            type="number"
-                            value={String(band.feeCents ?? "")}
-                          />
-                          <Button
-                            disabled={
-                              !canEdit || (parsedData.deliveryBands as unknown[]).length <= 1
-                            }
-                            onClick={() =>
-                              setData({
-                                ...parsedData,
-                                deliveryBands: (parsedData.deliveryBands as unknown[]).filter(
-                                  (_item, position) => position !== index,
-                                ),
-                              })
-                            }
-                          >
-                            {t("removeDeliveryBand")}
-                          </Button>
-                        </Stack>
-                      );
-                    })
-                  : null}
-                <Button
-                  disabled={
-                    !canEdit ||
-                    (Array.isArray(parsedData.deliveryBands) &&
-                      parsedData.deliveryBands.length >= 12)
-                  }
-                  onClick={() => {
-                    const bands = Array.isArray(parsedData.deliveryBands)
-                      ? parsedData.deliveryBands
-                      : [];
-                    const last = asObject(bands.at(-1));
-                    setData({
-                      ...parsedData,
-                      deliveryBands: [
-                        ...bands,
-                        {
-                          maxDistanceMeters: Number(last.maxDistanceMeters ?? 0) + 5_000,
-                          feeCents: Number(last.feeCents ?? 0) + 200,
-                        },
-                      ],
-                    });
-                  }}
-                  variant="outlined"
+          <Stack spacing={1.5}>
+            <Box>
+              <Typography variant="h6">{t("forms.policyMetadata")}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t("forms.policyMetadataHelp")}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  md: "repeat(2, minmax(0, 1fr))",
+                  xl: "2fr 1fr 1fr",
+                },
+                gap: 1.5,
+              }}
+            >
+              <FormControl fullWidth>
+                <InputLabel id="policy-document-type">{t("documentType")}</InputLabel>
+                <Select
+                  labelId="policy-document-type"
+                  label={t("documentType")}
+                  value={state.documentType}
+                  onChange={(event) => apply({ documentType: event.target.value })}
+                  disabled={!canEdit || Boolean(state.policyId)}
                 >
-                  {t("addDeliveryBand")}
-                </Button>
-              </Stack>
-            ) : null}
-            {definition.key === "languages" && parsedData && Array.isArray(parsedData.locales) ? (
-              <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 2 }}>
-                {parsedData.locales.map((entry) => {
-                  const item = asObject(entry);
-                  const language = item.locale as Locale;
-                  return (
-                    <FormControl key={language} fullWidth>
-                      <InputLabel id={`visibility-${language}`}>
-                        {t(`language.${language}`)}
-                      </InputLabel>
-                      <Select
-                        labelId={`visibility-${language}`}
-                        label={t(`language.${language}`)}
-                        value={String(item.visibility)}
-                        onChange={(event) => setLocaleVisibility(language, event.target.value)}
-                        disabled={!canEdit}
-                      >
-                        {(["active", "maintenance", "hidden"] as const).map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(`visibility.${value}`)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  );
-                })}
-              </Stack>
-            ) : null}
-            {definition.key === "faq" ? (
-              <Button startIcon={<AddRounded />} onClick={addFaq} disabled={!canEdit}>
-                {t("addFaq")}
-              </Button>
-            ) : null}
-            {definition.key === "social" ? (
-              <Button startIcon={<AddRounded />} onClick={addSocialLink} disabled={!canEdit}>
-                {t("addSocial")}
-              </Button>
-            ) : null}
-            <TextField
-              label={t("structuredData")}
-              value={state.dataText}
-              onChange={(event) => apply({ dataText: event.target.value })}
-              disabled={!canEdit}
-              error={!parsedData}
-              helperText={t("structuredDataHelp")}
-              multiline
-              minRows={10}
-              fullWidth
-              slotProps={{ htmlInput: { dir: "ltr", spellCheck: false } }}
-            />
+                  {[
+                    "terms-of-service",
+                    "privacy-policy",
+                    "marketing-consent",
+                    "delivery-policy",
+                    "refund-policy",
+                  ].map((value) => (
+                    <MenuItem key={value} value={value}>
+                      {t(POLICY_TYPE_TRANSLATIONS[value as keyof typeof POLICY_TYPE_TRANSLATIONS])}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                fullWidth
+                type="number"
+                label={t("version")}
+                value={state.version}
+                onChange={(event) => apply({ version: event.target.value })}
+                disabled={!canEdit || Boolean(state.policyId)}
+                slotProps={{ htmlInput: { min: 1, step: 1 } }}
+              />
+              <TextField
+                fullWidth
+                type="date"
+                label={t("effectiveAt")}
+                value={state.effectiveAt}
+                onChange={(event) => apply({ effectiveAt: event.target.value })}
+                disabled={!canEdit || Boolean(state.policyId)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Box>
           </Stack>
         </Paper>
+      ) : definition.key === "homepage" ? (
+        parsedData ? (
+          <HomepageSettingsEditor
+            data={parsedData as unknown as HomepageSettingsData}
+            locale={locale}
+            canEdit={canEdit}
+            canUploadMedia={canUploadMedia}
+            onDataChange={setHomepageData}
+          />
+        ) : (
+          <Alert
+            severity="error"
+            action={
+              <Button
+                onClick={() => {
+                  load().catch(() => undefined);
+                }}
+              >
+                {t("retry")}
+              </Button>
+            }
+          >
+            {t("homepageConfigError")}
+          </Alert>
+        )
+      ) : parsedData ? (
+        <SettingsDataForm
+          section={definition.key}
+          data={parsedData}
+          labelsTranslation={
+            readJson(state.translations[locale]) ?? readJson(state.translations.en) ?? {}
+          }
+          canEdit={canEdit}
+          canUploadMedia={canUploadMedia}
+          onChange={setStructuredData}
+        />
+      ) : (
+        <Alert
+          severity="error"
+          action={
+            <Button
+              onClick={() => {
+                load().catch(() => undefined);
+              }}
+            >
+              {t("retry")}
+            </Button>
+          }
+        >
+          {t("structuredConfigError")}
+        </Alert>
       )}
 
       <Paper sx={{ p: { xs: 2, md: 3 } }}>
@@ -768,24 +713,61 @@ export function SettingsSectionEditor({
             <Tab key={language} value={language} label={t(`language.${language}`)} />
           ))}
         </Tabs>
-        <TextField
-          sx={{ mt: 2 }}
-          label={t("localizedContent")}
-          value={state.translations[locale]}
-          onChange={(event) =>
-            setState((current) => ({
-              ...current,
-              translations: { ...current.translations, [locale]: event.target.value },
-            }))
-          }
-          disabled={!canEdit || (definition.key === "terms" && Boolean(state.policyId))}
-          error={Boolean(state.translations[locale]) && !parsedTranslation}
-          helperText={locale === "en" ? t("englishRequired") : t("optionalLocale")}
-          multiline
-          minRows={12}
-          fullWidth
-          slotProps={{ htmlInput: { dir: locale === "fa" ? "rtl" : "ltr", spellCheck: false } }}
-        />
+        {definition.key === "homepage" ? (
+          parsedData ? (
+            <Box sx={{ mt: 2 }}>
+              <HomepageTranslationsEditor
+                data={parsedData as unknown as HomepageSettingsData}
+                locale={locale}
+                value={parsedTranslation as unknown as HomepageSettingsTranslationValue | null}
+                canEdit={canEdit}
+                onChange={(value) => setTranslation(locale, value as unknown as JsonObject)}
+                onClear={() =>
+                  setState((current) => ({
+                    ...current,
+                    translations: { ...current.translations, [locale]: "" },
+                  }))
+                }
+              />
+            </Box>
+          ) : (
+            <Alert
+              severity="error"
+              action={
+                <Button
+                  onClick={() => {
+                    load().catch(() => undefined);
+                  }}
+                >
+                  {t("retry")}
+                </Button>
+              }
+            >
+              {t("homepageConfigError")}
+            </Alert>
+          )
+        ) : parsedData || definition.key === "terms" ? (
+          <Box sx={{ mt: 2 }}>
+            <SettingsTranslationForm
+              section={definition.key}
+              data={parsedData ?? {}}
+              locale={locale}
+              value={parsedTranslation}
+              englishValue={readJson(state.translations.en) ?? {}}
+              disabled={!canEdit || (definition.key === "terms" && Boolean(state.policyId))}
+              onChange={(value) => setStructuredTranslation(locale, value)}
+              onClear={() =>
+                setState((current) => ({
+                  ...current,
+                  translations: { ...current.translations, [locale]: "" },
+                }))
+              }
+              onEnglishChange={(value) => setStructuredTranslation("en", value)}
+            />
+          </Box>
+        ) : (
+          <Alert severity="error">{t("structuredConfigError")}</Alert>
+        )}
       </Paper>
 
       <Paper sx={{ p: { xs: 2, md: 3 }, bgcolor: "background.default" }}>
@@ -796,24 +778,42 @@ export function SettingsSectionEditor({
           </Stack>
           <Typography variant="subtitle1">
             {String(
-              currentPreview.title ??
-                currentPreview.eyebrow ??
-                t(`sections.${definition.labelKey}`),
+              definition.key === "homepage"
+                ? (asObject(currentPreview.sectionTitles).featured ?? t("homepage.featuredDishes"))
+                : (currentPreview.title ??
+                    currentPreview.eyebrow ??
+                    t(`sections.${definition.labelKey}`)),
             )}
           </Typography>
           <Typography color="text.secondary">
-            {String(currentPreview.summary ?? currentPreview.description ?? t("previewHelp"))}
+            {String(
+              definition.key === "homepage"
+                ? ((Array.isArray(currentPreview.heroSlides)
+                    ? asObject(currentPreview.heroSlides[0]).description
+                    : null) ?? t("homepage.homepagePreviewHelp"))
+                : (currentPreview.summary ?? currentPreview.description ?? t("previewHelp")),
+            )}
           </Typography>
           <Stack direction="row" sx={{ gap: 1, flexWrap: "wrap" }}>
-            {Object.entries(currentPreview)
-              .slice(0, 8)
-              .map(([key, value]) => (
-                <Chip
-                  key={key}
-                  label={`${key}: ${Array.isArray(value) ? value.length : typeof value === "object" ? "…" : String(value).slice(0, 40)}`}
-                  size="small"
-                />
-              ))}
+            {definition.key === "homepage" && parsedData
+              ? (
+                  [
+                    ["heroSlides", "heroSlides"],
+                    ["linkedBanners", "linkedBanners"],
+                    ["featuredDishIds", "featuredDishes"],
+                    ["categoryBanners", "categoryShowcase"],
+                    ["benefits", "benefits"],
+                    ["testimonials", "testimonials"],
+                    ["blogIds", "blogPosts"],
+                  ] as const
+                ).map(([field, label]) => (
+                  <Chip
+                    key={field}
+                    label={`${t(`homepage.${label}`)}: ${Array.isArray(parsedData[field]) ? parsedData[field].length : 0}`}
+                    size="small"
+                  />
+                ))
+              : null}
           </Stack>
         </Stack>
       </Paper>
