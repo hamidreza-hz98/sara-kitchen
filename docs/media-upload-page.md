@@ -5,7 +5,7 @@ single-file `POST /api/media` endpoint through the bounded bulk coordinator. Eac
 file is an independent request; a failed item does not roll back a successful one.
 
 The current serverless inline policy allows JPEG, PNG, WebP, and AVIF images up to
-3 MiB each and 10 files per selection. Video and PDF uploads remain unsupported
+10 MiB each and 10 files per selection. Video and PDF uploads remain unsupported
 until background processing is available. The browser checks filename, extension,
 declared MIME type, size, empty files, and duplicate selection; the server checks
 bytes and signatures authoritatively. A checksum conflict is shown as an existing
