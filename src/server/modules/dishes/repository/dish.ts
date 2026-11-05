@@ -115,6 +115,7 @@ export interface DishRepository {
   save(current: DishSnapshot, value: DishWrite, actorId: string): Promise<DishSnapshot>;
   setSeoPageId(current: DishSnapshot, seoPageId: string, actorId: string): Promise<DishSnapshot>;
   rollbackCreate(current: DishSnapshot): Promise<boolean>;
+  hardDeleteArchived(current: DishSnapshot): Promise<void>;
   removeInboundRelationships(dishId: string, actorId: string): Promise<readonly string[]>;
 }
 
@@ -243,6 +244,7 @@ export function createDishRepository(connection: Connection): DishRepository {
     async list(options) {
       const filter: Record<string, unknown> = { deletedAt: null };
       if (options.status) filter.status = options.status;
+      else filter.status = { $ne: "archived" };
       if (options.categoryId && Types.ObjectId.isValid(options.categoryId)) {
         filter.categoryIds = new Types.ObjectId(options.categoryId);
       }
@@ -341,6 +343,15 @@ export function createDishRepository(connection: Connection): DishRepository {
         seoPageId: null,
       });
       return result.deletedCount === 1;
+    },
+    async hardDeleteArchived(current) {
+      const result = await Dish.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        deletedAt: null,
+        status: "archived",
+      });
+      if (result.deletedCount !== 1) throw new DishRepositoryConflictError();
     },
     async removeInboundRelationships(dishId, actorId) {
       const id = new Types.ObjectId(dishId);
