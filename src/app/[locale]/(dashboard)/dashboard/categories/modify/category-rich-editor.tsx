@@ -19,10 +19,12 @@ export function CategoryRichEditor({
   value,
   onChange,
   labelledBy,
+  direction,
 }: {
   value: string;
   onChange: (value: string) => void;
   labelledBy: string;
+  direction: "ltr" | "rtl";
 }) {
   const editor = useEditor({
     extensions: [
@@ -54,7 +56,9 @@ export function CategoryRichEditor({
           "& .tiptap ul, & .tiptap ol": { ps: 3 },
         }}
       >
-        <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        <Box dir={direction}>
+          <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        </Box>
       </Box>
     </Box>
   );
