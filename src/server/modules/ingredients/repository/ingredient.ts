@@ -65,6 +65,7 @@ export interface IngredientRepository {
     actorId: string,
   ): Promise<IngredientSnapshot>;
   softDelete(current: IngredientSnapshot, actorId: string, now: Date): Promise<IngredientSnapshot>;
+  hardDeleteArchived(current: IngredientSnapshot): Promise<void>;
   restore(current: IngredientSnapshot, actorId: string): Promise<IngredientSnapshot>;
 }
 
@@ -127,6 +128,7 @@ export function createIngredientRepository(connection: Connection): IngredientRe
     async list(options) {
       const filter: Record<string, unknown> = { deletedAt: null };
       if (options.status) filter.status = options.status;
+      else filter.status = { $ne: "archived" };
       if (options.allergen) filter.allergenTags = options.allergen;
       if (options.search) {
         filter.normalizedSearchText = {
@@ -188,6 +190,15 @@ export function createIngredientRepository(connection: Connection): IngredientRe
       document.updatedBy = createActorMetadata("admin", actorId);
       await document.save();
       return snapshot(document);
+    },
+    async hardDeleteArchived(current) {
+      const result = await Ingredient.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        deletedAt: null,
+        status: "archived",
+      });
+      if (result.deletedCount !== 1) throw new IngredientRepositoryConflictError();
     },
     async restore(current, actorId) {
       const document = await load(current);
