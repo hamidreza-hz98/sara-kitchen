@@ -95,6 +95,8 @@ const safeReference = (value: string | null) =>
     value.length <= 128 &&
     /^[A-Za-z0-9._:-]+$/u.test(value) &&
     !/\d{12,}/u.test(value));
+const safeProviderReference = (value: string | null) =>
+  value === null || (value.length >= 1 && value.length <= 128 && /^[A-Za-z0-9._:-]+$/u.test(value));
 const safeCode = (value: string | null) =>
   value === null ||
   (value.length >= 1 &&
@@ -121,8 +123,8 @@ const amountsSchema = new Schema<TransactionAmounts>(
 
 const providerReferencesSchema = new Schema<TransactionProviderReferences>(
   {
-    paymentId: { type: String, default: null, validate: { validator: safeReference } },
-    requestId: { type: String, default: null, validate: { validator: safeReference } },
+    paymentId: { type: String, default: null, validate: { validator: safeProviderReference } },
+    requestId: { type: String, default: null, validate: { validator: safeProviderReference } },
   },
   { _id: false, id: false, strict: "throw" },
 );
@@ -138,7 +140,11 @@ const eventSchema = new Schema<TransactionEvent>(
       validate: { validator: (value: number | null) => value === null || safeInteger(value) },
     },
     responseCode: { type: String, default: null, validate: { validator: safeCode } },
-    providerEventId: { type: String, default: null, validate: { validator: safeReference } },
+    providerEventId: {
+      type: String,
+      default: null,
+      validate: { validator: safeProviderReference },
+    },
     occurredAt: { type: Date, required: true },
     recordedAt: { type: Date, required: true, default: Date.now },
   },
