@@ -36,15 +36,13 @@ async function readHomeContent(locale: SupportedLocale): Promise<HomeContent> {
     "homepage",
     locale,
   );
-  if (!settings) return EMPTY_HOME_CONTENT;
-
   const storage = createMediaStorageProvider();
   const dishRepository = createDishRepository(connection);
   const categoryRepository = createCategoryRepository(connection);
   const blogRepository = createBlogRepository(connection);
   const now = new Date();
   const localized = resolveTranslation(
-    settings.translations.map((entry) => ({
+    (settings?.translations ?? []).map((entry) => ({
       locale: entry.locale,
       ...entry.value,
     })),
@@ -69,8 +67,7 @@ async function readHomeContent(locale: SupportedLocale): Promise<HomeContent> {
   };
   const dish = async (id: string): Promise<HomeDish | null> => {
     const record = await dishRepository.findById(id);
-    if (!record || record.status !== "published" || record.availability.mode === "unavailable")
-      return null;
+    if (!record || record.status !== "published") return null;
     if (record.availability.availableFrom && record.availability.availableFrom > now) return null;
     if (record.availability.availableUntil && record.availability.availableUntil <= now)
       return null;
@@ -89,10 +86,63 @@ async function readHomeContent(locale: SupportedLocale): Promise<HomeContent> {
       image: await image(record.mediaIds[0] ?? null, translation.name),
       priceCents: price.effectivePriceCents,
       originalPriceCents: price.display.compareAtPriceCents,
+      available: record.availability.mode !== "unavailable",
     };
   };
   const compact = <T>(items: readonly (T | null)[]): T[] =>
     items.filter((item): item is T => item !== null);
+  if (!settings) {
+    const [featuredRecords, categoryRecords, blogRecords] = await Promise.all([
+      dishRepository.list({
+        page: 1,
+        pageSize: 6,
+        status: "published",
+        featured: true,
+        sortBy: "featuredOrder",
+        sortDirection: "asc",
+      }),
+      categoryRepository.list({
+        page: 1,
+        pageSize: 100,
+        status: "published",
+        sortBy: "sortOrder",
+        sortDirection: "asc",
+      }),
+      blogRepository.listPublic({
+        page: 1,
+        pageSize: 4,
+        sortBy: "publishedAt",
+        sortDirection: "desc",
+      }),
+    ]);
+    const featured = compact(await Promise.all(featuredRecords.items.map((item) => dish(item.id))));
+    const categories = compact(
+      await Promise.all(
+        categoryRecords.items.map(async (item) => {
+          const name = resolveTranslation(item.translations, locale)?.value.name ?? item.slug;
+          const picture = await image(item.bannerMediaId ?? item.imageMediaId, name, "display");
+          return { id: item.id, slug: item.slug, name, image: picture };
+        }),
+      ),
+    );
+    const blogs = compact(
+      await Promise.all(
+        blogRecords.items.map(async (item) => {
+          const copy = resolveTranslation(item.translations, locale)?.value;
+          if (!copy) return null;
+          return {
+            id: item.id,
+            slug: item.slug,
+            title: copy.title,
+            excerpt: copy.excerpt,
+            image: await image(item.imageMediaId ?? item.bannerMediaId, copy.title, "display"),
+            readTimeMinutes: item.readTimeMinutes,
+          };
+        }),
+      ),
+    );
+    return { ...EMPTY_HOME_CONTENT, featured, discounted: featured.slice(0, 4), categories, blogs };
+  }
   const [hero, banners, featured, benefits, categories, testimonials, blogs] = await Promise.all([
     Promise.all(
       settings.data.heroSlides
@@ -136,7 +186,21 @@ async function readHomeContent(locale: SupportedLocale): Promise<HomeContent> {
             : null;
         }),
     ),
-    Promise.all(settings.data.featuredDishIds.slice(0, 6).map(dish)),
+    (async () => {
+      const selected = compact(
+        await Promise.all(settings.data.featuredDishIds.slice(0, 6).map(dish)),
+      );
+      if (selected.length > 0) return selected;
+      const databaseFeatured = await dishRepository.list({
+        page: 1,
+        pageSize: 6,
+        status: "published",
+        featured: true,
+        sortBy: "featuredOrder",
+        sortDirection: "asc",
+      });
+      return compact(await Promise.all(databaseFeatured.items.map((item) => dish(item.id))));
+    })(),
     Promise.all(
       settings.data.benefits
         .filter((item) => item.enabled)
