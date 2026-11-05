@@ -62,8 +62,10 @@ Component.
 credentials may remain empty during early development when the flag is `false`. Enabling a provider
 requires every value in its group:
 
-- MB Way: `MBWAY_API_URL`, `MBWAY_MERCHANT_ID`, `MBWAY_API_KEY`, and
-  `MBWAY_WEBHOOK_SECRET`.
+- SIBS MB WAY sandbox: `MBWAY_API_URL`, `MBWAY_TERMINAL_ID`, `MBWAY_CLIENT_ID`,
+  `MBWAY_AUTH_TOKEN`, and `MBWAY_WEBHOOK_SECRET`. The API URL is fixed to the SIBS sandbox
+  host for local and production deployments; the production host is rejected. The webhook secret
+  is a Base64-encoded AES-256-GCM key issued in SIBS SPG Backoffice.
 - WhatsApp: `WHATSAPP_API_URL`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, and
   `WHATSAPP_EMPLOYER_NUMBER` in E.164 format.
 
