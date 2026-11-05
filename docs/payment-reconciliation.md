@@ -9,8 +9,8 @@ five minutes. It never initiates a payment and never writes transaction or order
 Configure the deployment scheduler to `POST /api/internal/payments/reconcile` every five minutes
 with `Authorization: Bearer <PAYMENT_RECONCILIATION_CRON_SECRET>`. The secret is server-only,
 stored in the deployment secret store, and should be rotated like webhook credentials. The route
-is unavailable when the provider is disabled. The local MB Way simulator is deliberately blocked
-in production until a real acquirer transport is approved.
+is unavailable when the SIBS MB WAY sandbox provider is disabled. Local and production deployments
+use the same sandbox-only gateway endpoint.
 
 ## Recovery flow
 
