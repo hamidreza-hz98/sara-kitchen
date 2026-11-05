@@ -6,16 +6,16 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import NextLink from "next/link";
 
 import { broadcastCustomerAuthChange } from "@/lib/customer-auth-sync";
 import { safeCustomerReturnTo } from "@/lib/customer-return-to";
-import { useRouter } from "@/locales/navigation";
+import { Link as LocalizedLink, useRouter } from "@/locales/navigation";
 
 export function CustomerLoginForm() {
   const t = useTranslations("storefront.login");
@@ -70,7 +70,7 @@ export function CustomerLoginForm() {
         required
       />
       <FormControlLabel control={<Checkbox name="persistent" />} label={t("persistent")} />
-      <Link component={NextLink} href="/forgot-password">
+      <Link component={LocalizedLink} href="/forgot-password">
         {t("forgotPassword")}
       </Link>
       {error && (
@@ -81,6 +81,14 @@ export function CustomerLoginForm() {
       <Button disabled={pending} type="submit" variant="contained">
         {pending ? t("submitting") : t("submit")}
       </Button>
+      <Stack direction="row" spacing={0.75} sx={{ justifyContent: "center" }}>
+        <Typography color="text.secondary" variant="body2">
+          {t("newCustomer")}
+        </Typography>
+        <Link component={LocalizedLink} href="/signup" variant="body2">
+          {t("signupLink")}
+        </Link>
+      </Stack>
     </Stack>
   );
 }
