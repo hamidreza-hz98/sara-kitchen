@@ -187,7 +187,7 @@ export const mediaSchema = createBaseSchema<MediaRecord>(
 
 mediaSchema.pre("validate", function validateMediaState() {
   const managed = this.source === "managed";
-  if (managed !== (this.provider === "minio")) {
+  if (managed ? !["minio", "mongodb"].includes(this.provider) : this.provider !== "external") {
     this.invalidate("provider", "Media source and provider must agree.");
   }
   if (managed) {
