@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { isSupportedLocale } from "@/constants";
@@ -12,7 +12,7 @@ import {
 import { StructuredDataScript } from "../../structured-data-script";
 import { loadMenuContent } from "./menu-data";
 import { MenuPage } from "./menu-page";
-import { parseMenuQuery, type MenuSearchParams } from "./menu-query";
+import { menuHref, parseMenuQuery, type MenuSearchParams } from "./menu-query";
 
 type MenuPageProps = Readonly<{
   params: Promise<{ locale: string }>;
@@ -34,6 +34,7 @@ export default async function Menu({ params, searchParams }: MenuPageProps) {
   const { locale } = await params;
   if (!isSupportedLocale(locale)) notFound();
   const query = parseMenuQuery(await searchParams);
+  if (query.page > 1) redirect(menuHref(query, { page: null }));
   const [content, t] = await Promise.all([
     loadMenuContent(locale, query),
     getTranslations({ locale, namespace: "storefront.menu" }),
