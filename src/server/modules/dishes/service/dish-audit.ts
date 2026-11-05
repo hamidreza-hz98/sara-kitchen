@@ -12,6 +12,7 @@ const ACTION_CODES = {
   update: "crud.resource.update",
   archive: "crud.resource.update",
   restore: "crud.resource.update",
+  delete: "crud.resource.delete",
 } as const;
 
 /** Request-scoped adapter for the canonical append-only English audit service. */
