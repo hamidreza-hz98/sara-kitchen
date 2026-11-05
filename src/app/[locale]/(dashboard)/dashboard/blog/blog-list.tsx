@@ -5,6 +5,7 @@ import { AdvancedFilters } from "@/components/ui/advanced-filters";
 import AddRounded from "@mui/icons-material/AddRounded";
 import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
 import ArticleRounded from "@mui/icons-material/ArticleRounded";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import EditRounded from "@mui/icons-material/EditRounded";
 import ImageNotSupportedRounded from "@mui/icons-material/ImageNotSupportedRounded";
 import PublishRounded from "@mui/icons-material/PublishRounded";
@@ -78,10 +79,10 @@ type ListEnvelope<T> = Readonly<{
 type MediaEnvelope = Readonly<{
   data?: Readonly<{ preview?: Readonly<{ url: string }> | null }>;
 }>;
-type LifecycleAction = "publish" | "unpublish" | "archive";
+type LifecycleAction = "publish" | "unpublish" | "archive" | "delete";
 
 const PAGE_SIZES = [10, 20, 50] as const;
-const STATUSES = ["draft", "scheduled", "published", "archived"] as const;
+const STATUSES = ["draft", "scheduled", "published"] as const;
 const SORTS = [
   "createdAt:desc",
   "createdAt:asc",
@@ -172,11 +173,18 @@ function BlogImage({ id, alt }: { id: string | null; alt: string }) {
 export type BlogListProps = Readonly<{
   canArchive: boolean;
   canCreate: boolean;
+  canDelete?: boolean;
   canPublish: boolean;
   canUpdate: boolean;
 }>;
 
-export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogListProps) {
+export function BlogList({
+  canArchive,
+  canCreate,
+  canDelete = false,
+  canPublish,
+  canUpdate,
+}: BlogListProps) {
   const t = useTranslations("dashboard.blogs");
   const locale = useLocale();
   const router = useRouter();
@@ -185,13 +193,17 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
   const feedback = useFeedback();
   const raw = searchParams.toString();
   const query = useMemo(() => new URLSearchParams(raw), [raw]);
+  const isTrash = query.get("trash") === "1";
   const page = Math.max(1, Number(query.get("page")) || 1);
   const requestedPageSize = Number(query.get("pageSize"));
   const pageSize = PAGE_SIZES.includes(requestedPageSize as (typeof PAGE_SIZES)[number])
     ? requestedPageSize
     : 10;
   const requestedStatus = query.get("status");
-  const status = STATUSES.includes(requestedStatus as BlogStatus) ? requestedStatus! : "";
+  const status =
+    !isTrash && STATUSES.includes(requestedStatus as (typeof STATUSES)[number])
+      ? requestedStatus!
+      : "";
   const requestedSort = query.get("sort");
   const sort = SORTS.includes(requestedSort as (typeof SORTS)[number]) ? requestedSort! : SORTS[0];
   const search = query.get("search") ?? "";
@@ -248,7 +260,8 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (status) params.set("status", status);
+    if (isTrash) params.set("status", "archived");
+    else if (status) params.set("status", status);
     if (search.length >= 2) params.set("search", search);
     const [sortBy, sortDirection] = sort.split(":");
     params.set("sortBy", sortBy ?? "createdAt");
@@ -276,7 +289,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [page, pageSize, reload, search, sort, status]);
+  }, [isTrash, page, pageSize, reload, search, sort, status]);
 
   const refresh = () => {
     setLoading(true);
@@ -319,7 +332,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
           <VisibilityRounded />
         </IconButton>
       </Tooltip>
-      {canUpdate && item.status !== "archived" ? (
+      {!isTrash && canUpdate && item.status !== "archived" ? (
         <Tooltip title={t("edit")}>
           <IconButton
             aria-label={t("editBlog", { title: localizedTitle(item, locale) })}
@@ -352,7 +365,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
           </IconButton>
         </Tooltip>
       ) : null}
-      {canArchive && item.status !== "archived" ? (
+      {!isTrash && canArchive && item.status !== "archived" ? (
         <Tooltip title={t("archive")}>
           <IconButton
             color="error"
@@ -360,6 +373,17 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
             onClick={() => setConfirmAction({ action: "archive", item })}
           >
             <ArchiveRounded />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+      {isTrash && canDelete && item.status === "archived" ? (
+        <Tooltip title={t("delete")}>
+          <IconButton
+            color="error"
+            aria-label={t("deleteBlog", { title: localizedTitle(item, locale) })}
+            onClick={() => setConfirmAction({ action: "delete", item })}
+          >
+            <DeleteOutlineRounded />
           </IconButton>
         </Tooltip>
       ) : null}
@@ -371,12 +395,14 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
     setMutating(true);
     try {
       const response = await fetch(
-        `/api/blogs/manage/${confirmAction.item.id}/${confirmAction.action}`,
+        confirmAction.action === "delete"
+          ? `/api/blogs/manage/${confirmAction.item.id}`
+          : `/api/blogs/manage/${confirmAction.item.id}/${confirmAction.action}`,
         {
-          method: "POST",
+          method: confirmAction.action === "delete" ? "DELETE" : "POST",
           credentials: "same-origin",
           headers: await csrfJsonHeaders("admin"),
-          body: "{}",
+          ...(confirmAction.action !== "delete" ? { body: "{}" } : {}),
         },
       );
       if (!response.ok) throw new Error("blog_action_failed");
@@ -409,15 +435,26 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
       >
         <Box>
           <Typography component="h1" variant="h4">
-            {t("title")}
+            {t(isTrash ? "trashTitle" : "title")}
           </Typography>
-          <Typography color="text.secondary">{t("description")}</Typography>
+          <Typography color="text.secondary">
+            {t(isTrash ? "trashDescription" : "description")}
+          </Typography>
         </Box>
         <Stack direction="row" sx={{ gap: 1 }}>
+          <Tooltip title={t(isTrash ? "hideTrash" : "showTrash")}>
+            <IconButton
+              aria-label={t(isTrash ? "hideTrash" : "showTrash")}
+              color={isTrash ? "error" : "default"}
+              onClick={() => updateQuery({ trash: isTrash ? null : 1, status: null, page: 1 })}
+            >
+              <DeleteOutlineRounded />
+            </IconButton>
+          </Tooltip>
           <Button variant="outlined" startIcon={<RefreshRounded />} onClick={refresh}>
             {t("refresh")}
           </Button>
-          {canCreate ? (
+          {!isTrash && canCreate ? (
             <Button
               variant="contained"
               startIcon={<AddRounded />}
@@ -447,22 +484,24 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
               },
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel id="blog-status-label">{t("status")}</InputLabel>
-            <Select
-              labelId="blog-status-label"
-              label={t("status")}
-              value={status}
-              onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
-            >
-              <MenuItem value="">{t("allStatuses")}</MenuItem>
-              {STATUSES.map((value) => (
-                <MenuItem key={value} value={value}>
-                  {t(`statuses.${value}`)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {!isTrash ? (
+            <FormControl size="small" sx={{ minWidth: 160 }}>
+              <InputLabel id="blog-status-label">{t("status")}</InputLabel>
+              <Select
+                labelId="blog-status-label"
+                label={t("status")}
+                value={status}
+                onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
+              >
+                <MenuItem value="">{t("allStatuses")}</MenuItem>
+                {STATUSES.map((value) => (
+                  <MenuItem key={value} value={value}>
+                    {t(`statuses.${value}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : null}
           <FormControl size="small" sx={{ minWidth: 210 }}>
             <InputLabel id="blog-sort-label">{t("sort")}</InputLabel>
             <Select
@@ -685,7 +724,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelected(null)}>{t("close")}</Button>
-          {selected && canUpdate && selected.status !== "archived" ? (
+          {selected && canUpdate && selected.status !== "archived" && !isTrash ? (
             <Button
               variant="contained"
               startIcon={<EditRounded />}
@@ -704,7 +743,7 @@ export function BlogList({ canArchive, canCreate, canPublish, canUpdate }: BlogL
         confirmLabel={confirmAction ? t(confirmAction.action) : t("confirmAction")}
         cancelLabel={t("cancel")}
         closeLabel={t("close")}
-        danger={confirmAction?.action === "archive"}
+        danger={confirmAction?.action === "archive" || confirmAction?.action === "delete"}
         loading={mutating}
         onCancel={() => setConfirmAction(null)}
         onConfirm={() => {
