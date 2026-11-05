@@ -4,8 +4,13 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
+
+import type { SupportedLocale } from "@/constants";
+import { resolveTranslation } from "@/locales/translation-selection";
+import { connectToDatabase } from "@/server/database";
+import { createCategoryRepository } from "@/server/modules/categories";
 
 import { BrandMark } from "./brand-mark";
 import styles from "./storefront-shell.module.css";
@@ -16,17 +21,41 @@ const quickLinks = [
   { href: "/contact", key: "contact" },
 ] as const;
 
-const categoryLinks = [
-  { href: "/menu?category=kebabs", key: "kebabs" },
-  { href: "/menu?category=stews", key: "stews" },
-  { href: "/menu?category=sides", key: "sides" },
-  { href: "/menu?category=drinks", key: "drinks" },
-] as const;
-
 export async function StorefrontFooter() {
   const shared = await getTranslations("shared");
   const navigation = await getTranslations("shared.navigation");
   const shell = await getTranslations("storefront.shell");
+  const locale = await getLocale();
+  const connection = await connectToDatabase();
+  const categoryRepository = createCategoryRepository(connection);
+  const firstCategoryPage = await categoryRepository.list({
+    page: 1,
+    pageSize: 100,
+    status: "published",
+    sortBy: "sortOrder",
+    sortDirection: "asc",
+  });
+  const remainingCategoryPages = await Promise.all(
+    Array.from({ length: Math.ceil(firstCategoryPage.total / 100) - 1 }, (_, index) =>
+      categoryRepository.list({
+        page: index + 2,
+        pageSize: 100,
+        status: "published",
+        sortBy: "sortOrder",
+        sortDirection: "asc",
+      }),
+    ),
+  );
+  const categoryLinks = [
+    ...firstCategoryPage.items,
+    ...remainingCategoryPages.flatMap((page) => page.items),
+  ].map((category) => {
+    const translation = resolveTranslation(category.translations, locale as SupportedLocale);
+    return {
+      href: `/menu/category/${category.slug}`,
+      name: translation?.value.name ?? category.slug,
+    };
+  });
 
   return (
     <Box
@@ -53,7 +82,7 @@ export async function StorefrontFooter() {
               textAlign: { xs: "center", md: "start" },
             }}
           >
-            <BrandMark size={64} />
+            <BrandMark size={64} symbolOnly={locale === "fa"} />
             <Typography color="primary.dark" variant="h2">
               {shared("brandName")}
             </Typography>
@@ -73,8 +102,8 @@ export async function StorefrontFooter() {
           </FooterLinkGroup>
           <FooterLinkGroup title={shell("categories")}>
             {categoryLinks.map((item) => (
-              <Link className={styles.footerLink} href={item.href} key={item.key}>
-                {shell(item.key)}
+              <Link className={styles.footerLink} href={item.href} key={item.href}>
+                {item.name}
               </Link>
             ))}
           </FooterLinkGroup>
