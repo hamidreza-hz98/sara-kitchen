@@ -117,10 +117,12 @@
 
   /* MUI's default floating label and fieldset notch are positioned from the left. */
   html[dir="rtl"] .MuiInputLabel-root {
-    right: 0;
+    right: 14px;
     left: auto;
+    width: calc(100% - 28px);
     max-width: calc(100% - 28px);
     overflow: hidden;
+    direction: rtl;
     text-align: right;
     text-overflow: ellipsis;
     transform-origin: top right;
@@ -128,31 +130,31 @@
   }
 
   html[dir="rtl"] .MuiInputLabel-outlined:not(.MuiInputLabel-shrink) {
-    transform: translate(-14px, 16px) scale(1);
+    transform: translate(0, 16px) scale(1);
   }
 
   html[dir="rtl"] .MuiInputLabel-outlined.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink) {
-    transform: translate(-14px, 9px) scale(1);
+    transform: translate(0, 9px) scale(1);
   }
 
   html[dir="rtl"] .MuiInputLabel-outlined.MuiInputLabel-shrink {
-    transform: translate(-14px, -9px) scale(0.75);
+    transform: translate(0, -9px) scale(0.75);
   }
 
   html[dir="rtl"] .MuiInputLabel-filled:not(.MuiInputLabel-shrink) {
-    transform: translate(-12px, 16px) scale(1);
+    transform: translate(0, 16px) scale(1);
   }
 
   html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink) {
-    transform: translate(-12px, 13px) scale(1);
+    transform: translate(0, 13px) scale(1);
   }
 
   html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-shrink {
-    transform: translate(-12px, 7px) scale(0.75);
+    transform: translate(0, 7px) scale(0.75);
   }
 
   html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-sizeSmall.MuiInputLabel-shrink {
-    transform: translate(-12px, 4px) scale(0.75);
+    transform: translate(0, 4px) scale(0.75);
   }
 
   html[dir="rtl"] .MuiOutlinedInput-notchedOutline {
@@ -223,10 +225,12 @@
 /* MUI injects component styles outside the authored CSS layers. Keep RTL field
    labels anchored to the right edge after those component rules are emitted. */
 html[dir="rtl"] .MuiInputLabel-root {
-  right: 0 !important;
+  right: 14px !important;
   left: auto !important;
+  width: calc(100% - 28px) !important;
   max-width: calc(100% - 28px);
   overflow: hidden;
+  direction: rtl;
   text-align: right;
   text-overflow: ellipsis;
   transform-origin: top right !important;
@@ -234,31 +238,31 @@ html[dir="rtl"] .MuiInputLabel-root {
 }
 
 html[dir="rtl"] .MuiInputLabel-outlined:not(.MuiInputLabel-shrink) {
-  transform: translate(-14px, 16px) scale(1) !important;
+  transform: translate(0, 16px) scale(1) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-outlined.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink) {
-  transform: translate(-14px, 9px) scale(1) !important;
+  transform: translate(0, 9px) scale(1) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-outlined.MuiInputLabel-shrink {
-  transform: translate(-14px, -9px) scale(0.75) !important;
+  transform: translate(0, -9px) scale(0.75) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-filled:not(.MuiInputLabel-shrink) {
-  transform: translate(-12px, 16px) scale(1) !important;
+  transform: translate(0, 16px) scale(1) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-sizeSmall:not(.MuiInputLabel-shrink) {
-  transform: translate(-12px, 13px) scale(1) !important;
+  transform: translate(0, 13px) scale(1) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-shrink {
-  transform: translate(-12px, 7px) scale(0.75) !important;
+  transform: translate(0, 7px) scale(0.75) !important;
 }
 
 html[dir="rtl"] .MuiInputLabel-filled.MuiInputLabel-sizeSmall.MuiInputLabel-shrink {
-  transform: translate(-12px, 4px) scale(0.75) !important;
+  transform: translate(0, 4px) scale(0.75) !important;
 }
 
 html[dir="rtl"] .MuiOutlinedInput-notchedOutline {
