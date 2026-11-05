@@ -4,6 +4,7 @@ import { AdvancedFilters } from "@/components/ui/advanced-filters";
 
 import AddRounded from "@mui/icons-material/AddRounded";
 import ArchiveRounded from "@mui/icons-material/ArchiveRounded";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import EditRounded from "@mui/icons-material/EditRounded";
 import ImageNotSupportedRounded from "@mui/icons-material/ImageNotSupportedRounded";
 import LocalDiningRounded from "@mui/icons-material/LocalDiningRounded";
@@ -194,10 +195,17 @@ export type DishListProps = Readonly<{
   canCreate: boolean;
   canReadCategories: boolean;
   canRestore: boolean;
+  canDelete?: boolean;
   canUpdate: boolean;
 }>;
 
-export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }: DishListProps) {
+export function DishList({
+  canCreate,
+  canReadCategories,
+  canRestore,
+  canDelete = false,
+  canUpdate,
+}: DishListProps) {
   const t = useTranslations("dashboard.dishes");
   const locale = useLocale();
   const router = useRouter();
@@ -206,11 +214,15 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
   const feedback = useFeedback();
   const raw = searchParams.toString();
   const query = useMemo(() => new URLSearchParams(raw), [raw]);
+  const isTrash = query.get("trash") === "1";
   const page = Math.max(1, Number(query.get("page")) || 1);
   const pageSize = PAGE_SIZES.includes(Number(query.get("pageSize")) as (typeof PAGE_SIZES)[number])
     ? Number(query.get("pageSize"))
     : 10;
-  const status = STATUSES.includes(query.get("status") as Status) ? query.get("status")! : "";
+  const status =
+    !isTrash && (query.get("status") === "draft" || query.get("status") === "published")
+      ? query.get("status")!
+      : "";
   const availability = AVAILABILITIES.includes(query.get("availability") as Availability)
     ? query.get("availability")!
     : "";
@@ -238,7 +250,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
   const [reload, setReload] = useState(0);
   const [selected, setSelected] = useState<Dish | null>(null);
   const [confirmAction, setConfirmAction] = useState<Readonly<{
-    action: "archive" | "restore";
+    action: "archive" | "restore" | "delete";
     item: Dish;
   }> | null>(null);
   const [mutating, setMutating] = useState(false);
@@ -291,7 +303,8 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
-    if (status) params.set("status", status);
+    if (isTrash) params.set("status", "archived");
+    else if (status) params.set("status", status);
     if (availability) params.set("availability", availability);
     if (featured) params.set("featured", featured);
     if (categoryId) params.set("categoryId", categoryId);
@@ -322,7 +335,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [availability, categoryId, featured, page, pageSize, reload, search, sort, status]);
+  }, [availability, categoryId, featured, isTrash, page, pageSize, reload, search, sort, status]);
 
   const refresh = () => {
     setLoading(true);
@@ -384,7 +397,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
           <VisibilityRounded />
         </IconButton>
       </Tooltip>
-      {canUpdate ? (
+      {!isTrash && item.status !== "archived" && canUpdate ? (
         <Tooltip title={t("edit")}>
           <IconButton
             aria-label={t("editDish", { name: localizedName(item, locale) })}
@@ -394,7 +407,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
           </IconButton>
         </Tooltip>
       ) : null}
-      {item.status !== "archived" && canUpdate ? (
+      {!isTrash && item.status !== "archived" && canUpdate ? (
         <Tooltip title={t("archive")}>
           <IconButton
             aria-label={t("archiveDish", { name: localizedName(item, locale) })}
@@ -413,6 +426,17 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
           </IconButton>
         </Tooltip>
       ) : null}
+      {isTrash && item.status === "archived" && canDelete ? (
+        <Tooltip title={t("delete")}>
+          <IconButton
+            color="error"
+            aria-label={t("deleteDish", { name: localizedName(item, locale) })}
+            onClick={() => setConfirmAction({ action: "delete", item })}
+          >
+            <DeleteOutlineRounded />
+          </IconButton>
+        </Tooltip>
+      ) : null}
     </Stack>
   );
 
@@ -421,12 +445,14 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
     setMutating(true);
     try {
       const response = await fetch(
-        `/api/dishes/manage/${confirmAction.item.id}/${confirmAction.action}`,
+        confirmAction.action === "delete"
+          ? `/api/dishes/manage/${confirmAction.item.id}`
+          : `/api/dishes/manage/${confirmAction.item.id}/${confirmAction.action}`,
         {
-          method: "POST",
+          method: confirmAction.action === "delete" ? "DELETE" : "POST",
           credentials: "same-origin",
           headers: await csrfJsonHeaders("admin"),
-          body: "{}",
+          ...(confirmAction.action !== "delete" ? { body: "{}" } : {}),
         },
       );
       if (!response.ok) {
@@ -434,7 +460,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
         return;
       }
       feedback.notify({
-        message: t(confirmAction.action === "archive" ? "archiveSuccess" : "restoreSuccess"),
+        message: t(`${confirmAction.action}Success`),
         severity: "success",
       });
       setConfirmAction(null);
@@ -454,15 +480,35 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
       >
         <Box>
           <Typography component="h1" variant="h4">
-            {t("title")}
+            {t(isTrash ? "trashTitle" : "title")}
           </Typography>
-          <Typography color="text.secondary">{t("description")}</Typography>
+          <Typography color="text.secondary">
+            {t(isTrash ? "trashDescription" : "description")}
+          </Typography>
         </Box>
         <Stack direction="row" sx={{ gap: 1 }}>
+          <Tooltip title={t(isTrash ? "hideTrash" : "showTrash")}>
+            <IconButton
+              aria-label={t(isTrash ? "hideTrash" : "showTrash")}
+              color={isTrash ? "error" : "default"}
+              onClick={() =>
+                updateQuery({
+                  trash: isTrash ? null : 1,
+                  status: null,
+                  category: null,
+                  availability: null,
+                  featured: null,
+                  page: 1,
+                })
+              }
+            >
+              <DeleteOutlineRounded />
+            </IconButton>
+          </Tooltip>
           <Button variant="outlined" startIcon={<RefreshRounded />} onClick={refresh}>
             {t("refresh")}
           </Button>
-          {canCreate ? (
+          {!isTrash && canCreate ? (
             <Button
               variant="contained"
               startIcon={<AddRounded />}
@@ -492,22 +538,24 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
               },
             }}
           />
-          <FormControl size="small" sx={{ minWidth: 145 }}>
-            <InputLabel id="dish-status-label">{t("status")}</InputLabel>
-            <Select
-              labelId="dish-status-label"
-              label={t("status")}
-              value={status}
-              onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
-            >
-              <MenuItem value="">{t("allStatuses")}</MenuItem>
-              {STATUSES.map((value) => (
-                <MenuItem key={value} value={value}>
-                  {t(`statuses.${value}`)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {!isTrash ? (
+            <FormControl size="small" sx={{ minWidth: 145 }}>
+              <InputLabel id="dish-status-label">{t("status")}</InputLabel>
+              <Select
+                labelId="dish-status-label"
+                label={t("status")}
+                value={status}
+                onChange={(event) => updateQuery({ status: event.target.value || null, page: 1 })}
+              >
+                <MenuItem value="">{t("allStatuses")}</MenuItem>
+                {STATUSES.filter((value) => value !== "archived").map((value) => (
+                  <MenuItem key={value} value={value}>
+                    {t(`statuses.${value}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : null}
           <FormControl size="small" sx={{ minWidth: 155 }}>
             <InputLabel id="dish-availability-label">{t("availability")}</InputLabel>
             <Select
@@ -777,7 +825,7 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSelected(null)}>{t("close")}</Button>
-          {selected && canUpdate ? (
+          {selected && canUpdate && selected.status !== "archived" && !isTrash ? (
             <Button
               variant="contained"
               startIcon={<EditRounded />}
@@ -790,14 +838,25 @@ export function DishList({ canCreate, canReadCategories, canRestore, canUpdate }
       </Dialog>
       <ConfirmationDialog
         open={confirmAction !== null}
-        title={t(confirmAction?.action === "restore" ? "restoreTitle" : "archiveTitle")}
+        title={t(
+          confirmAction?.action === "restore"
+            ? "restoreTitle"
+            : confirmAction?.action === "delete"
+              ? "deleteTitle"
+              : "archiveTitle",
+        )}
         description={t(
-          confirmAction?.action === "restore" ? "restoreDescription" : "archiveDescription",
+          confirmAction?.action === "restore"
+            ? "restoreDescription"
+            : confirmAction?.action === "delete"
+              ? "deleteDescription"
+              : "archiveDescription",
           { name: confirmAction ? localizedName(confirmAction.item, locale) : "" },
         )}
-        confirmLabel={t(confirmAction?.action === "restore" ? "restore" : "archive")}
+        confirmLabel={t(confirmAction?.action ?? "archive")}
         cancelLabel={t("cancel")}
         closeLabel={t("close")}
+        danger={confirmAction?.action === "archive" || confirmAction?.action === "delete"}
         loading={mutating}
         onCancel={() => setConfirmAction(null)}
         onConfirm={() => {
