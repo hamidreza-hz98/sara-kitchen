@@ -31,6 +31,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
 import NextLink from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
@@ -41,6 +42,8 @@ import { csrfJsonHeaders } from "@/lib/csrf-client";
 import { usePathname, useRouter } from "@/locales/navigation";
 
 import { BrandMark } from "./brand-mark";
+import { LocaleSelector } from "./locale-selector";
+import { ThemeSwitcher } from "./theme-switcher";
 import {
   dashboardItemForPath,
   visibleDashboardItems,
@@ -117,6 +120,7 @@ function NavigationList({
 }) {
   const navigation = useTranslations("dashboard.navigation");
   const shell = useTranslations("dashboard.shell");
+  const theme = useTheme();
   const items = visibleDashboardItems(actor);
   const activeItem = dashboardItemForPath(pathname, basePath);
   const sections: DashboardSection[] = ["main", "management", "settings"];
@@ -193,7 +197,15 @@ function NavigationList({
                     {collapsed && !mobile ? null : (
                       <ListItemText
                         primary={label}
-                        slotProps={{ primary: { sx: { fontSize: 14, fontWeight: 700 } } }}
+                        slotProps={{
+                          primary: {
+                            sx: {
+                              fontSize: 14,
+                              fontWeight: 700,
+                              textAlign: theme.direction === "rtl" ? "right" : "left",
+                            },
+                          },
+                        }}
                       />
                     )}
                   </ListItemButton>
@@ -272,7 +284,30 @@ export function DashboardShell({
   const detailParts = pathParts.slice(sectionDepth).map(safePathLabel);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100dvh", bgcolor: "background.default" }}>
+    <Box
+      sx={(theme) => ({
+        display: "flex",
+        minHeight: "100dvh",
+        bgcolor: "background.default",
+        ...theme.applyStyles("dark", {
+          "--sara-palette-primary-main": "#2563EB",
+          "--sara-palette-primary-mainChannel": "37 99 235",
+          "--sara-palette-primary-dark": "#60A5FA",
+          "--sara-palette-primary-darkChannel": "96 165 250",
+          "--sara-palette-primary-contrastText": "#FFFFFF",
+          "--sara-palette-background-default": "#0F172A",
+          "--sara-palette-background-defaultChannel": "15 23 42",
+          "--sara-palette-background-paper": "#111827",
+          "--sara-palette-background-paperChannel": "17 24 39",
+          "--sara-palette-text-primary": "#F8FAFC",
+          "--sara-palette-text-secondary": "#94A3B8",
+          "--sara-palette-divider": "rgba(148, 163, 184, 0.16)",
+          "--sara-palette-action-hover": "rgba(148, 163, 184, 0.08)",
+          "--sara-palette-action-selected": "rgba(37, 99, 235, 0.18)",
+          "--sara-palette-action-focus": "rgba(37, 99, 235, 0.24)",
+        }),
+      })}
+    >
       <SkipLink label={shell("skipToContent")} targetId="dashboard-main-content" />
       <Box
         aria-hidden="true"
@@ -314,7 +349,7 @@ export function DashboardShell({
             borderColor: "divider",
           }}
         >
-          <BrandMark size={40} />
+          <BrandMark size={40} symbolOnly />
           {collapsed ? null : (
             <Box>
               <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap" }}>
@@ -394,6 +429,8 @@ export function DashboardShell({
                   ? navigation(activeItem.key)
                   : shell("unknownSection")}
             </Typography>
+            <ThemeSwitcher />
+            <LocaleSelector />
             <IconButton
               aria-label={shell("accountMenu")}
               aria-haspopup="menu"
