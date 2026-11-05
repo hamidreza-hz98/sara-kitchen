@@ -10,7 +10,7 @@ import {
 } from "@/server/modules/transactions";
 
 import {
-  localPaymentProvider,
+  configuredMbWayPaymentProvider,
   transactionActionKey,
   transactionRequestContext,
   translateTransactionError,
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
       }).cancel(
         { id: actor.id, role: actor.role, active: true },
         transactionId,
-        localPaymentProvider(),
+        configuredMbWayPaymentProvider(),
         key,
         (session, state) =>
           applyVerifiedPaymentStateToOrder(connection, state, session, requestId).then(
