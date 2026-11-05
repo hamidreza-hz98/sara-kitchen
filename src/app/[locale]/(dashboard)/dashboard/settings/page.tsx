@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
+import Link from "@/components/ui/client-next-link";
 
 import { requireAdminPage } from "@/server/auth/page-guards";
 
