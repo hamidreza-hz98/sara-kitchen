@@ -1,3 +1,6 @@
+import { parsePhoneNumberFromString } from "libphonenumber-js/max";
+import type { CountryCode } from "libphonenumber-js";
+
 /** Shared, deterministic identity normalization for customer forms and server validation. */
 const NAME_PATTERN = /^[\p{L}\p{M}]+(?:[\u200c '\u2019-][\p{L}\p{M}]+)*$/u;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
@@ -52,11 +55,28 @@ export function normalizeCustomerMobile(value: string): string {
     .replace(/[۰-۹٠-٩]/gu, (digit) => DIGITS[digit] ?? digit);
   if (!MOBILE_INPUT_PATTERN.test(normalized)) return normalized;
   const compact = normalized.replace(/[\s().-]/gu, "");
-  if (/^9\d{8}$/u.test(compact)) return `+351${compact}`;
-  if (/^00[1-9]\d+$/u.test(compact)) return `+${compact.slice(2)}`;
-  return compact;
+  const international = compact.startsWith("00") ? `+${compact.slice(2)}` : compact;
+  const parsed = parsePhoneNumberFromString(international, "PT");
+  return parsed?.isValid() ? parsed.number : international;
 }
 
 export function isValidCustomerMobile(value: string): boolean {
-  return E164_PATTERN.test(value) && (!value.startsWith("+351") || /^\+3519\d{8}$/u.test(value));
+  if (!E164_PATTERN.test(value)) return false;
+  const parsed = parsePhoneNumberFromString(value);
+  return parsed?.isValid() === true && parsed.number === value;
+}
+
+/** Parse a national number for the selected country and return its canonical E.164 form. */
+export function parseCustomerMobile(value: string, country: CountryCode): string | null {
+  const normalized = value
+    .normalize("NFKC")
+    .trim()
+    .replace(/[۰-۹٠-٩]/gu, (digit) => DIGITS[digit] ?? digit);
+  if (!MOBILE_INPUT_PATTERN.test(normalized)) return null;
+
+  const compact = normalized.replace(/[\s().-]/gu, "");
+  const international = compact.startsWith("00") ? `+${compact.slice(2)}` : compact;
+  const parsed = parsePhoneNumberFromString(international, country);
+  if (!parsed?.isValid() || (parsed.country && parsed.country !== country)) return null;
+  return parsed.number;
 }
