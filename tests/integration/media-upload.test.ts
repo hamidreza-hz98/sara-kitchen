@@ -81,6 +81,7 @@ describe("media upload persistence and rollback", () => {
       {
         actorId,
         bucket,
+        provider: "mongodb",
         candidate: await file("a"),
         translations: [{ locale: "en", alt: "Red meal" }],
       },
@@ -89,6 +90,7 @@ describe("media upload persistence and rollback", () => {
     expect(await Media.countDocuments({ processingState: "ready" })).toBe(1);
     const persisted = await Media.findById(result.id).lean();
     expect(persisted?.checksum).toBe(result.checksum);
+    expect(persisted?.provider).toBe("mongodb");
     expect(persisted?.variants).toHaveLength(2);
     expect((await repo.quotaUsage(actorId)).activeStorageBytes).toBeGreaterThan(
       persisted?.bytes ?? 0,
