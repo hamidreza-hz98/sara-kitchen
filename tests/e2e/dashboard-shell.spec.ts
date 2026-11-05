@@ -3,6 +3,13 @@ import { expect, test } from "@playwright/test";
 
 const preview = "/theme-showcase/dashboard-shell";
 
+test("server-rendered dashboard buttons support Next links", async ({ page }) => {
+  await page.goto(preview);
+  await expect(
+    page.getByRole("link", { name: "Sara Kitchen", exact: true }).last(),
+  ).toHaveAttribute("href", "/theme-showcase");
+});
+
 test("actual dashboard routes fail closed without an admin session", async ({ page }) => {
   for (const path of ["/dashboard", "/dashboard/orders/SK-1234"]) {
     await page.goto(path);
@@ -106,4 +113,17 @@ test("mobile drawer, skip link, account menu, and RTL direction remain accessibl
   await expect.poll(async () => (await drawer.boundingBox())?.x ?? Infinity).toBeLessThan(100);
   await page.keyboard.press("Escape");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("dashboard language selector preserves the page and query", async ({ page, context }) => {
+  await context.addCookies([{ name: "SARA_LOCALE", value: "en", url: "http://127.0.0.1:3100/" }]);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${preview}/orders/SK-1234?status=paid`);
+  await page.getByRole("button", { name: "Language" }).click();
+  await page.getByRole("menuitem", { name: "فارسی" }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "fa");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expect(page).toHaveURL(new RegExp(`${preview}/orders/SK-1234\\?status=paid$`));
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "fa");
 });
