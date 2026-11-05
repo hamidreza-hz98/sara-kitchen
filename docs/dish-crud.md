@@ -36,10 +36,9 @@ not retain broken recommendations.
 
 ## Publication and concurrency
 
-Drafts still require structurally valid references when a reference is present. Published dishes
-additionally require all configured locales, at least one ready media item, one active category, and
-one active ingredient. The dependency adapter is responsible for classifying non-ready media as
-unavailable at this boundary.
+Drafts and published dishes require an English name. Additional translations, media, categories,
+and ingredients are optional; when provided, references must exist and be usable. The dependency
+adapter classifies non-ready media as unavailable at this boundary.
 
 Slugs use the shared English canonical-name policy and deterministic collision suffixes. Creation
 retries a racing unique-index conflict up to three times. Updates use Mongoose optimistic versioning;
