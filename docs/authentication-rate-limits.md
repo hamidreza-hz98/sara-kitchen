@@ -16,8 +16,8 @@ Authentication throttles are stored in MongoDB so serverless instances enforce o
 | Password-reset request         | normalized mobile/email              | 1 hour     |     5 |
 | Password-reset completion      | source IP                            | 1 hour     |    30 |
 | Password-reset completion      | submitted opaque reset token         | 1 hour     |     8 |
-| Future identity verification   | source IP                            | 1 hour     |    20 |
-| Future identity verification   | normalized mobile/email              | 1 hour     |     6 |
+| Mobile verification            | source IP                            | 1 hour     |    20 |
+| Mobile verification            | opaque challenge token               | 1 hour     |     6 |
 | Customer password change       | source IP                            | 1 hour     |    20 |
 | Customer password change       | authenticated actor                  | 1 hour     |     5 |
 | Active-session mutation/action | source IP                            | 15 minutes |    60 |
@@ -31,6 +31,6 @@ Limits return the shared API `429` envelope with a positive `Retry-After` header
 
 The trusted deployment proxy must overwrite `X-Forwarded-For`. Invalid or absent addresses use one `unknown` bucket and therefore fail closed. A deployment without a trusted overwriting proxy must not be launched because client-supplied forwarding headers could bypass or poison IP buckets.
 
-MongoDB uniquely indexes each opaque window key and TTL-cleans expired records. TTL timing is not part of enforcement: every request derives the active fixed window and atomically increments it. The unique index resolves concurrent first writes. The verification limiter is ready for the future verification endpoint and must be consumed before any identity lookup or provider message.
+MongoDB uniquely indexes each opaque window key and TTL-cleans expired records. TTL timing is not part of enforcement: every request derives the active fixed window and atomically increments it. The unique index resolves concurrent first writes. Mobile code verification consumes both IP and challenge-token buckets before looking up the challenge.
 
 References: [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), [OWASP Forgot Password Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html), and [OWASP Bot Management and Anti-Automation](https://cheatsheetseries.owasp.org/cheatsheets/Bot_Management_and_Anti-Automation_Cheat_Sheet.html).
