@@ -50,6 +50,9 @@ describe("media upload policy", () => {
       inspectUpload({ name: "../A meal (1).png", blob: blob(png, "image/png") }),
     ).resolves.toMatchObject({ name: "A-meal-1.png" });
     await expect(
+      inspectUpload({ name: "تصویر Oct 6, 2026 (1).PNG", blob: blob(png, "image/png") }),
+    ).resolves.toMatchObject({ name: "تصویر-Oct-6-2026-1.png" });
+    await expect(
       inspectUpload({ name: "x".repeat(500), blob: blob(png, "image/png") }),
     ).resolves.toMatchObject({ extension: "png" });
     await expect(
