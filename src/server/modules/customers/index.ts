@@ -4,6 +4,7 @@ export { readDashboardCustomers } from "./service/dashboard-customers";
 export { loadCustomerIdentityForCheckout } from "./service/customer-checkout";
 export { hashCustomerPassword, verifyCustomerPasswordForLogin } from "./service/password";
 export { registerCustomer } from "./service/signup";
+export { markCustomerMobileVerified } from "./service/mobile-verification";
 export {
   findCustomerForLogin,
   getActiveCustomerIdentity,
