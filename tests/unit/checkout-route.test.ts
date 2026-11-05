@@ -29,7 +29,7 @@ vi.mock("@/server/modules/settings", () => ({
 }));
 vi.mock("@/server/modules/orders", () => ({ submitAtomicCheckout: state.checkout }));
 vi.mock("@/server/modules/transactions", () => ({
-  getLocalMbWaySandboxProvider: () => ({ id: "fake" }),
+  createConfiguredSibsMbWaySandboxProvider: () => ({ id: "mbway-sandbox" }),
 }));
 
 import { POST } from "@/app/api/checkout/route";
