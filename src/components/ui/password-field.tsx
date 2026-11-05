@@ -16,6 +16,7 @@ export function PasswordField({ slotProps, disabled, ...props }: Omit<TextFieldP
     <TextField
       {...props}
       disabled={disabled}
+      className={[props.className, "password-field"].filter(Boolean).join(" ")}
       type={visible ? "text" : "password"}
       slotProps={{
         ...slotProps,
