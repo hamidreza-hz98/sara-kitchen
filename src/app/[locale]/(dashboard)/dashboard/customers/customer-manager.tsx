@@ -532,7 +532,7 @@ export function CustomerManager({ capabilities }: { capabilities: Capabilities }
               closeMenu();
             }}
           >
-            <BlockRounded fontSize="small" sx={{ mr: 1 }} />
+            <BlockRounded fontSize="small" sx={{ me: 1 }} />
             {t("disable")}
           </MenuItem>
         )}
@@ -544,7 +544,7 @@ export function CustomerManager({ capabilities }: { capabilities: Capabilities }
               if (customer) void setCustomerStatus(customer, "active").catch(() => undefined);
             }}
           >
-            <VerifiedUserRounded fontSize="small" sx={{ mr: 1 }} />
+            <VerifiedUserRounded fontSize="small" sx={{ me: 1 }} />
             {t("reactivate")}
           </MenuItem>
         )}
@@ -556,7 +556,7 @@ export function CustomerManager({ capabilities }: { capabilities: Capabilities }
               closeMenu();
             }}
           >
-            <DeleteOutlineRounded fontSize="small" sx={{ mr: 1 }} />
+            <DeleteOutlineRounded fontSize="small" sx={{ me: 1 }} />
             {t("anonymize")}
           </MenuItem>
         )}
