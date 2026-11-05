@@ -322,9 +322,9 @@ export function createCategoryServices(deps: CategoryServiceDependencies) {
         if (!current) throw new CategoryServiceError("not_found");
         if (current.status !== "archived") throw new CategoryServiceError("not_archived");
         if (await deps.countDishReferences(id)) throw new CategoryServiceError("referenced");
-        const deleted = await deps.repository.softDelete(current, actor.id, new Date());
-        await deps.seo.remove(deleted);
-        return { value: deleted, id, changedIds: [id, current.slug] };
+        await deps.seo.remove(current);
+        await deps.repository.hardDeleteArchived(current);
+        return { value: current, id, changedIds: [id, current.slug] };
       });
     },
   };
