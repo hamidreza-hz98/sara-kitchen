@@ -90,6 +90,7 @@ describe("contact-submission manager", () => {
     const user = userEvent.setup();
     renderManager({ update: false, delete: false });
     await screen.findAllByText("Joao Silva");
+    await user.click(screen.getByRole("button", { name: "Advanced filters" }));
     await user.click(screen.getByRole("button", { name: "Resolved" }));
     expect(navigation.replace).toHaveBeenCalledWith("/dashboard/contact?status=resolved&page=1", {
       scroll: false,
