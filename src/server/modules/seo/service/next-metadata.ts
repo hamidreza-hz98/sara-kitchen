@@ -144,8 +144,9 @@ export function createNextMetadata(
       },
     },
     openGraph: {
-      // Next's type list omits valid product/restaurant Open Graph values; preserve the stored value.
-      type: record.openGraph.type as "website",
+      // Next validates these values while rendering. Product and restaurant remain in SEO data,
+      // but map to the supported website type in its Metadata API.
+      type: record.openGraph.type === "article" ? "article" : "website",
       url: canonical,
       siteName: record.openGraph.siteName ?? settings.siteName,
       locale: openGraphLocale(selection.resolvedLocale),
