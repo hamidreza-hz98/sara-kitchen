@@ -13,7 +13,7 @@ import {
 import { planTransactionTransition } from "../policy/transaction-state-machine";
 import { PaymentProviderError, type ProviderPaymentStatus } from "../provider/payment-provider";
 
-const SAFE_REFERENCE = /^(?!.*\d{12,})[A-Za-z0-9._:-]{1,128}$/u;
+const SAFE_REFERENCE = /^[A-Za-z0-9._:-]{1,128}$/u;
 const SAFE_KEY = /^[A-Za-z0-9._:-]{8,128}$/u;
 
 export type StoredMbWayInitiation = {
@@ -22,6 +22,62 @@ export type StoredMbWayInitiation = {
   providerRequestId: string;
   status: TransactionStatus;
 };
+
+/** Persist SIBS' transaction reference before the MB WAY authorization call is sent. */
+export async function persistMbWaySandboxSession(
+  connection: Connection,
+  input: {
+    transactionId: string;
+    idempotencyKey: string;
+    providerPaymentId: string;
+    providerRequestId: string;
+  },
+): Promise<void> {
+  if (
+    !isValidObjectId(input.transactionId) ||
+    !SAFE_KEY.test(input.idempotencyKey) ||
+    !SAFE_REFERENCE.test(input.providerPaymentId) ||
+    !SAFE_REFERENCE.test(input.providerRequestId)
+  ) {
+    throw new PaymentProviderError("invalid-request", "Invalid MB Way sandbox session reference.");
+  }
+  const Transaction = getTransactionModel(connection);
+  const record = await Transaction.findById(input.transactionId).select(
+    "+providerReferences +idempotencyKeyHash",
+  );
+  if (!record) throw new PaymentProviderError("not-found", "Transaction was not found.");
+  if (record.method !== "mbway" || record.provider !== "mbway-sandbox") {
+    throw new PaymentProviderError("conflict", "Transaction is not an MB Way sandbox attempt.");
+  }
+  if (
+    record.idempotencyKeyHash !== createHash("sha256").update(input.idempotencyKey).digest("hex")
+  ) {
+    throw new PaymentProviderError(
+      "conflict",
+      "Payment idempotency key does not match the transaction.",
+    );
+  }
+  const references = record.providerReferences;
+  if (references.paymentId || references.requestId) {
+    if (
+      references.paymentId === input.providerPaymentId &&
+      references.requestId === input.providerRequestId
+    )
+      return;
+    throw new PaymentProviderError(
+      "conflict",
+      "Transaction already references a different payment.",
+    );
+  }
+  if (record.status !== "created") {
+    throw new PaymentProviderError("conflict", "Transaction cannot accept a provider session.");
+  }
+  record.providerReferences = {
+    paymentId: input.providerPaymentId,
+    requestId: input.providerRequestId,
+  };
+  await record.save();
+}
 
 /** Persist a known provider initiation outcome. Never invoke the provider inside this write. */
 export async function persistMbWaySandboxInitiation(
@@ -80,18 +136,16 @@ export async function persistMbWaySandboxInitiation(
     if (
       record.providerReferences.paymentId === response.providerPaymentId &&
       record.providerReferences.requestId === response.providerRequestId
-    )
-      return result;
-    throw new PaymentProviderError(
-      "conflict",
-      "Transaction already references a different payment.",
-    );
+    ) {
+      if (record.status !== "created") return result;
+    } else {
+      throw new PaymentProviderError(
+        "conflict",
+        "Transaction already references a different payment.",
+      );
+    }
   }
-  if (
-    record.status !== "created" ||
-    record.providerReferences.paymentId ||
-    record.providerReferences.requestId
-  ) {
+  if (record.status !== "created") {
     throw new PaymentProviderError(
       "conflict",
       "Transaction cannot accept a new provider initiation.",
