@@ -15,6 +15,7 @@ const ACTION_CODES = {
   publish: "crud.resource.update",
   unpublish: "crud.resource.update",
   archive: "crud.resource.update",
+  delete: "crud.resource.delete",
 } as const;
 
 export function createBlogAuditSink(
