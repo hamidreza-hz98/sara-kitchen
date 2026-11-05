@@ -3,6 +3,7 @@
 import { PasswordField } from "@/components/ui/password-field";
 
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -24,6 +25,15 @@ import { storeCustomerMobileVerification } from "@/lib/customer-mobile-verificat
 import { parseCustomerMobile } from "@/validations/customer-identity";
 
 type Result = "accepted" | "validationError" | "rateLimited" | "networkError" | null;
+
+function countryFlag(country: CountryCode) {
+  return String.fromCodePoint(
+    ...country
+      .toUpperCase()
+      .split("")
+      .map((letter) => 127397 + letter.charCodeAt(0)),
+  );
+}
 
 export function CustomerSignupForm() {
   const t = useTranslations("storefront.signup");
@@ -125,11 +135,16 @@ export function CustomerSignupForm() {
     <Stack
       component="form"
       spacing={3}
+      sx={{ width: "100%", minWidth: 0 }}
       onSubmit={(event) => {
         submit(event).catch(() => setResult("networkError"));
       }}
     >
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ minWidth: 0, "& > .MuiFormControl-root": { flex: "1 1 0", minWidth: 0 } }}
+      >
         <TextField
           autoComplete="given-name"
           fullWidth
@@ -145,8 +160,11 @@ export function CustomerSignupForm() {
           required
         />
       </Stack>
-      <Stack direction="row" spacing={2}>
-        <FormControl sx={{ flex: "0 0 42%", minWidth: 0 }}>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ minWidth: 0 }}>
+        <FormControl
+          fullWidth
+          sx={{ flex: { xs: "1 1 auto", sm: "0 0 48%" }, minWidth: 0, width: "100%" }}
+        >
           <InputLabel id="signup-country-label">{t("country")}</InputLabel>
           <Select<CountryCode>
             labelId="signup-country-label"
@@ -156,12 +174,55 @@ export function CustomerSignupForm() {
               setCountry(event.target.value as CountryCode);
               setMobileInvalid(false);
             }}
-            renderValue={(selected) => `${selected} (+${getCountryCallingCode(selected)})`}
+            renderValue={(selected) => {
+              const selectedCountry = countryOptions.find((option) => option.code === selected);
+              if (!selectedCountry) return selected;
+              return (
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center", minWidth: 0 }}>
+                  <Box component="span" aria-hidden="true" sx={{ flexShrink: 0, fontSize: 20 }}>
+                    {countryFlag(selectedCountry.code)}
+                  </Box>
+                  <Typography component="span" noWrap sx={{ flex: 1, minWidth: 0 }} variant="body2">
+                    {selectedCountry.name}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    dir="ltr"
+                    noWrap
+                    sx={{ flexShrink: 0 }}
+                    variant="body2"
+                  >
+                    +{selectedCountry.callingCode}
+                  </Typography>
+                </Stack>
+              );
+            }}
+            sx={{ minWidth: 0, "& .MuiSelect-select": { minWidth: 0, overflow: "hidden" } }}
             value={country}
           >
             {countryOptions.map((option) => (
-              <MenuItem key={option.code} value={option.code}>
-                {option.name} (+{option.callingCode})
+              <MenuItem key={option.code} value={option.code} sx={{ minWidth: 0 }}>
+                <Stack
+                  direction="row"
+                  spacing={1.25}
+                  sx={{ width: "100%", alignItems: "center", minWidth: 0 }}
+                >
+                  <Box component="span" aria-hidden="true" sx={{ flexShrink: 0, fontSize: 20 }}>
+                    {countryFlag(option.code)}
+                  </Box>
+                  <Typography component="span" sx={{ flex: 1, minWidth: 0 }} variant="body2">
+                    {option.name}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    color="text.secondary"
+                    dir="ltr"
+                    sx={{ flexShrink: 0 }}
+                    variant="body2"
+                  >
+                    +{option.callingCode}
+                  </Typography>
+                </Stack>
               </MenuItem>
             ))}
           </Select>
@@ -178,14 +239,15 @@ export function CustomerSignupForm() {
             setMobileInvalid(false);
           }}
           required
-          sx={{ flex: "1 1 auto", minWidth: 0 }}
+          sx={{ flex: "1 1 0", minWidth: 0 }}
           type="tel"
           value={mobile}
         />
       </Stack>
-      <TextField autoComplete="email" label={t("email")} name="email" type="email" />
+      <TextField autoComplete="email" fullWidth label={t("email")} name="email" type="email" />
       <PasswordField
         autoComplete="new-password"
+        fullWidth
         helperText={t("passwordHint")}
         label={t("password")}
         name="password"
@@ -196,6 +258,7 @@ export function CustomerSignupForm() {
       <PasswordField
         autoComplete="new-password"
         error={passwordMismatch}
+        fullWidth
         helperText={passwordMismatch ? t("passwordMismatch") : undefined}
         label={t("confirmPassword")}
         name="confirmPassword"
@@ -203,17 +266,34 @@ export function CustomerSignupForm() {
         slotProps={{ htmlInput: { minLength: 8 } }}
         required
       />
-      <FormControlLabel control={<Checkbox name="termsAccepted" required />} label={t("terms")} />
-      <FormControlLabel control={<Checkbox name="marketingConsent" />} label={t("marketing")} />
+      <FormControlLabel
+        control={<Checkbox name="termsAccepted" required />}
+        label={t("terms")}
+        sx={signupCheckboxLabelSx}
+      />
+      <FormControlLabel
+        control={<Checkbox name="marketingConsent" />}
+        label={t("marketing")}
+        sx={signupCheckboxLabelSx}
+      />
       {result && (
         <Alert role="status" severity={result === "accepted" ? "success" : "error"}>
           {t(result)}
         </Alert>
       )}
-      <Button disabled={pending || result === "accepted"} type="submit" variant="contained">
+      <Button
+        disabled={pending || result === "accepted"}
+        fullWidth
+        type="submit"
+        variant="contained"
+      >
         {pending ? t("submitting") : t("submit")}
       </Button>
-      <Stack direction="row" spacing={0.75} sx={{ justifyContent: "center" }}>
+      <Stack
+        direction="row"
+        spacing={0.75}
+        sx={{ justifyContent: "center", flexWrap: "wrap", minWidth: 0, textAlign: "center" }}
+      >
         <Typography color="text.secondary" variant="body2">
           {t("existingCustomer")}
         </Typography>
@@ -224,3 +304,13 @@ export function CustomerSignupForm() {
     </Stack>
   );
 }
+
+const signupCheckboxLabelSx = {
+  m: 0,
+  width: "100%",
+  minWidth: 0,
+  alignItems: "flex-start",
+  gap: 0.5,
+  "& .MuiCheckbox-root": { flexShrink: 0, mt: -0.5 },
+  "& .MuiFormControlLabel-label": { minWidth: 0, overflowWrap: "anywhere", textAlign: "start" },
+} as const;

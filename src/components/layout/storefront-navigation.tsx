@@ -306,6 +306,14 @@ export function StorefrontMobileNavigation({ cartItemCount }: { cartItemCount: n
   const shell = useTranslations("storefront.shell");
   const auth = useCustomerAuth();
 
+  if (
+    ["/login", "/signup", "/forgot-password", "/reset-password", "/verify-mobile"].includes(
+      pathname,
+    )
+  ) {
+    return null;
+  }
+
   return (
     <Box
       aria-label={shell("mobileNavigation")}

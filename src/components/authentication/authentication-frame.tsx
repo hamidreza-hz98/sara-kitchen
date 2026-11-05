@@ -25,7 +25,8 @@ export function AuthenticationFrame({
       sx={{
         position: "relative",
         isolation: "isolate",
-        overflow: "hidden",
+        display: { md: "flex" },
+        alignItems: { md: "center" },
         minHeight: { xs: 0, md: "min(820px, calc(100svh - 84px))" },
         py: { xs: 2, md: 5 },
         bgcolor: "#f4eee7",
@@ -50,12 +51,9 @@ export function AuthenticationFrame({
       <Container
         maxWidth="lg"
         sx={{
-          position: { xs: "relative", md: "absolute" },
-          insetBlock: { md: 0 },
-          insetInline: { md: 0 },
+          position: "relative",
           display: "flex",
-          direction: { md: "ltr" },
-          justifyContent: { md: "flex-end" },
+          justifyContent: { md: rtl ? "flex-start" : "flex-end" },
           alignItems: "center",
           px: { xs: 2, md: 3 },
           mt: { xs: -4, md: 0 },
@@ -71,7 +69,33 @@ export function AuthenticationFrame({
             maxWidth: { xs: "none", md: 470 },
             p: { xs: 2.5, sm: 3.5, md: 4 },
             borderRadius: { xs: 2, md: 2.5 },
-            color: "#242239",
+            color: "var(--sara-palette-text-primary)",
+            "--sara-palette-text-primary": "#2C2C47",
+            "--sara-palette-text-secondary": "#5A6678",
+            "--sara-palette-divider": "rgba(44,44,71,.24)",
+            "--sara-palette-action-active": "rgba(44,44,71,.68)",
+            "--sara-palette-background-paperChannel": "255 255 255",
+            "& .MuiInputBase-root": { color: "var(--sara-palette-text-primary)" },
+            "& .MuiInputLabel-root, & .MuiFormHelperText-root": {
+              color: "var(--sara-palette-text-secondary)",
+            },
+            "& .MuiInputLabel-root.Mui-focused": { color: "var(--sara-palette-primary-dark)" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(44,44,71,.28)" },
+            "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(44,44,71,.5)",
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "var(--sara-palette-primary-dark)",
+            },
+            "& .MuiIconButton-root, & .MuiCheckbox-root": {
+              color: "var(--sara-palette-action-active)",
+            },
+            "& .MuiCheckbox-root.Mui-checked": { color: "var(--sara-palette-primary-dark)" },
+            "& input:-webkit-autofill": {
+              WebkitBoxShadow: "0 0 0 100px rgba(255,255,255,.92) inset",
+              WebkitTextFillColor: "#2C2C47",
+              caretColor: "#2C2C47",
+            },
           }}
         >
           <Typography
