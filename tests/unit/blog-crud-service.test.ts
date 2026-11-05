@@ -82,6 +82,9 @@ function harness() {
       return value;
     }),
     rollbackCreate: vi.fn(async (current) => values.delete(current.id)),
+    hardDeleteArchived: vi.fn(async (current) => {
+      values.delete(current.id);
+    }),
     removeInboundRelationships: vi.fn(async () => []),
     publishDue: vi.fn(async () => []),
   };
@@ -190,13 +193,20 @@ describe("blog CRUD and publishing", () => {
     expect(test.removeInboundDishRelationships).toHaveBeenCalledWith(created.id, actor.id);
   });
 
-  it("does not schedule an incomplete launch-locale draft", async () => {
+  it("schedules and publishes with one translation and no excerpt", async () => {
     const created = await test.services.create(actor, {
-      translations: [input.translations[0]!],
+      translations: [{ ...input.translations[0]!, excerpt: "" }],
     });
     await expect(
       test.services.schedule(actor, created.id, new Date(at.getTime() + 60_000)),
-    ).rejects.toMatchObject({ code: "invalid_input" });
+    ).resolves.toMatchObject({ status: "scheduled" });
+    await expect(test.services.publish(actor, created.id)).resolves.toMatchObject({
+      status: "published",
+    });
+    await expect(test.services.getPublicBySlug(created.slug, "fa")).resolves.toMatchObject({
+      title: "Persian Pantry",
+      excerpt: "",
+    });
   });
 
   it("rejects missing references, cycles, and actors without publishing permission", async () => {
