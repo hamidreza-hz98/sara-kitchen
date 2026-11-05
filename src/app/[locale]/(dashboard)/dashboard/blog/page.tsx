@@ -9,6 +9,7 @@ export default async function DashboardBlogPage() {
     <BlogList
       canArchive={admin.permissions.includes("blogs:delete")}
       canCreate={admin.permissions.includes("blogs:create")}
+      canDelete={admin.permissions.includes("blogs:delete")}
       canPublish={admin.permissions.includes("blogs:publish")}
       canUpdate={admin.permissions.includes("blogs:update")}
     />
