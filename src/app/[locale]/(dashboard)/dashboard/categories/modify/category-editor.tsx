@@ -99,9 +99,11 @@ function fromDetail(item: CategoryDetail): FormValues {
 export function CategoryEditor({
   canCreate,
   canUpdate,
+  canUploadMedia = false,
 }: {
   canCreate: boolean;
   canUpdate: boolean;
+  canUploadMedia?: boolean;
 }) {
   const t = useTranslations("dashboard.categoryEditor");
   const router = useRouter();
@@ -368,6 +370,7 @@ export function CategoryEditor({
           </Tabs>
           <TextField
             label={t("name")}
+            slotProps={{ htmlInput: { dir: tab === "fa" ? "rtl" : "ltr" } }}
             value={current.name}
             onChange={(event) => updateTranslation(tab, { name: event.target.value })}
             required={tab === "en"}
@@ -386,6 +389,7 @@ export function CategoryEditor({
               {t("richDescription")}
             </Typography>
             <CategoryRichEditor
+              direction={tab === "fa" ? "rtl" : "ltr"}
               value={current.description}
               onChange={(description) => updateTranslation(tab, { description })}
               labelledBy="category-description-label"
@@ -402,75 +406,88 @@ export function CategoryEditor({
           </Box>
         </Stack>
       </Paper>
-      <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack spacing={3}>
-          <Typography variant="h6">{t("media")}</Typography>
-          <Stack direction={{ xs: "column", md: "row" }} sx={{ gap: 3 }}>
-            <Box sx={{ flex: 1 }}>
-              <MediaPicker
-                label={t("image")}
-                allowedKinds={["image"]}
-                value={values.imageMediaId}
-                onChange={(imageMediaId) => update({ imageMediaId })}
-              />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <MediaPicker
-                label={t("banner")}
-                allowedKinds={["image"]}
-                value={values.bannerMediaId}
-                onChange={(bannerMediaId) => update({ bannerMediaId })}
-              />
-            </Box>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: "repeat(2, minmax(0, 1fr))" },
+          gap: 3,
+          alignItems: "stretch",
+        }}
+      >
+        <Paper sx={{ p: { xs: 2, md: 3 } }}>
+          <Stack spacing={3}>
+            <Typography variant="h6">{t("media")}</Typography>
+            <Stack direction={{ xs: "column", xl: "row" }} sx={{ gap: 3 }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <MediaPicker
+                  canUpload={canUploadMedia}
+                  label={t("image")}
+                  allowedKinds={["image"]}
+                  value={values.imageMediaId}
+                  onChange={(imageMediaId) => update({ imageMediaId })}
+                />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <MediaPicker
+                  canUpload={canUploadMedia}
+                  label={t("banner")}
+                  allowedKinds={["image"]}
+                  value={values.bannerMediaId}
+                  onChange={(bannerMediaId) => update({ bannerMediaId })}
+                />
+              </Box>
+            </Stack>
           </Stack>
-        </Stack>
-      </Paper>
-      <Paper sx={{ p: { xs: 2, md: 3 } }}>
-        <Stack spacing={3}>
-          <Typography variant="h6">{t("publishing")}</Typography>
-          <TextField
-            label={t("slugOverride")}
-            value={values.slugOverride}
-            onChange={(event) => update({ slugOverride: event.target.value })}
-            error={
-              attempted &&
-              Boolean(values.slugOverride) &&
-              !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(values.slugOverride)
-            }
-            helperText={t("slugHelp")}
-            fullWidth
-            slotProps={{ htmlInput: { dir: "ltr" } }}
-          />
-          <Typography variant="body2" color="text.secondary">
-            {t("slugPreview")}: /menu/{slug || "…"}
-          </Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} sx={{ gap: 2 }}>
-            <FormControl sx={{ minWidth: 180 }}>
-              <InputLabel id="category-edit-status">{t("status")}</InputLabel>
-              <Select
-                labelId="category-edit-status"
-                label={t("status")}
-                value={values.status}
-                onChange={(event) => update({ status: event.target.value as FormValues["status"] })}
-              >
-                <MenuItem value="draft">{t("draft")}</MenuItem>
-                <MenuItem value="published">{t("published")}</MenuItem>
-              </Select>
-            </FormControl>
+        </Paper>
+        <Paper sx={{ p: { xs: 2, md: 3 } }}>
+          <Stack spacing={3}>
+            <Typography variant="h6">{t("publishing")}</Typography>
             <TextField
-              type="number"
-              label={t("sortOrder")}
-              value={values.sortOrder}
-              onChange={(event) => update({ sortOrder: event.target.value })}
+              label={t("slugOverride")}
+              value={values.slugOverride}
+              onChange={(event) => update({ slugOverride: event.target.value })}
               error={
                 attempted &&
-                (!Number.isSafeInteger(Number(values.sortOrder)) || Number(values.sortOrder) < 0)
+                Boolean(values.slugOverride) &&
+                !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(values.slugOverride)
               }
-              slotProps={{ htmlInput: { min: 0, step: 1 } }}
+              helperText={t("slugHelp")}
+              fullWidth
+              slotProps={{ htmlInput: { dir: "ltr" } }}
             />
+            <Typography variant="body2" color="text.secondary">
+              {t("slugPreview")}: /menu/{slug || "…"}
+            </Typography>
+            <Stack direction={{ xs: "column", xl: "row" }} sx={{ gap: 2 }}>
+              <FormControl sx={{ minWidth: 180 }}>
+                <InputLabel id="category-edit-status">{t("status")}</InputLabel>
+                <Select
+                  labelId="category-edit-status"
+                  label={t("status")}
+                  value={values.status}
+                  onChange={(event) =>
+                    update({ status: event.target.value as FormValues["status"] })
+                  }
+                >
+                  <MenuItem value="draft">{t("draft")}</MenuItem>
+                  <MenuItem value="published">{t("published")}</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                type="number"
+                label={t("sortOrder")}
+                value={values.sortOrder}
+                onChange={(event) => update({ sortOrder: event.target.value })}
+                error={
+                  attempted &&
+                  (!Number.isSafeInteger(Number(values.sortOrder)) || Number(values.sortOrder) < 0)
+                }
+                slotProps={{ htmlInput: { min: 0, step: 1 } }}
+              />
+            </Stack>
           </Stack>
-        </Stack>
-      </Paper>
+        </Paper>
+      </Box>
       <Typography variant="body2" color="text.secondary">
         {t("availabilityNote")}
       </Typography>
