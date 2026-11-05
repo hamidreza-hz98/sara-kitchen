@@ -309,7 +309,10 @@ export function createTransactionManagement(connection: Connection, context: Con
       const transaction = await load(id);
       if (transaction.provider !== provider.id || !transaction.providerReferences.paymentId)
         throw new TransactionManagementError("conflict");
-      const status = await provider.fetchStatus(transaction.providerReferences.paymentId);
+      const status = await provider.fetchStatus(
+        transaction.providerReferences.paymentId,
+        transaction.providerReferences.requestId ?? undefined,
+      );
       return applyProviderStatus(actor, id, status, onApplied);
     },
     async cancel(
