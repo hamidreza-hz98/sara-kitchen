@@ -18,6 +18,7 @@ import {
 } from "@/server/modules/media";
 import { findSeoMetadataByPath } from "@/server/modules/seo";
 
+import { getBlogCoverImage } from "../blog-cover-image";
 import type { BlogDetailContent, BlogDetailImage, BlogEmbeddedMedia } from "./blog-detail-content";
 
 function collectMediaIds(
@@ -126,11 +127,12 @@ export const loadBlogDetailContent = cache(async function readBlogDetailContent(
         return {
           slug: record.slug,
           title: translated.title,
-          image: await image(
-            record.imageMediaId ?? record.bannerMediaId,
-            translated.title,
-            "thumbnail",
-          ),
+          image:
+            (await image(
+              record.imageMediaId ?? record.bannerMediaId,
+              translated.title,
+              "thumbnail",
+            )) ?? getBlogCoverImage(record.slug, locale),
           readTimeMinutes: record.readTimeMinutes,
         };
       }),
@@ -144,7 +146,7 @@ export const loadBlogDetailContent = cache(async function readBlogDetailContent(
     author: article.authorSnapshot.displayName,
     publishedAt: article.publishedAt,
     readTimeMinutes: article.readTimeMinutes,
-    banner,
+    banner: banner ?? getBlogCoverImage(article.slug, locale),
     content,
     embeddedMedia,
     relatedDishes,
