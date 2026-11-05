@@ -123,6 +123,29 @@ const dishFields = {
 const dishCreateObjectSchema = z.strictObject(dishFields);
 
 export const sharedDishCreateSchema = dishCreateObjectSchema.superRefine((value, context) => {
+  for (const [index, translation] of value.translations.entries()) {
+    const labels = translation.specifications.map((item) =>
+      item.label.trim().toLocaleLowerCase("en"),
+    );
+    if (new Set(labels).size !== labels.length) {
+      context.addIssue({
+        code: "custom",
+        message: "Specification labels must be unique.",
+        path: ["translations", index, "specifications"],
+      });
+    }
+  }
+  if (
+    value.ingredients &&
+    new Set(value.ingredients.map((item) => item.ingredientId.toLowerCase())).size !==
+      value.ingredients.length
+  ) {
+    context.addIssue({
+      code: "custom",
+      message: "Ingredients must be unique.",
+      path: ["ingredients"],
+    });
+  }
   const discount = value.discount;
   if (discount) {
     const start = discount.startsAt?.getTime() ?? null;
@@ -175,20 +198,6 @@ export const sharedDishCreateSchema = dishCreateObjectSchema.superRefine((value,
         path: ["availability"],
       });
     }
-  }
-
-  if (
-    value.status === "published" &&
-    (value.translations.length !== SUPPORTED_LOCALES.length ||
-      !value.mediaIds?.length ||
-      !value.categoryIds?.length ||
-      !value.ingredients?.length)
-  ) {
-    context.addIssue({
-      code: "custom",
-      message: "Published dishes require every launch locale, media, category, and ingredient.",
-      path: ["status"],
-    });
   }
 });
 export const sharedDishUpdateSchema = z
