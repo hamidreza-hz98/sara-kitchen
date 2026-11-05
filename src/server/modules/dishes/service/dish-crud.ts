@@ -32,7 +32,7 @@ import {
   type DishWrite,
 } from "../repository/dish";
 
-export type DishAction = "create" | "read" | "update" | "archive" | "restore";
+export type DishAction = "create" | "read" | "update" | "archive" | "restore" | "delete";
 export type DishActor = Readonly<{ id: string; role: AdminRole }>;
 export type DishAuditEvent = Readonly<{
   action: DishAction;
@@ -282,15 +282,6 @@ function validateWrite(value: DishWrite): void {
     throw new DishServiceError("invalid_input");
   }
   validateAvailability(value.availability);
-  if (
-    value.status === "published" &&
-    (value.translations.length !== SUPPORTED_LOCALES.length ||
-      value.mediaIds.length === 0 ||
-      value.categoryIds.length === 0 ||
-      value.ingredients.length === 0)
-  ) {
-    throw new DishServiceError("invalid_input");
-  }
 }
 
 function referencesFrom(value: DishWrite): DishReferenceSet {
@@ -381,7 +372,7 @@ function requirePermission(actor: DishActor, action: DishAction): void {
       ? "dishes:create"
       : action === "read"
         ? "dishes:read"
-        : action === "restore"
+        : action === "restore" || action === "delete"
           ? "dishes:delete"
           : "dishes:update";
   if (!hasAdminPermission({ role: actor.role, active: true }, permission)) {
@@ -581,6 +572,23 @@ export function createDishServices(deps: DishServiceDependencies) {
           const restored = await deps.repository.save(current, value, actor.id);
           const synced = await synchronizeSeo(deps, restored, actor.id);
           return { value: synced, id, changedIds: [id, current.slug] };
+        } catch (error) {
+          if (error instanceof DishRepositoryConflictError) {
+            throw new DishServiceError("conflict");
+          }
+          throw error;
+        }
+      });
+    },
+    async delete(actor: DishActor, id: string): Promise<DishSnapshot> {
+      return execute(deps, actor, "delete", async () => {
+        const current = await deps.repository.findById(id);
+        if (!current) throw new DishServiceError("not_found");
+        if (current.status !== "archived") throw new DishServiceError("not_archived");
+        try {
+          await deps.seo.remove(current);
+          await deps.repository.hardDeleteArchived(current);
+          return { value: current, id, changedIds: [id, current.slug] };
         } catch (error) {
           if (error instanceof DishRepositoryConflictError) {
             throw new DishServiceError("conflict");
