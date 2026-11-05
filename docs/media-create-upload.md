@@ -4,7 +4,7 @@
 
 `POST /api/media` accepts one `multipart/form-data` request in the Node.js runtime. It requires an
 authenticated admin with `media:create` permission and the admin CSRF/origin proof. The complete request
-body is limited to 3.5 MiB before multipart parsing.
+body is limited to 10.5 MiB before multipart parsing.
 
 Fields:
 
