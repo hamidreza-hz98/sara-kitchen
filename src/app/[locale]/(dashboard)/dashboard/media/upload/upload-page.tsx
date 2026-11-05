@@ -1,5 +1,6 @@
 "use client";
 
+import { notifyMediaUploaded } from "@/lib/media-change";
 import { normalizeMediaFilename } from "@/lib/media-filename";
 
 import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
@@ -208,6 +209,7 @@ export function MediaUploadPage() {
           };
         }),
       );
+      if (report.summary.succeeded > 0) notifyMediaUploaded();
       setLastSummary(report.summary);
       feedback.notify({
         message: t("summary", report.summary),
@@ -407,8 +409,10 @@ export function MediaUploadPage() {
                     </Box>
                   </Stack>
                   <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-                    {(row.file.size / 1024 / 1024).toFixed(2)} MB ·{" "}
-                    {row.file.type || t("unknownType")}
+                    <bdi dir="ltr">
+                      {(row.file.size / 1024 / 1024).toFixed(2)} MB ·{" "}
+                      <bdi dir="auto">{row.file.type || t("unknownType")}</bdi>
+                    </bdi>
                   </Typography>
                   <LinearProgress
                     aria-label={t("fileProgress", { name: row.file.name })}
