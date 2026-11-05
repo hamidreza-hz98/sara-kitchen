@@ -107,7 +107,7 @@ export async function limitCustomerLogin(
   });
 }
 
-/** Reserved for the email/mobile verification endpoint; consume before identity lookup. */
+/** Limits unauthenticated mobile-verification attempts by source and opaque challenge. */
 export async function limitVerificationAttempt(
   connection: Connection,
   request: Request,
