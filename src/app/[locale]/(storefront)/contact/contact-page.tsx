@@ -1,8 +1,10 @@
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
+import InstagramIcon from "@mui/icons-material/Instagram";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -21,6 +23,14 @@ import { osmDirectionsUrl, osmEmbedUrl, whatsappHref } from "./contact-links";
 export function ContactPage({ data }: { data: ContactPageData }) {
   const t = useTranslations("storefront.contact");
   const { contact, social } = data;
+  const sampleSocials = [
+    {
+      platform: "instagram",
+      label: "@sarakitchen.porto",
+      href: "https://www.instagram.com/sarakitchen.porto/",
+    },
+    { platform: "telegram", label: "@sara_kitchen", href: "https://t.me/sara_kitchen" },
+  ];
   const map = contact?.map;
   const mapUrl =
     contact && map?.provider === "leaflet" ? osmEmbedUrl(contact.location) : map?.embedUrl;
@@ -41,7 +51,7 @@ export function ContactPage({ data }: { data: ContactPageData }) {
       <Box
         sx={{
           background: "linear-gradient(150deg, #ffe6de 0%, #f5d5d2 45%, #f3e5f0 100%)",
-          py: { xs: 7, md: 11 },
+          py: { xs: 3.5, md: 8 },
           "html.dark &": {
             background: "linear-gradient(150deg, #321b1b 0%, #432424 45%, #321b1b 100%)",
           },
@@ -52,11 +62,44 @@ export function ContactPage({ data }: { data: ContactPageData }) {
             sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "1fr 1.05fr" },
-              gap: { xs: 5, md: 8 },
+              gap: { xs: 3, md: 7 },
               alignItems: "center",
             }}
           >
-            <Stack spacing={2.5}>
+            <Stack spacing={{ xs: 1.5, md: 2.5 }}>
+              <Stack
+                direction="row"
+                spacing={1.5}
+                sx={{ alignItems: "center", mb: { xs: 0.5, md: 1 } }}
+                aria-hidden="true"
+              >
+                <Box
+                  component="img"
+                  src="/images/home/tahdig.webp"
+                  alt=""
+                  sx={{
+                    width: { xs: 92, md: 132 },
+                    height: { xs: 92, md: 132 },
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    border: "4px solid white",
+                    boxShadow: "0 8px 20px #24243a24",
+                  }}
+                />
+                <Box
+                  component="img"
+                  src="/images/home/persian-spices.webp"
+                  alt=""
+                  sx={{
+                    width: { xs: 70, md: 98 },
+                    height: { xs: 70, md: 98 },
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    border: "4px solid white",
+                    boxShadow: "0 8px 20px #24243a24",
+                  }}
+                />
+              </Stack>
               <Typography
                 sx={{
                   color: "primary.dark",
@@ -70,11 +113,11 @@ export function ContactPage({ data }: { data: ContactPageData }) {
               <Typography
                 component="h1"
                 variant="h2"
-                sx={{ fontWeight: 800, fontSize: { xs: "2.6rem", md: "4.2rem" }, lineHeight: 1.1 }}
+                sx={{ fontWeight: 800, fontSize: { xs: "2rem", md: "3.6rem" }, lineHeight: 1.1 }}
               >
                 {t("title")}
               </Typography>
-              <Typography sx={{ fontSize: { xs: "1.05rem", md: "1.25rem" }, lineHeight: 1.8 }}>
+              <Typography sx={{ fontSize: { xs: ".95rem", md: "1.15rem" }, lineHeight: 1.75 }}>
                 {t("intro")}
               </Typography>
               <Box
@@ -84,8 +127,8 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     xs: "repeat(2, minmax(0, 1fr))",
                     sm: "repeat(3, minmax(0, 1fr))",
                   },
-                  gap: 1.5,
-                  pt: 1,
+                  gap: 1.25,
+                  pt: { xs: 1.5, md: 1 },
                 }}
               >
                 {contact?.phones.map((phone) => (
@@ -94,8 +137,8 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     component="a"
                     href={`tel:${phone.number}`}
                     sx={{
-                      p: 2,
-                      borderRadius: 3,
+                      p: { xs: 1.5, md: 2 },
+                      borderRadius: 1.5,
                       textDecoration: "none",
                       color: "inherit",
                       overflowWrap: "anywhere",
@@ -116,8 +159,8 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     component="a"
                     href={`mailto:${contact.email}`}
                     sx={{
-                      p: 2,
-                      borderRadius: 3,
+                      p: { xs: 1.5, md: 2 },
+                      borderRadius: 1.5,
                       textDecoration: "none",
                       color: "inherit",
                       overflowWrap: "anywhere",
@@ -140,8 +183,8 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      p: 2,
-                      borderRadius: 3,
+                      p: { xs: 1.5, md: 2 },
+                      borderRadius: 1.5,
                       textDecoration: "none",
                       color: "inherit",
                       overflowWrap: "anywhere",
@@ -157,7 +200,14 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     <Typography sx={{ fontWeight: 700 }}>{contact.whatsapp.number}</Typography>
                   </Paper>
                 )}
-                {social?.links.map((link) => (
+                {(social?.links.length
+                  ? social.links
+                  : sampleSocials.map((item) => ({
+                      ...item,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    }))
+                ).map((link) => (
                   <Paper
                     key={`${link.platform}-${link.href}`}
                     component="a"
@@ -165,14 +215,20 @@ export function ContactPage({ data }: { data: ContactPageData }) {
                     target={link.target}
                     rel={link.rel}
                     sx={{
-                      p: 2,
-                      borderRadius: 3,
+                      p: { xs: 1.5, md: 2 },
+                      borderRadius: 1.5,
                       textDecoration: "none",
                       color: "inherit",
                       overflowWrap: "anywhere",
                     }}
                   >
-                    <PublicRoundedIcon color="primary" />
+                    {link.platform === "instagram" ? (
+                      <InstagramIcon color="primary" />
+                    ) : link.platform === "telegram" ? (
+                      <SendRoundedIcon color="primary" />
+                    ) : (
+                      <PublicRoundedIcon color="primary" />
+                    )}
                     <Typography
                       variant="caption"
                       sx={{ display: "block", textTransform: "uppercase", mt: 1 }}
@@ -189,10 +245,12 @@ export function ContactPage({ data }: { data: ContactPageData }) {
             </Stack>
             <Paper
               sx={{
-                p: { xs: 3, md: 5 },
-                borderRadius: 5,
+                p: { xs: 2, md: 4 },
+                borderRadius: 2,
                 boxShadow: "0 22px 65px #2c2c4720",
                 position: "relative",
+                background:
+                  "linear-gradient(#ffffffd9,#ffffffd9), url('/images/blog/persian-rice-table.webp') center/cover",
               }}
             >
               <ContactForm />
@@ -201,7 +259,7 @@ export function ContactPage({ data }: { data: ContactPageData }) {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ mt: { xs: 7, md: 10 } }}>
+      <Container maxWidth="lg" sx={{ mt: { xs: 5, md: 9 } }}>
         <Box
           sx={{
             display: "grid",
@@ -210,8 +268,12 @@ export function ContactPage({ data }: { data: ContactPageData }) {
             alignItems: "start",
           }}
         >
-          <Stack spacing={3}>
-            <Typography component="h2" variant="h4" sx={{ fontWeight: 800 }}>
+          <Stack spacing={2}>
+            <Typography
+              component="h2"
+              variant="h4"
+              sx={{ fontWeight: 800, fontSize: { xs: "1.55rem", md: "2.1rem" } }}
+            >
               {t("visitTitle")}
             </Typography>
             {contact ? (
@@ -290,7 +352,7 @@ export function ContactPage({ data }: { data: ContactPageData }) {
             <Paper
               component="section"
               aria-label={t("mapTitle")}
-              sx={{ overflow: "hidden", borderRadius: 4 }}
+              sx={{ overflow: "hidden", borderRadius: 2 }}
             >
               <Box
                 component="iframe"
