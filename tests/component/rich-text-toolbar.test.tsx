@@ -18,6 +18,7 @@ describe("rich text toolbar", () => {
           value={{ schemaVersion: 1, document: { type: "doc", content: [] } }}
           onChange={onChange}
           labelledBy="article-label"
+          direction="ltr"
           labels={{
             bold: "Bold",
             italic: "Italic",
