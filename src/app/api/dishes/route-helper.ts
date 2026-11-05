@@ -166,6 +166,22 @@ export function translateDishError(error: unknown): never {
     if (error.code === "conflict" || error.code === "not_archived") {
       throw ApiError.conflict({ resource: "dish" });
     }
+    if (error.issues.length) {
+      const fields = {
+        media: "mediaIds",
+        category: "categoryIds",
+        ingredient: "ingredients",
+        dish: "relatedDishIds",
+        blog: "relatedBlogIds",
+      } as const;
+      throw ApiError.validation(
+        error.issues.map((issue) => ({
+          code: error.code,
+          message: "A selected item is missing or unavailable.",
+          path: [fields[issue.kind]],
+        })),
+      );
+    }
     throw ApiError.validation([
       { code: error.code, message: "The dish data is not accepted.", path: [] },
     ]);
