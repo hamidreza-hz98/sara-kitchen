@@ -3,9 +3,23 @@ import Image from "next/image";
 
 export type BrandMarkProps = {
   size?: number;
+  symbolOnly?: boolean;
 };
 
-export function BrandMark({ size = 44 }: BrandMarkProps) {
+export function BrandMark({ size = 44, symbolOnly = false }: BrandMarkProps) {
+  if (symbolOnly) {
+    return (
+      <Image
+        alt=""
+        aria-hidden="true"
+        height={size}
+        width={size}
+        priority
+        src="/icons/icon-192.png"
+        style={{ display: "block", flexShrink: 0, objectFit: "contain" }}
+      />
+    );
+  }
   return (
     <Box
       aria-hidden="true"
