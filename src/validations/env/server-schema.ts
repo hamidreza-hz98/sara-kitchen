@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { MBWAY_SANDBOX_API_URL } from "@/constants/payment";
+import { MBWAY_SANDBOX_API_URL } from "../../constants/payment";
 
 import { EnvironmentValidationError } from "./error";
 
