@@ -121,6 +121,48 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("blog editor", () => {
+  it("saves a title-only draft without requiring an excerpt or other languages", async () => {
+    renderEditor();
+    fireEvent.change(screen.getByRole("textbox", { name: "Article title" }), {
+      target: { value: "Persian hospitality" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(navigation.replace).toHaveBeenCalled());
+    const request = vi.mocked(fetch).mock.calls.find(([, init]) => init?.method === "POST");
+    expect(JSON.parse(String(request?.[1]?.body)).translations).toEqual([
+      { locale: "en", title: "Persian hospitality", excerpt: "", content: emptyContent },
+    ]);
+  }, 30_000);
+
+  it("reports which language and field needs attention", async () => {
+    renderEditor();
+    fireEvent.change(screen.getByRole("textbox", { name: "Article title" }), {
+      target: { value: "Article" },
+    });
+    fireEvent.click(screen.getByRole("tab", { name: "Persian" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Excerpt" }), {
+      target: { value: "خلاصه" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Enter an article title for Persian",
+    );
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled();
+  }, 30_000);
+
+  it("identifies invalid read time", async () => {
+    renderEditor();
+    fireEvent.change(screen.getByRole("textbox", { name: "Article title" }), {
+      target: { value: "Article" },
+    });
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Read time override (minutes)" }), {
+      target: { value: "1500" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Read time must be a whole number between 1 and 1440 minutes",
+    );
+  }, 30_000);
   it("creates a draft using the shared server-compatible schema and automatic read time", async () => {
     vi.stubGlobal(
       "fetch",
