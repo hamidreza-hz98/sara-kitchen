@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MBWAY_SANDBOX_API_URL } from "@/constants/payment";
+
 import { EnvironmentValidationError } from "./error";
 
 const placeholderPrefix = /^(?:change-me|replace-with)/i;
@@ -92,8 +94,9 @@ export const SERVER_ENVIRONMENT_KEYS = [
   "KITCHEN_LONGITUDE",
   "MBWAY_ENABLED",
   "MBWAY_API_URL",
-  "MBWAY_MERCHANT_ID",
-  "MBWAY_API_KEY",
+  "MBWAY_TERMINAL_ID",
+  "MBWAY_CLIENT_ID",
+  "MBWAY_AUTH_TOKEN",
   "MBWAY_WEBHOOK_SECRET",
   "PAYMENT_RECONCILIATION_CRON_SECRET",
   "WHATSAPP_ENABLED",
@@ -186,12 +189,33 @@ export const serverEnvironmentSchema = z
       .min(-180, "KITCHEN_LONGITUDE must be between -180 and 180.")
       .max(180, "KITCHEN_LONGITUDE must be between -180 and 180."),
     MBWAY_ENABLED: booleanString("MBWAY_ENABLED"),
-    MBWAY_API_URL: optionalUrl("MBWAY_API_URL"),
-    MBWAY_MERCHANT_ID: optionalText("MBWAY_MERCHANT_ID"),
-    MBWAY_API_KEY: optionalText("MBWAY_API_KEY"),
+    MBWAY_API_URL: z.preprocess(
+      emptyStringToUndefined,
+      z.literal(MBWAY_SANDBOX_API_URL).default(MBWAY_SANDBOX_API_URL),
+    ),
+    MBWAY_TERMINAL_ID: z.preprocess(
+      emptyStringToUndefined,
+      z
+        .string()
+        .trim()
+        .regex(/^\d{1,12}$/u, "MBWAY_TERMINAL_ID must be numeric.")
+        .optional(),
+    ),
+    MBWAY_CLIENT_ID: optionalText("MBWAY_CLIENT_ID"),
+    MBWAY_AUTH_TOKEN: optionalText("MBWAY_AUTH_TOKEN"),
     MBWAY_WEBHOOK_SECRET: z.preprocess(
       emptyStringToUndefined,
-      requiredSecret("MBWAY_WEBHOOK_SECRET").optional(),
+      z
+        .string()
+        .trim()
+        .regex(/^[A-Za-z0-9+/]+={0,2}$/u, "MBWAY_WEBHOOK_SECRET must be base64 encoded.")
+        .refine(
+          (value) =>
+            Buffer.from(value, "base64").length === 32 &&
+            Buffer.from(value, "base64").toString("base64") === value,
+          "MBWAY_WEBHOOK_SECRET must be a base64 encoded 32-byte key.",
+        )
+        .optional(),
     ),
     PAYMENT_RECONCILIATION_CRON_SECRET: z.preprocess(
       emptyStringToUndefined,
@@ -270,8 +294,9 @@ export const serverEnvironmentSchema = z
     if (environment.MBWAY_ENABLED) {
       const requiredFields = [
         ["MBWAY_API_URL", "MBWAY_API_URL"],
-        ["MBWAY_MERCHANT_ID", "MBWAY_MERCHANT_ID"],
-        ["MBWAY_API_KEY", "MBWAY_API_KEY"],
+        ["MBWAY_TERMINAL_ID", "MBWAY_TERMINAL_ID"],
+        ["MBWAY_CLIENT_ID", "MBWAY_CLIENT_ID"],
+        ["MBWAY_AUTH_TOKEN", "MBWAY_AUTH_TOKEN"],
         ["MBWAY_WEBHOOK_SECRET", "MBWAY_WEBHOOK_SECRET"],
       ] as const;
 
