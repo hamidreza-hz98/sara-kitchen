@@ -1,11 +1,30 @@
-# Local MB Way sandbox integration (SK-0150)
+# SIBS MB WAY sandbox
 
-This implementation is the **agreed deterministic local simulator**, not an integration with a licensed MB Way acquirer or its remote test environment. No PSP protocol or credentials have been supplied. `MBWAY_ENABLED` should remain disabled in deployed environments, and checkout still cannot place an order or collect payment. Selecting a PSP, adding its authenticated HTTP transport, mapping its documented status/webhook format, and running that PSP's certification tests are separate activation requirements.
+The checkout uses the SIBS SPG server-to-server MB WAY flow. It is pinned in code and environment validation to `https://spg.qly.site1.sibs.pt/api/v2`; local and production deployments both use this sandbox host. The production SIBS host is rejected, so this integration cannot collect live funds.
 
-`MbWaySandboxProvider` implements the common `PaymentProvider` contract over a local simulator transport. It validates and normalizes Portuguese mobile numbers to `+3519…`, requires EUR positive integer cents and a stable 8–128-character idempotency key, starts payments in `pending`, and reports later provider status rather than assuming payment succeeded. It never returns or logs the mobile, idempotency key, webhook secret, or raw transport error. Automated refunds are explicitly unsupported; the agreed phone-call refund process remains manual. The local factory creates a process-local in-memory simulator and is only suitable for tests/development, not multi-instance/serverless persistence; construction fails when `NODE_ENV=production`.
+## Configure credentials
 
-Each provider call has a bounded 10–15,000 ms timeout and 0–2 retries. Only timeout or the explicit transient sandbox transport error is retried. Initiation/cancellation retries reuse the **same provider idempotency key**; status reads are side-effect-free. Validation, conflict, unsupported-operation, and other provider errors are never retried. After repeated uncertain side-effect failures the adapter returns `outcome-unknown`, not `failed`; callers must reconcile using the original key or known provider reference before starting a new attempt. A timeout does not cancel the underlying local operation, so provider-side idempotency is mandatory. A real PSP transport must prove the same guarantee before reuse of this policy.
+Request SIBS SPG sandbox access and the MB WAY product for the merchant. Configure these server-only environment values in `.env.local` for local development and in the deployment environment for production:
 
-`persistMbWaySandboxInitiation` records the successful pending response on a matching local MB Way sandbox Transaction: it checks the SHA-256 idempotency-key digest, authoritative amount/currency, safe request/payment IDs, and provider/method; appends a `pending` event; and saves with optimistic concurrency. Repeating the same response is harmless, including after the transaction later becomes paid. A different reference, amount, key, or provider is rejected without changing the record. The mobile and raw key are never stored. The external provider call must happen **after** the initial checkout commit; this single-record update does not itself create an Order or perform the future SK-0151 webhook/order transaction.
+```dotenv
+MBWAY_ENABLED=true
+MBWAY_API_URL=https://spg.qly.site1.sibs.pt/api/v2
+MBWAY_TERMINAL_ID=your-sandbox-terminal-id
+MBWAY_CLIENT_ID=your-sandbox-client-id
+MBWAY_AUTH_TOKEN=your-sandbox-bearer-token
+MBWAY_WEBHOOK_SECRET=your-base64-encoded-32-byte-aes-key
+```
 
-Tests cover pending/success, failed and expired outcomes, invalid mobiles, retried timeouts and transport faults, committed-but-lost responses, unknown outcomes, no retry on conflicts, safe logs, refund capability, and MongoDB reference persistence. SK-0151 adds the local-simulator webhook described in `docs/payment-webhook.md`; a real PSP adapter, Order model, and atomic checkout/outbox workflow remain required before enabling payments.
+Keep `MBWAY_ENABLED=false` until the real sandbox credentials are installed. `MBWAY_WEBHOOK_SECRET` is the AES-GCM key from SIBS SPG Backoffice's webhook configuration. Never use production credentials or expose these values to the browser.
+
+## Checkout and payment state
+
+Checkout creates the local order and transaction first, then creates the SIBS payment session. It saves SIBS' transaction ID before requesting MB WAY authorization, and sends the validated Portuguese mobile alias to the sandbox. Checkout is considered pending until a verified status inquiry or webhook confirms a final outcome. The customer payment-result page also polls SIBS while the local transaction is still pending.
+
+Configure SIBS merchant notifications to call `POST /api/payments/mbway/webhook` over HTTPS. SIBS sends a Base64 encrypted body with `X-Initialization-Vector` and `X-Authentication-Tag`; the endpoint authenticates and decrypts it with AES-256-GCM, stores only validated event fields, processes duplicate deliveries idempotently, and returns SIBS' required acknowledgement.
+
+Keep the internal reconciliation scheduler enabled as a recovery path. Call `POST /api/internal/payments/reconcile` with `Authorization: Bearer <PAYMENT_RECONCILIATION_CRON_SECRET>` on a five-minute schedule. The request performs status inquiries for stale pending transactions and applies verified state changes to the related order.
+
+## Sandbox verification
+
+Use SIBS' sandbox simulator and test aliases supplied with the merchant onboarding. Local webhooks need an HTTPS tunnel configured in the SIBS sandbox backoffice. Without valid SIBS sandbox credentials and an enabled MB WAY sandbox product, the app intentionally keeps checkout disabled; no simulator or fabricated payment success is substituted.
