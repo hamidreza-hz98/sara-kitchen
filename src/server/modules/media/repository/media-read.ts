@@ -1,7 +1,13 @@
 import "server-only";
 
 import { Types } from "mongoose";
-import type { Connection } from "mongoose";
+import type { Connection, Model } from "mongoose";
+
+import { getBlogModel } from "@/server/modules/blogs/model/blog";
+import { getCategoryModel } from "@/server/modules/categories/model/category";
+import { getDishModel } from "@/server/modules/dishes/model/dish";
+import { getIngredientModel } from "@/server/modules/ingredients/model/ingredient";
+import { getPageSeoModel } from "@/server/modules/seo/model/page-seo";
 
 import { getMediaModel } from "../model/media";
 import type {
@@ -63,6 +69,47 @@ const projection = {
   updatedAt: 1,
 } as const;
 
+type ReferenceCountRow = Readonly<{ _id: Types.ObjectId; count: number }>;
+
+async function countReferenceField<T>(
+  model: Model<T>,
+  field: string,
+  mediaIds: readonly Types.ObjectId[],
+  array = false,
+): Promise<readonly ReferenceCountRow[]> {
+  const path = `$${field}`;
+  return model.aggregate<ReferenceCountRow>([
+    { $match: { deletedAt: null, [field]: { $in: mediaIds } } },
+    ...(array ? [{ $unwind: path }] : []),
+    { $match: { [field]: { $in: mediaIds } } },
+    { $group: { _id: path, count: { $sum: 1 } } },
+  ]);
+}
+
+async function actualUsageCounts(
+  connection: Connection,
+  ids: readonly string[],
+): Promise<ReadonlyMap<string, number>> {
+  const mediaIds = ids.map((id) => new Types.ObjectId(id));
+  const groups = await Promise.all([
+    countReferenceField(getDishModel(connection), "mediaIds", mediaIds, true),
+    countReferenceField(getCategoryModel(connection), "imageMediaId", mediaIds),
+    countReferenceField(getCategoryModel(connection), "bannerMediaId", mediaIds),
+    countReferenceField(getBlogModel(connection), "imageMediaId", mediaIds),
+    countReferenceField(getBlogModel(connection), "bannerMediaId", mediaIds),
+    countReferenceField(getIngredientModel(connection), "imageMediaId", mediaIds),
+    countReferenceField(getPageSeoModel(connection), "shareImageMediaId", mediaIds),
+  ]);
+  const counts = new Map<string, number>();
+  for (const group of groups) {
+    for (const row of group) {
+      const id = row._id.toHexString();
+      counts.set(id, (counts.get(id) ?? 0) + row.count);
+    }
+  }
+  return counts;
+}
+
 function toRecord(value: MediaRecord): MediaReadRecord {
   return {
     id: value._id.toString(),
@@ -101,14 +148,26 @@ export function createMediaReadRepository(connection: Connection): MediaReadRepo
           .lean<MediaRecord[]>(),
         Media.countDocuments(filter),
       ]);
-      return { items: items.map(toRecord), total };
+      const counts = await actualUsageCounts(
+        connection,
+        items.map((item) => item._id.toString()),
+      );
+      return {
+        items: items.map((item) => ({
+          ...toRecord(item),
+          usageCount: counts.get(item._id.toString()) ?? 0,
+        })),
+        total,
+      };
     },
     async findById(id) {
       if (!Types.ObjectId.isValid(id)) return null;
       const item = await Media.findOne({ _id: new Types.ObjectId(id), deletedAt: null }, projection)
         .lean<MediaRecord>()
         .exec();
-      return item ? toRecord(item) : null;
+      if (!item) return null;
+      const counts = await actualUsageCounts(connection, [item._id.toString()]);
+      return { ...toRecord(item), usageCount: counts.get(item._id.toString()) ?? 0 };
     },
   };
 }
