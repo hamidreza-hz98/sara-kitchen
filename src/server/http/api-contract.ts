@@ -95,6 +95,14 @@ export type ApiSuccessResult<Data, Meta = never> = {
   status: number;
 };
 
+/** Provider-specific JSON acknowledgement that must remain at the top level. */
+export type ApiRawSuccessResult = {
+  body: unknown;
+  headers?: HeadersInit;
+  rawJson: true;
+  status: number;
+};
+
 export type ApiSuccessOptions<Meta = never> = {
   headers?: HeadersInit;
   meta?: Meta;
@@ -114,6 +122,22 @@ export function apiSuccess<Data, Meta = never>(
     data,
     ...(options.headers ? { headers: options.headers } : {}),
     ...(options.meta !== undefined ? { meta: options.meta } : {}),
+    status,
+  };
+}
+
+export function apiRawSuccess(
+  body: unknown,
+  options: Omit<ApiSuccessOptions, "meta"> = {},
+): ApiRawSuccessResult {
+  const status = options.status ?? 200;
+  if (!Number.isSafeInteger(status) || status < 200 || status > 299 || status === 204) {
+    throw new RangeError("JSON success status must be an integer from 200–299 excluding 204.");
+  }
+  return {
+    body,
+    ...(options.headers ? { headers: options.headers } : {}),
+    rawJson: true,
     status,
   };
 }
