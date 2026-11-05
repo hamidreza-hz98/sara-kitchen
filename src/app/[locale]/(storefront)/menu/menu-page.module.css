@@ -110,6 +110,11 @@
   white-space: nowrap;
 }
 
+.categoryOption,
+.categoryOptionActive {
+  text-decoration: none;
+}
+
 .categoryOptionActive {
   border-color: var(--sara-palette-primary-main);
   background: var(--sara-palette-action-selected);
@@ -241,9 +246,13 @@
 
 .viewButton,
 .viewButtonActive {
+  display: inline-flex;
   width: 36px;
   height: 36px;
+  align-items: center;
+  justify-content: center;
   border-radius: 5px !important;
+  text-decoration: none;
 }
 
 .viewButton {

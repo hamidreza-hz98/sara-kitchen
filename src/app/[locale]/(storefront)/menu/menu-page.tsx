@@ -3,7 +3,6 @@ import ViewListRounded from "@mui/icons-material/ViewListRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -79,8 +78,7 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
 
         <Box component="nav" aria-label={t("category")} className={styles.categorySelector}>
           <Box className={styles.categoryTrack}>
-            <Box
-              component={Link}
+            <Link
               href={categoryHref(query)}
               aria-current={!content.selectedCategory && !query.category ? "page" : undefined}
               className={`${styles.categoryOption} ${!content.selectedCategory && !query.category ? styles.categoryOptionActive : ""}`}
@@ -94,12 +92,11 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
                 className={styles.categoryOptionImage}
               />
               <span>{t("allDishes")}</span>
-            </Box>
+            </Link>
             {content.categories.map((category) => {
               const selected = category.slug === (query.category || content.selectedCategory?.slug);
               return (
-                <Box
-                  component={Link}
+                <Link
                   href={categoryHref(query, category.slug)}
                   aria-current={selected ? "page" : undefined}
                   className={`${styles.categoryOption} ${selected ? styles.categoryOptionActive : ""}`}
@@ -118,7 +115,7 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
                     className={styles.categoryOptionImage}
                   />
                   <span>{category.name}</span>
-                </Box>
+                </Link>
               );
             })}
           </Box>
@@ -131,26 +128,22 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
             {t("results", { count: formatNumber(content.totalItems, locale) })}
           </Typography>
           <Box role="group" aria-label={t("viewMode")} className={styles.viewToggle}>
-            <IconButton
-              component={Link}
+            <Link
               href={menuHref(query, { view: "grid", page: null })}
               aria-label={t("grid")}
               aria-current={query.view === "grid" ? "page" : undefined}
               className={query.view === "grid" ? styles.viewButtonActive : styles.viewButton}
-              size="small"
             >
               <GridViewRounded fontSize="small" />
-            </IconButton>
-            <IconButton
-              component={Link}
+            </Link>
+            <Link
               href={menuHref(query, { view: "list", page: null })}
               aria-label={t("list")}
               aria-current={query.view === "list" ? "page" : undefined}
               className={query.view === "list" ? styles.viewButtonActive : styles.viewButton}
-              size="small"
             >
               <ViewListRounded fontSize="small" />
-            </IconButton>
+            </Link>
           </Box>
         </Stack>
 
@@ -195,13 +188,12 @@ export function MenuPage({ content, query }: { content: MenuContent; query: Menu
                         </Typography>
                       )}
                     </Box>
-                    <Box
-                      component={Link}
+                    <Link
                       href={categoryHref(query, showcase.category.slug)}
                       className={styles.showcaseLink}
                     >
                       {t("viewCategory")}
-                    </Box>
+                    </Link>
                   </Box>
                   {showcase.dishes.length ? (
                     <MenuInfiniteResults

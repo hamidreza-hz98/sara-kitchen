@@ -34,7 +34,7 @@ export function createAddressAuditSink(
       },
       outcome: event.outcome,
       requestId: context.requestId,
-      context: { addressAction: event.action, customerId: event.customerId },
+      context: { action: event.action, customerId: event.customerId },
       network: { policy: "omitted", ipHash: null, ipAddress: null },
       userAgent: context.userAgent ?? null,
     });
