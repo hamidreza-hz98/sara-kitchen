@@ -81,6 +81,7 @@ export interface BlogRepository {
   save(current: BlogSnapshot, value: BlogWrite, actorId: string): Promise<BlogSnapshot>;
   setSeoPageId(current: BlogSnapshot, seoPageId: string, actorId: string): Promise<BlogSnapshot>;
   rollbackCreate(current: BlogSnapshot): Promise<boolean>;
+  hardDeleteArchived(current: BlogSnapshot): Promise<void>;
   removeInboundRelationships(blogId: string, actorId: string): Promise<readonly string[]>;
   publishDue(at: Date): Promise<readonly BlogSnapshot[]>;
 }
@@ -91,7 +92,9 @@ function snapshot(document: BlogDocument): BlogSnapshot {
   return {
     id: document._id.toHexString(),
     translations: document.translations.map((translation) => ({
-      ...translation,
+      locale: translation.locale,
+      title: translation.title,
+      excerpt: translation.excerpt,
       content: structuredClone(translation.content),
     })),
     slug: document.slug,
@@ -99,7 +102,7 @@ function snapshot(document: BlogDocument): BlogSnapshot {
     bannerMediaId: document.bannerMediaId?.toHexString() ?? null,
     readTimeMinutes: document.readTimeMinutes,
     authorAdminId: document.authorAdminId.toHexString(),
-    authorSnapshot: { ...document.authorSnapshot },
+    authorSnapshot: { displayName: document.authorSnapshot.displayName },
     status: document.status,
     publishAt: document.publishAt?.toISOString() ?? null,
     publishedAt: document.publishedAt?.toISOString() ?? null,
@@ -167,6 +170,7 @@ export function createBlogRepository(connection: Connection): BlogRepository {
   ): Promise<BlogListResult> => {
     const filter: Record<string, unknown> = { ...initial };
     if (options.status) filter.status = options.status;
+    else if (!("status" in initial)) filter.status = { $ne: "archived" };
     if (options.authorAdminId) filter.authorAdminId = new Types.ObjectId(options.authorAdminId);
     if (options.search) {
       filter.normalizedSearchText = { $regex: normalizeSearchText(options.search) };
@@ -277,6 +281,15 @@ export function createBlogRepository(connection: Connection): BlogRepository {
         seoPageId: null,
       });
       return result.deletedCount === 1;
+    },
+    async hardDeleteArchived(current) {
+      const result = await Blog.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        deletedAt: null,
+        status: "archived",
+      });
+      if (result.deletedCount !== 1) throw new BlogRepositoryConflictError();
     },
     async removeInboundRelationships(blogId, actorId) {
       const id = new Types.ObjectId(blogId);
