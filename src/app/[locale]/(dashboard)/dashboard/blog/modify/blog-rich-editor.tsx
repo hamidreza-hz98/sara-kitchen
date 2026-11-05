@@ -34,10 +34,12 @@ export function BlogRichEditor({
   value,
   onChange,
   labelledBy,
+  direction,
 }: {
   value: StoredRichText;
   onChange: (value: StoredRichText) => void;
   labelledBy: string;
+  direction: "ltr" | "rtl";
   labels: Readonly<{
     bold: string;
     italic: string;
@@ -91,7 +93,9 @@ export function BlogRichEditor({
           },
         }}
       >
-        <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        <Box dir={direction}>
+          <EditorContent editor={editor} aria-labelledby={labelledBy} />
+        </Box>
       </Box>
     </Box>
   );
