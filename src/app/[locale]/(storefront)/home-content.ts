@@ -8,6 +8,7 @@ export type HomeDish = Readonly<{
   image: HomeImage | null;
   priceCents: number;
   originalPriceCents: number | null;
+  available?: boolean;
 }>;
 export type HomeContent = Readonly<{
   hero: readonly Readonly<{
