@@ -56,6 +56,16 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("category editor", () => {
+  it("uses the selected translation language for text direction", async () => {
+    const user = userEvent.setup();
+    renderEditor();
+    expect(screen.getByRole("textbox", { name: "Category name" })).toHaveAttribute("dir", "ltr");
+    await user.click(screen.getByRole("tab", { name: "فارسی" }));
+    expect(screen.getByRole("textbox", { name: "Category name" })).toHaveAttribute("dir", "rtl");
+    await user.click(screen.getByRole("tab", { name: "Português" }));
+    expect(screen.getByRole("textbox", { name: "Category name" })).toHaveAttribute("dir", "ltr");
+  });
+
   it("requires canonical English text before submitting", async () => {
     const fetcher = vi.fn();
     vi.stubGlobal("fetch", fetcher);
