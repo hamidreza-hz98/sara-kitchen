@@ -10,7 +10,7 @@ import {
 } from "@/server/http";
 import { getServerEnvironment } from "@/server/environment";
 import { isSameOriginMutation } from "@/server/modules/auth";
-import { getLocalMbWaySandboxProvider } from "@/server/modules/transactions";
+import { createConfiguredSibsMbWaySandboxProvider } from "@/server/modules/transactions";
 import { submitAtomicCheckout } from "@/server/modules/orders";
 import { revalidateDashboardFromRoute } from "@/server/cache/dashboard-revalidation";
 
@@ -51,13 +51,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         },
       ]);
     const environment = getServerEnvironment();
-    // The local simulator is intentionally unavailable in production; real PSP transport is a separate release gate.
-    if (
-      process.env.NODE_ENV === "production" ||
-      !environment.MBWAY_ENABLED ||
-      !environment.MBWAY_WEBHOOK_SECRET
-    )
-      throw ApiError.serviceUnavailable();
+    if (!environment.MBWAY_ENABLED) throw ApiError.serviceUnavailable();
     const result = await submitAtomicCheckout({
       connection: context.connection,
       customerId: context.identity.customerId,
@@ -74,7 +68,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         longitude: environment.KITCHEN_LONGITUDE,
       },
       serviceRadiusKm: null,
-      provider: getLocalMbWaySandboxProvider(environment.MBWAY_WEBHOOK_SECRET),
+      provider: createConfiguredSibsMbWaySandboxProvider(environment),
     });
     if (!result.replayed) revalidateDashboardFromRoute();
     return apiSuccess(result, { headers: { "Cache-Control": "private, no-store" } });
