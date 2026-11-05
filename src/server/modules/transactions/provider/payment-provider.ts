@@ -7,7 +7,10 @@ export interface PaymentProvider {
   readonly id: string;
 
   initiate(input: PaymentInitiation): Promise<ProviderPaymentStatus>;
-  fetchStatus(providerPaymentId: string): Promise<ProviderPaymentStatus>;
+  fetchStatus(
+    providerPaymentId: string,
+    providerRequestId?: string,
+  ): Promise<ProviderPaymentStatus>;
   cancel(input: ProviderCancellation): Promise<ProviderPaymentStatus>;
   refund(input: ProviderRefund): Promise<ProviderPaymentStatus>;
   verifyWebhook(envelope: ProviderWebhookEnvelope): Promise<VerifiedProviderWebhook | null>;
@@ -28,6 +31,11 @@ export type PaymentInitiation = {
   idempotencyKey: string;
   /** Transient payment detail; adapters must never log, persist, or return it. */
   payerMobile?: string;
+  /** Called after the remote session is created and before the authorization request is sent. */
+  onSessionCreated?: (session: {
+    providerPaymentId: string;
+    providerRequestId: string;
+  }) => Promise<void>;
 };
 
 export type ProviderCancellation = {
@@ -55,6 +63,8 @@ export type ProviderWebhookEnvelope = {
   signature: string | null;
   timestamp: string | null;
   receivedAt: Date;
+  initializationVector?: string | null;
+  authenticationTag?: string | null;
 };
 
 export type VerifiedProviderWebhook = {
