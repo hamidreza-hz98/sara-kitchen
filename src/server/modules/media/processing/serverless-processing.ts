@@ -8,15 +8,15 @@ import type { ImageMimeType, ProcessedImage } from "./image-processor";
 const MiB = 1024 * 1024;
 
 export const INLINE_PROCESSING_POLICY = {
-  maxRequestImageBytes: 3 * MiB,
-  maxRouteBodyBytes: Math.floor(3.5 * MiB),
+  maxRequestImageBytes: 10 * MiB,
+  maxRouteBodyBytes: Math.floor(10.5 * MiB),
   maxImagePixels: 8_000_000,
   maxImageSide: 4_000,
   maxFilesPerRequest: 1,
   maxConcurrentJobsPerInstance: 1,
   routeMaxDurationSeconds: 15,
   processingBudgetMs: 8_000,
-  variantTimeoutSeconds: 2,
+  variantTimeoutSeconds: 4,
 } as const;
 
 export type MediaProcessingPlan =
@@ -91,6 +91,7 @@ export async function processImageForRoute(
     }
     return await processImage(input, mimeType, {
       webpOnly: true,
+      webpEffort: 2,
       deadlineAtMs: startedAt + INLINE_PROCESSING_POLICY.processingBudgetMs,
       variantTimeoutSeconds: INLINE_PROCESSING_POLICY.variantTimeoutSeconds,
     });
