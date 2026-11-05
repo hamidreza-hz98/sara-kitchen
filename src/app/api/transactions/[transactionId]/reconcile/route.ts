@@ -10,7 +10,7 @@ import {
 } from "@/server/modules/transactions";
 
 import {
-  localPaymentProvider,
+  configuredMbWayPaymentProvider,
   transactionRequestContext,
   translateTransactionError,
 } from "../../route-helper";
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
       }).reconcile(
         { id: actor.id, role: actor.role, active: true },
         transactionId,
-        localPaymentProvider(),
+        configuredMbWayPaymentProvider(),
         (session, state) =>
           applyVerifiedPaymentStateToOrder(connection, state, session, requestId).then(
             () => undefined,
