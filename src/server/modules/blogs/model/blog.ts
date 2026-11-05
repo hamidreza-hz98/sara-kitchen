@@ -108,7 +108,7 @@ export const blogSchema = createBaseSchema<BlogRecord>(
     translations: createTranslationsField<BlogTranslation>(
       {
         title: { type: String, required: true, trim: true, minlength: 1, maxlength: 180 },
-        excerpt: { type: String, required: true, trim: true, minlength: 1, maxlength: 500 },
+        excerpt: { type: String, default: "", trim: true, maxlength: 500 },
         content: {
           type: Schema.Types.Mixed,
           required: true,
@@ -118,7 +118,7 @@ export const blogSchema = createBaseSchema<BlogRecord>(
           },
         },
       },
-      { canonicalTextFields: ["title", "excerpt"] },
+      { canonicalTextFields: ["title"] },
     ),
     slug: createSlugField(),
     imageMediaId: optionalObjectId("Media"),
