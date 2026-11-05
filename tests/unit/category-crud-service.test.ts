@@ -83,6 +83,9 @@ function harness() {
       records.set(current.id, record);
       return record;
     },
+    hardDeleteArchived: async (current) => {
+      records.delete(current.id);
+    },
     restore: async (current) => {
       const record = { ...current, deletedAt: null, version: current.version + 1 };
       records.set(current.id, record);
@@ -159,7 +162,7 @@ describe("Category CRUD services", () => {
     expect(overridden.slug).toBe("new-starters");
   });
 
-  it("blocks archive/delete while referenced and requires archive before soft deletion", async () => {
+  it("blocks archive/delete while referenced and permanently deletes archived categories", async () => {
     const test = harness();
     const created = await test.services.create(actor, input);
     test.setDishReferences(2);
@@ -171,12 +174,13 @@ describe("Category CRUD services", () => {
       code: "not_archived",
     });
     await test.services.archive(actor, created.id);
-    const deleted = await test.services.delete(actor, created.id);
-    expect(deleted.deletedAt).not.toBeNull();
+    await test.services.delete(actor, created.id);
+    expect(test.records.has(created.id)).toBe(false);
     expect(test.remove).toHaveBeenCalledOnce();
-    const restored = await test.services.restore(actor, created.id);
-    expect(restored.deletedAt).toBeNull();
-    expect(test.sync).toHaveBeenCalledTimes(3);
+    await expect(test.services.restore(actor, created.id)).rejects.toMatchObject({
+      code: "not_found",
+    });
+    expect(test.sync).toHaveBeenCalledTimes(2);
   });
 
   it("denies unauthorized actions and audits the denial", async () => {
