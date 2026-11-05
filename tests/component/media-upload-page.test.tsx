@@ -42,6 +42,16 @@ function image(name: string, size = 3): File {
 beforeEach(() => upload.mockReset());
 
 describe("media upload page", () => {
+  it("isolates the file size and format from the surrounding RTL text", async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.upload(screen.getByLabelText("Choose media files"), image("rice.png", 1024 * 1024));
+    const details = screen.getByText(/1\.00 MB/);
+    expect(details).toHaveAttribute("dir", "ltr");
+    expect(details).toHaveTextContent("1.00 MB · image/png");
+    expect(details.querySelector("bdi")).toHaveAttribute("dir", "auto");
+  });
+
   it("validates duplicates and oversized files before upload", async () => {
     const user = userEvent.setup();
     renderPage();
@@ -51,9 +61,9 @@ describe("media upload page", () => {
     await user.upload(input, first);
     expect(screen.getByRole("alert")).toHaveTextContent("already in the list");
     fireEvent.drop(screen.getByLabelText("Media drop zone"), {
-      dataTransfer: { files: [image("large.png", 3 * 1024 * 1024 + 1)] },
+      dataTransfer: { files: [image("large.png", 10 * 1024 * 1024 + 1)] },
     });
-    expect(screen.getByText("This file exceeds the current 3 MB upload limit.")).toBeVisible();
+    expect(screen.getByText("This file exceeds the current 10 MB upload limit.")).toBeVisible();
     expect(upload).not.toHaveBeenCalled();
   });
 
