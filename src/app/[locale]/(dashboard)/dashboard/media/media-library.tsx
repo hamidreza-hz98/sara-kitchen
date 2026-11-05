@@ -1,5 +1,6 @@
 "use client";
 
+import { subscribeMediaUploads } from "@/lib/media-change";
 import { AdvancedFilters } from "@/components/ui/advanced-filters";
 
 import AddPhotoAlternateRounded from "@mui/icons-material/AddPhotoAlternateRounded";
@@ -198,13 +199,16 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
 
   const replaceQuery = useCallback(
     (patch: Readonly<Record<string, number | string | undefined>>) => {
-      setLoading(true);
-      setError(false);
       const next = patchMediaListSearchParams(new URLSearchParams(rawQuery), patch);
+      const nextApiQuery = mediaListApiSearchParams(parseMediaListUiQuery(next)).toString();
+      if (nextApiQuery !== apiQuery) {
+        setLoading(true);
+        setError(false);
+      }
       const suffix = next.size ? `?${next.toString()}` : "";
       router.replace(`${pathname}${suffix}`, { scroll: false });
     },
-    [pathname, rawQuery, router],
+    [apiQuery, pathname, rawQuery, router],
   );
 
   useEffect(() => {
@@ -247,6 +251,25 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
       });
     return () => controller.abort();
   }, [apiQuery, reloadKey]);
+
+  useEffect(
+    () =>
+      subscribeMediaUploads(() => {
+        setSearchDraft(null);
+        setLoading(true);
+        setError(false);
+        setReloadKey((value) => value + 1);
+        replaceQuery({
+          page: 1,
+          search: undefined,
+          kind: undefined,
+          usage: undefined,
+          processingState: undefined,
+          sort: "createdAt:desc",
+        });
+      }),
+    [replaceQuery],
+  );
 
   const refresh = () => {
     setLoading(true);
@@ -405,7 +428,34 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
       </Stack>
 
       <Paper sx={{ p: { xs: 3, md: 4 }, border: "1px solid", borderColor: "divider" }}>
-        <AdvancedFilters>
+        <AdvancedFilters
+          visibleCounts={{ xs: 1, sm: 2, lg: 3 }}
+          actions={
+            <Stack direction="row" sx={{ gap: 1, alignItems: "center" }}>
+              <Tooltip title={t("refresh")}>
+                <IconButton aria-label={t("refresh")} onClick={refresh}>
+                  <RefreshRounded />
+                </IconButton>
+              </Tooltip>
+              <ToggleButtonGroup
+                exclusive
+                aria-label={t("viewMode")}
+                size="small"
+                value={query.view}
+                onChange={(_event, value: "grid" | "list" | null) =>
+                  value && replaceQuery({ view: value })
+                }
+              >
+                <ToggleButton aria-label={t("gridView")} value="grid">
+                  <GridViewRounded />
+                </ToggleButton>
+                <ToggleButton aria-label={t("listView")} value="list">
+                  <ListRounded />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+          }
+        >
           <TextField
             aria-label={t("search")}
             label={t("search")}
@@ -501,31 +551,6 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
             </Select>
           </FormControl>
         </AdvancedFilters>
-        <Box sx={{ mt: 2 }}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-            <Tooltip title={t("refresh")}>
-              <IconButton aria-label={t("refresh")} onClick={refresh}>
-                <RefreshRounded />
-              </IconButton>
-            </Tooltip>
-            <ToggleButtonGroup
-              exclusive
-              aria-label={t("viewMode")}
-              size="small"
-              value={query.view}
-              onChange={(_event, value: "grid" | "list" | null) =>
-                value && replaceQuery({ view: value })
-              }
-            >
-              <ToggleButton aria-label={t("gridView")} value="grid">
-                <GridViewRounded />
-              </ToggleButton>
-              <ToggleButton aria-label={t("listView")} value="list">
-                <ListRounded />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Stack>
-        </Box>
       </Paper>
 
       <Stack
@@ -652,12 +677,23 @@ export function MediaLibrary({ capabilities }: { capabilities: Capabilities }) {
                   />
                   <StateChip state={item.processingState} />
                 </Stack>
-                <Typography color="text.secondary" sx={{ mt: 2, fontSize: 13 }}>
-                  {formatBytes(item.bytes, (value) =>
-                    formatter.number(value, { maximumFractionDigits: 1 }),
-                  )}{" "}
-                  · {formatter.dateTime(new Date(item.createdAt), { dateStyle: "medium" })}
-                </Typography>
+                <Stack
+                  direction="row"
+                  sx={{ mt: 2, gap: 1, alignItems: "center", color: "text.secondary" }}
+                >
+                  <Typography variant="body2" sx={{ fontSize: 13 }}>
+                    {formatBytes(item.bytes, (value) =>
+                      formatter.number(value, { maximumFractionDigits: 1 }),
+                    )}
+                  </Typography>
+                  <Box
+                    aria-hidden="true"
+                    sx={{ width: 1, height: 14, flexShrink: 0, bgcolor: "divider" }}
+                  />
+                  <Typography variant="body2" sx={{ fontSize: 13 }}>
+                    {formatter.dateTime(new Date(item.createdAt), { dateStyle: "medium" })}
+                  </Typography>
+                </Stack>
               </CardContent>
               <Divider />
               <CardActions sx={{ justifyContent: "flex-end" }}>{actions(item)}</CardActions>
