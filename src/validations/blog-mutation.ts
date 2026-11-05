@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { SUPPORTED_LOCALES } from "@/constants";
+import { isStoredRichText } from "@/lib/rich-text";
 
 export const BLOG_FORM_MAX_READ_TIME_MINUTES = 1_440;
 export const BLOG_FORM_MAX_RELATIONS = 30;
@@ -18,7 +19,7 @@ const unique = <Value extends z.ZodType>(value: Value, maximum: number, minimum 
 const translation = z.strictObject({
   locale: z.enum(SUPPORTED_LOCALES),
   title: z.string().trim().min(1).max(180),
-  excerpt: z.string().trim().min(1).max(500),
+  excerpt: z.string().trim().max(500),
   content: z
     .strictObject({
       schemaVersion: z.literal(1),
@@ -27,10 +28,7 @@ const translation = z.strictObject({
         content: z.array(z.unknown()).optional(),
       }),
     })
-    .refine(
-      (value) => JSON.stringify(value).length <= 500_000,
-      "Content does not satisfy the rich-text policy.",
-    ),
+    .refine(isStoredRichText, "Content does not satisfy the rich-text policy."),
 });
 
 export const sharedBlogCreateSchema = z.strictObject({
