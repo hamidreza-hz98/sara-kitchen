@@ -13,6 +13,7 @@ function file(name: string, type = "image/png", size = 1): File {
 describe("media upload browser admission", () => {
   it("accepts supported images and normalizes filenames", () => {
     expect(mediaUploadAdmission(file("sara-kitchen.png"))).toBeNull();
+    expect(mediaUploadAdmission(file("limit.png", "image/png", 10 * 1024 * 1024))).toBeNull();
     expect(mediaUploadAdmission(file("sara-kitchen.jpg", "image/png"))).toBeNull();
   });
 
