@@ -55,3 +55,21 @@ export async function PATCH(request: NextRequest, context: RouteContext): Promis
     }
   });
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext): Promise<Response> {
+  return handleApiRoute(request, async ({ requestId }) => {
+    const state = await blogAdminRequestContext(request, "blogs:delete", true);
+    const { blogId } = await parseRouteParameters(
+      context.params,
+      blogIdParametersSchema,
+      state.validation,
+    );
+    try {
+      return apiSuccess(
+        await resolveBlogServices(state.connection, requestId).delete(actor(state.actor), blogId),
+      );
+    } catch (error) {
+      return translateBlogError(error);
+    }
+  });
+}
