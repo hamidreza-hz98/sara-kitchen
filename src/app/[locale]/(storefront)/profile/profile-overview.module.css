@@ -10,7 +10,7 @@
 .shortcut {
   background: var(--sara-palette-background-paper);
   border: 1px solid var(--sara-palette-divider);
-  border-radius: 1rem;
+  border-radius: 8px;
   color: var(--sara-palette-text-primary);
   display: block;
   font-weight: 700;
