@@ -10,10 +10,14 @@ import { Children, useId, useState, type ReactNode } from "react";
 /** Keep one responsive row visible and preserve the state of additional filters. */
 export function AdvancedFilters({
   children,
+  actions,
   spacing = 2,
+  visibleCounts = { xs: 1, sm: 2, lg: 4 },
 }: {
   children: ReactNode;
+  actions?: ReactNode;
   spacing?: number;
+  visibleCounts?: Readonly<{ xs: number; sm: number; lg: number }>;
 }) {
   const t = useTranslations("shared.filters");
   const [expanded, setExpanded] = useState(false);
@@ -23,7 +27,10 @@ export function AdvancedFilters({
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "minmax(0, 1fr) auto",
+        gridTemplateColumns: {
+          xs: actions ? "minmax(0, 1fr)" : "minmax(0, 1fr) auto",
+          sm: actions ? "minmax(0, 1fr) auto auto" : "minmax(0, 1fr) auto",
+        },
         gap: spacing,
         alignItems: "start",
       }}
@@ -35,7 +42,7 @@ export function AdvancedFilters({
           gridTemplateColumns: {
             xs: "minmax(0, 1fr)",
             sm: "repeat(2, minmax(0, 1fr))",
-            lg: "repeat(4, minmax(0, 1fr))",
+            lg: `repeat(${visibleCounts.lg}, minmax(0, 1fr))`,
           },
           gap: spacing,
           alignItems: "start",
@@ -49,9 +56,9 @@ export function AdvancedFilters({
               display: expanded
                 ? "block"
                 : {
-                    xs: index < 1 ? "block" : "none",
-                    sm: index < 2 ? "block" : "none",
-                    lg: index < 4 ? "block" : "none",
+                    xs: index < visibleCounts.xs ? "block" : "none",
+                    sm: index < visibleCounts.sm ? "block" : "none",
+                    lg: index < visibleCounts.lg ? "block" : "none",
                   },
               "& > .MuiFormControl-root": { width: "100%", minWidth: 0 },
             }}
@@ -69,14 +76,15 @@ export function AdvancedFilters({
         sx={{
           whiteSpace: "nowrap",
           display: {
-            xs: items.length > 1 ? "inline-flex" : "none",
-            sm: items.length > 2 ? "inline-flex" : "none",
-            lg: items.length > 4 ? "inline-flex" : "none",
+            xs: items.length > visibleCounts.xs ? "inline-flex" : "none",
+            sm: items.length > visibleCounts.sm ? "inline-flex" : "none",
+            lg: items.length > visibleCounts.lg ? "inline-flex" : "none",
           },
         }}
       >
         {expanded ? t("less") : t("advanced")}
       </Button>
+      {actions ? <Box sx={{ display: "flex", alignItems: "center" }}>{actions}</Box> : null}
     </Box>
   );
 }
