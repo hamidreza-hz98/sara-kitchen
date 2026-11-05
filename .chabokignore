@@ -1,0 +1,32 @@
+# Keep deployment uploads lean and prevent local-only data from leaving the workspace.
+.git/
+node_modules/
+.next/
+out/
+build/
+.vercel/
+coverage/
+playwright-report/
+test-results/
+quality-fixture-*/
+hook-fixture-*/
+secret-scan-fixture-*/
+
+# Environment files and private credentials are configured in Chabokan.
+.env*
+*.pem
+
+# Development-only content is not needed by the production build.
+docs/
+tests/
+
+# Local logs, caches, and operating-system files.
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+Thumbs.db
