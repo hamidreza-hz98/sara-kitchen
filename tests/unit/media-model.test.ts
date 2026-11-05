@@ -53,6 +53,26 @@ describe("Media schema", () => {
     expect(document.get("normalizedSearchText")).toContain("persian meal on a plate");
   });
 
+  it.each(["minio", "mongodb"] as const)("accepts %s managed storage", async (provider) => {
+    await expect(managedImage({ provider }).validate()).resolves.toBeUndefined();
+  });
+
+  it("rejects a managed file with an external provider and the reverse", async () => {
+    await expect(managedImage({ provider: "external" }).validate()).rejects.toThrow(/provider/u);
+    await expect(
+      managedImage({
+        source: "external",
+        provider: "mongodb",
+        bucket: null,
+        objectKey: null,
+        externalUrl: "https://example.com/image.jpg",
+        bytes: null,
+        checksum: null,
+        dimensions: null,
+      }).validate(),
+    ).rejects.toThrow(/provider/u);
+  });
+
   it("accepts external assets without claiming a MinIO object", async () => {
     const document = managedImage({
       source: "external",
