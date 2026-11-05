@@ -48,6 +48,7 @@ test("checks every configured authentication and provider secret in build output
     "MINIO_ACCESS_KEY",
     "MINIO_SECRET_KEY",
     "MBWAY_API_KEY",
+    "MBWAY_AUTH_TOKEN",
     "MBWAY_WEBHOOK_SECRET",
     "WHATSAPP_ACCESS_TOKEN",
   ]);
