@@ -58,6 +58,7 @@ export async function getCustomerPaymentResult(
   connection: Connection,
   customerId: string,
   orderCode: string,
+  refreshPaymentStatus?: (transactionId: string) => Promise<void>,
 ): Promise<CustomerPaymentResult> {
   if (!Types.ObjectId.isValid(customerId)) throw new PaymentResultError("not_found");
   const order = await getOrderModel(connection)
@@ -67,13 +68,22 @@ export async function getCustomerPaymentResult(
   if (!order) throw new PaymentResultError("not_found");
 
   const transactionId = order.transactionIds.at(-1)?.toString();
-  const payment = transactionId ? await getOrderPaymentView(connection, transactionId) : null;
+  let payment = transactionId ? await getOrderPaymentView(connection, transactionId) : null;
+  if (
+    transactionId &&
+    payment &&
+    refreshPaymentStatus &&
+    ["created", "pending", "authorized"].includes(payment.status)
+  ) {
+    await refreshPaymentStatus(transactionId).catch(() => undefined);
+    payment = await getOrderPaymentView(connection, transactionId);
+  }
   const paymentMatches =
     payment?.orderId === order._id.toString() &&
     payment.customerId === customerId &&
     payment.currency === order.currency &&
     payment.requestedCents === order.pricing.totalCents;
-  const paymentStatus = paymentMatches ? payment.status : "unknown";
+  const paymentStatus = paymentMatches && payment ? payment.status : "unknown";
   const state = resultState(order.status, paymentStatus);
   return Object.freeze({
     orderCode: order.code,
@@ -83,7 +93,7 @@ export async function getCustomerPaymentResult(
     amountCents: order.pricing.totalCents,
     currency: order.currency,
     updatedAt: order.updatedAt,
-    pollAfterMs: state === "pending" ? 2_500 : null,
+    pollAfterMs: state === "pending" ? 5_000 : null,
     canStartNewOrder: ["failed", "expired", "cancelled"].includes(state),
   });
 }
