@@ -31,6 +31,7 @@ const mocks = {
   create: vi.fn(),
   save: vi.fn(),
   softDelete: vi.fn(),
+  hardDeleteArchived: vi.fn(),
   restore: vi.fn(),
   validateImage: vi.fn(),
   countDishReferences: vi.fn(),
@@ -46,6 +47,7 @@ function services() {
     create: mocks.create,
     save: mocks.save,
     softDelete: mocks.softDelete,
+    hardDeleteArchived: mocks.hardDeleteArchived,
     restore: mocks.restore,
   };
   const dependencies: IngredientServiceDependencies = {
@@ -67,6 +69,7 @@ beforeEach(() => {
   mocks.create.mockResolvedValue(snapshot);
   mocks.save.mockResolvedValue(snapshot);
   mocks.softDelete.mockResolvedValue({ ...snapshot, status: "archived", deletedAt: "now" });
+  mocks.hardDeleteArchived.mockResolvedValue(undefined);
   mocks.restore.mockResolvedValue({ ...snapshot, deletedAt: null });
   mocks.findById.mockResolvedValue(snapshot);
   mocks.list.mockResolvedValue({ items: [snapshot], total: 1 });
@@ -136,7 +139,7 @@ describe("ingredient CRUD service", () => {
       expect.objectContaining({ status: "archived" }),
       actor.id,
     );
-    expect(mocks.softDelete).not.toHaveBeenCalled();
+    expect(mocks.hardDeleteArchived).not.toHaveBeenCalled();
   });
 
   it("refuses destructive deletion of active ingredients", async () => {
@@ -144,7 +147,7 @@ describe("ingredient CRUD service", () => {
       code: "not_archived",
     });
     expect(mocks.countDishReferences).not.toHaveBeenCalled();
-    expect(mocks.softDelete).not.toHaveBeenCalled();
+    expect(mocks.hardDeleteArchived).not.toHaveBeenCalled();
   });
 
   it("refuses destructive deletion when any dish references the ingredient", async () => {
@@ -153,18 +156,14 @@ describe("ingredient CRUD service", () => {
     await expect(services().delete(actor, snapshot.id)).rejects.toMatchObject({
       code: "referenced",
     });
-    expect(mocks.softDelete).not.toHaveBeenCalled();
+    expect(mocks.hardDeleteArchived).not.toHaveBeenCalled();
   });
 
-  it("soft-deletes an unreferenced archived ingredient and supports safe restore", async () => {
+  it("permanently deletes an unreferenced archived ingredient", async () => {
     const archived = { ...snapshot, status: "archived" as const };
     mocks.findById.mockResolvedValueOnce(archived);
     await services().delete(actor, snapshot.id);
-    expect(mocks.softDelete).toHaveBeenCalledWith(archived, actor.id, expect.any(Date));
-
-    mocks.findById.mockResolvedValueOnce({ ...archived, deletedAt: "2026-09-18T00:00:00.000Z" });
-    await services().restore(actor, snapshot.id);
-    expect(mocks.restore).toHaveBeenCalled();
+    expect(mocks.hardDeleteArchived).toHaveBeenCalledWith(archived);
   });
 
   it("uses stable domain errors", () => {
