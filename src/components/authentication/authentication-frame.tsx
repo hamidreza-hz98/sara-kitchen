@@ -44,15 +44,7 @@ export function AuthenticationFrame({
           backgroundImage:
             "linear-gradient(90deg, rgba(33,23,21,.04), rgba(33,23,21,0)), url('/images/authentication/persian-table.webp')",
           backgroundSize: "cover",
-          backgroundPosition: rtl ? "right center" : "left center",
-          clipPath: {
-            xs: rtl
-              ? "polygon(0 0,100% 0,100% 100%,28% 100%)"
-              : "polygon(0 0,100% 0,72% 100%,0 100%)",
-            md: rtl
-              ? "polygon(0 0,100% 0,100% 100%,38% 100%)"
-              : "polygon(0 0,100% 0,62% 100%,0 100%)",
-          },
+          backgroundPosition: "center center",
         }}
       />
       <Container
@@ -62,6 +54,8 @@ export function AuthenticationFrame({
           insetBlock: { md: 0 },
           insetInline: { md: 0 },
           display: "flex",
+          direction: { md: "ltr" },
+          justifyContent: { md: "flex-end" },
           alignItems: "center",
           px: { xs: 2, md: 3 },
           mt: { xs: -4, md: 0 },
@@ -70,12 +64,12 @@ export function AuthenticationFrame({
         <LiquidGlass
           component="section"
           aria-labelledby="authentication-title"
+          dir={rtl ? "rtl" : "ltr"}
           intensity="strong"
           sx={{
             width: "100%",
             maxWidth: { xs: "none", md: 470 },
             p: { xs: 2.5, sm: 3.5, md: 4 },
-            marginInlineStart: { md: "auto" },
             borderRadius: { xs: 2, md: 2.5 },
             color: "#242239",
           }}
