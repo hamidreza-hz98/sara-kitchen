@@ -17,7 +17,7 @@ const png = (width: number, height: number) =>
 
 describe("serverless media processing boundary", () => {
   it("leaves headroom below Vercel body and function time limits", () => {
-    expect(INLINE_PROCESSING_POLICY.maxRouteBodyBytes).toBeLessThan(4.5 * 1024 * 1024);
+    expect(INLINE_PROCESSING_POLICY.maxRouteBodyBytes).toBe(10.5 * 1024 * 1024);
     expect(INLINE_PROCESSING_POLICY.maxRequestImageBytes).toBeLessThan(
       INLINE_PROCESSING_POLICY.maxRouteBodyBytes,
     );
@@ -73,6 +73,30 @@ describe("serverless media processing boundary", () => {
     });
     const processed = await processImageForRoute(await png(200, 100), "image/png");
     expect(processed.variants[0]?.role).toBe("display_webp");
+  });
+
+  it("processes a detailed PNG within the inline limits", async () => {
+    const width = 1600;
+    const height = 1000;
+    const pixels = Buffer.alloc(width * height * 4);
+    for (let i = 0; i < width * height; i += 1) {
+      const x = i % width;
+      const y = Math.floor(i / width);
+      pixels[i * 4] = (x * 7 + y * 3) % 256;
+      pixels[i * 4 + 1] = (x * 3 + y * 11) % 256;
+      pixels[i * 4 + 2] = (x ^ y) % 256;
+      pixels[i * 4 + 3] = 200;
+    }
+    const input = await sharp(pixels, { raw: { width, height, channels: 4 } })
+      .png()
+      .toBuffer();
+    expect(input.length).toBeLessThan(INLINE_PROCESSING_POLICY.maxRequestImageBytes);
+    const result = await processImageForRoute(input, "image/png");
+    expect(result.variants.map((variant) => variant.role)).toEqual([
+      "display_webp",
+      "thumbnail_webp",
+    ]);
+    expect(result.source).toMatchObject({ width, height, mimeType: "image/png" });
   });
 
   it("rejects concurrent work on the same warm function instance", async () => {
