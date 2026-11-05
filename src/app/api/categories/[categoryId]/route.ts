@@ -74,3 +74,25 @@ export async function PATCH(request: NextRequest, context: RouteContext): Promis
     }
   });
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext): Promise<Response> {
+  return handleApiRoute(request, async ({ requestId }) => {
+    const { connection, actor, validation } = await categoryRequestContext(
+      request,
+      "categories:delete",
+      true,
+    );
+    const { categoryId } = await parseRouteParameters(
+      context.params,
+      categoryIdParametersSchema,
+      validation,
+    );
+    const services = resolveCategoryMutationServices(connection, requestId);
+    if (!services) categoryMutationUnavailable();
+    try {
+      return apiSuccess(await services.delete({ id: actor.id, role: actor.role }, categoryId));
+    } catch (error) {
+      return translateCategoryServiceError(error);
+    }
+  });
+}
