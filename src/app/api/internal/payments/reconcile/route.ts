@@ -7,7 +7,10 @@ import { connectToDatabase } from "@/server/database";
 import { getServerEnvironment } from "@/server/environment";
 import { ApiError, apiSuccess, handleApiRoute } from "@/server/http";
 import { applyVerifiedPaymentStateToOrder } from "@/server/modules/orders";
-import { getLocalMbWaySandboxProvider, reconcilePayments } from "@/server/modules/transactions";
+import {
+  createConfiguredSibsMbWaySandboxProvider,
+  reconcilePayments,
+} from "@/server/modules/transactions";
 import { createApplicationLogger } from "@/server/observability";
 
 export const runtime = "nodejs";
@@ -26,16 +29,12 @@ export async function POST(request: NextRequest): Promise<Response> {
     if (!authorized(request, environment.PAYMENT_RECONCILIATION_CRON_SECRET)) {
       throw ApiError.authentication();
     }
-    if (
-      process.env.NODE_ENV === "production" ||
-      !environment.MBWAY_ENABLED ||
-      !environment.MBWAY_WEBHOOK_SECRET
-    ) {
+    if (!environment.MBWAY_ENABLED) {
       throw ApiError.serviceUnavailable("No approved payment provider is configured.");
     }
     const connection = await connectToDatabase();
     const logger = createApplicationLogger({ module: "payment-reconciliation", requestId });
-    const provider = getLocalMbWaySandboxProvider(environment.MBWAY_WEBHOOK_SECRET);
+    const provider = createConfiguredSibsMbWaySandboxProvider(environment);
     const summary = await reconcilePayments(
       connection,
       (providerId) => (providerId === provider.id ? provider : null),
