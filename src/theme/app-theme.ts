@@ -100,7 +100,7 @@ const appThemeOptions = {
   colorSchemes: appColorSchemes,
   breakpoints: { values: breakpointTokens },
   spacing: spacingTokens.xs,
-  shape: { borderRadius: radiusTokens.md },
+  shape: { borderRadius: radiusTokens.xs },
   shadows,
   transitions: {
     duration: {
@@ -210,8 +210,10 @@ const appThemeOptions = {
       styleOverrides: {
         root: ({ theme }) => ({
           minHeight: 44,
-          borderRadius: radiusTokens.md,
+          borderRadius: radiusTokens.sm,
           paddingInline: spacingTokens.lg,
+          gap: spacingTokens.sm,
+          "& .MuiButton-startIcon, & .MuiButton-endIcon": { margin: 0 },
           transition: theme.transitions.create([
             "background-color",
             "border-color",
@@ -249,7 +251,7 @@ const appThemeOptions = {
     MuiIconButton: {
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: radiusTokens.md,
+          borderRadius: radiusTokens.sm,
           transition: theme.transitions.create(["background-color", "transform"]),
           "&:active": { transform: `scale(${motionTokens.transform.pressedScale})` },
           "@media (prefers-reduced-motion: reduce)": {
@@ -284,7 +286,7 @@ const appThemeOptions = {
       styleOverrides: {
         root: ({ theme }) => ({
           minHeight: 28,
-          borderRadius: radiusTokens.pill,
+          borderRadius: radiusTokens.sm,
           fontWeight: typographyTokens.fontWeight.semiBold,
           variants: [
             {
@@ -333,7 +335,7 @@ const appThemeOptions = {
       styleOverrides: {
         root: {
           minHeight: 44,
-          borderRadius: radiusTokens.md,
+          borderRadius: radiusTokens.sm,
           "&.Mui-focused": { boxShadow: shadowTokens.focus },
         },
         notchedOutline: {
@@ -341,12 +343,18 @@ const appThemeOptions = {
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        select: ({ theme }) =>
+          theme.direction === "rtl" ? { direction: "rtl", textAlign: "start" } : {},
+      },
+    },
     MuiInputLabel: {
       styleOverrides: { root: { fontWeight: typographyTokens.fontWeight.medium } },
     },
     MuiAlert: {
       styleOverrides: {
-        root: { borderRadius: radiusTokens.md, alignItems: "center" },
+        root: { borderRadius: radiusTokens.sm, alignItems: "center" },
         message: { paddingBlock: spacingTokens.compact },
       },
     },
@@ -365,15 +373,17 @@ const appThemeOptions = {
     },
     MuiSkeleton: {
       styleOverrides: {
-        root: { borderRadius: radiusTokens.md },
+        root: { borderRadius: radiusTokens.sm },
       },
     },
     MuiPaginationItem: {
       styleOverrides: {
         root: {
-          minWidth: 40,
-          height: 40,
-          borderRadius: radiusTokens.md,
+          minWidth: 32,
+          height: 32,
+          margin: "0 2px",
+          borderRadius: radiusTokens.sm,
+          fontSize: pxToRem(13),
           fontWeight: typographyTokens.fontWeight.semiBold,
         },
       },
@@ -392,14 +402,31 @@ const appThemeOptions = {
     MuiTableCell: {
       styleOverrides: {
         root: { borderColor: "var(--sara-palette-divider)" },
-        head: {
+        body: ({ theme }) =>
+          theme.direction === "rtl"
+            ? {
+                textAlign: "right",
+                "&.MuiTableCell-alignLeft, &.MuiTableCell-alignCenter, &.MuiTableCell-alignRight": {
+                  textAlign: "right",
+                },
+              }
+            : {},
+        head: ({ theme }) => ({
           fontWeight: typographyTokens.fontWeight.bold,
           backgroundColor: "var(--sara-palette-action-hover)",
-        },
+          ...(theme.direction === "rtl"
+            ? {
+                textAlign: "center",
+                "&.MuiTableCell-alignLeft, &.MuiTableCell-alignCenter, &.MuiTableCell-alignRight": {
+                  textAlign: "center",
+                },
+              }
+            : {}),
+        }),
       },
     },
     MuiTabs: {
-      styleOverrides: { indicator: { height: 3, borderRadius: radiusTokens.pill } },
+      styleOverrides: { indicator: { height: 3, borderRadius: radiusTokens.sm } },
     },
     MuiTab: {
       styleOverrides: {
@@ -423,7 +450,7 @@ const appThemeOptions = {
     },
     MuiSnackbarContent: {
       styleOverrides: {
-        root: { borderRadius: radiusTokens.md, boxShadow: shadowTokens.floating },
+        root: { borderRadius: radiusTokens.sm, boxShadow: shadowTokens.floating },
       },
     },
   },
