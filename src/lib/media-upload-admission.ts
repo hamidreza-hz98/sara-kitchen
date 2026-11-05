@@ -1,6 +1,6 @@
 import { normalizeMediaFilename } from "./media-filename";
 
-export const MEDIA_UPLOAD_MAX_BYTES = 3 * 1024 * 1024;
+export const MEDIA_UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
 export const MEDIA_UPLOAD_MAX_FILES = 10;
 
 const formats = {
