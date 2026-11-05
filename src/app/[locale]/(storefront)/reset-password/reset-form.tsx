@@ -81,7 +81,7 @@ export function ResetPasswordForm() {
         label={t("newPassword")}
         name="newPassword"
         required
-        slotProps={{ htmlInput: { minLength: 15 } }}
+        slotProps={{ htmlInput: { minLength: 8 } }}
       />
       <PasswordField
         autoComplete="new-password"
