@@ -2,6 +2,7 @@ import "server-only";
 
 export {
   API_ERROR_DEFINITIONS,
+  apiRawSuccess,
   apiSuccess,
   type ApiErrorBody,
   type ApiErrorCode,
@@ -9,6 +10,7 @@ export {
   type ApiErrorPayload,
   type ApiErrorStatus,
   type ApiErrorType,
+  type ApiRawSuccessResult,
   type ApiResponseBody,
   type ApiSuccessBody,
   type ApiSuccessOptions,
