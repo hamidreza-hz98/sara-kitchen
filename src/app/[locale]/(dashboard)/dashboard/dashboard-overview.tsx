@@ -13,7 +13,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import Link from "next/link";
+import Link from "@/components/ui/client-next-link";
 import type { ReactNode } from "react";
 
 import type { SupportedLocale } from "@/constants";
@@ -60,6 +60,7 @@ export type DashboardLabels = Readonly<{
   refunds: string;
   netSales: string;
   noSales: string;
+  noTopSelling: string;
   recentOrders: string;
   all: string;
   awaiting: string;
@@ -80,14 +81,15 @@ export type DashboardLabels = Readonly<{
   paidOrders: string;
   averageOrder: string;
   views: string;
+  unitsSold: string;
   orderStatuses: Readonly<Record<string, string>>;
 }>;
 
 const surfaceSx = {
-  p: { xs: 2.5, sm: 3 },
+  p: { xs: 2, sm: 2.5 },
   border: "1px solid",
   borderColor: "divider",
-  borderRadius: 3,
+  borderRadius: 2,
   bgcolor: "background.paper",
   boxShadow: "none",
 } as const;
@@ -99,7 +101,14 @@ function signedEuro(cents: number, locale: SupportedLocale): string {
 function changeLabel(change: number | null, labels: DashboardLabels, locale: SupportedLocale) {
   return change === null
     ? labels.changeUnavailable
-    : `${change > 0 ? "+" : ""}${formatNumber(change, locale)}%`;
+    : `${change > 0 ? "+" : ""}${formatPercent(change, locale)}`;
+}
+
+function formatPercent(value: number, locale: SupportedLocale): string {
+  return new Intl.NumberFormat(locale, {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(value / 100);
 }
 
 function percentageChange(current: number, previous: number): number | null {
@@ -130,6 +139,14 @@ function empty(message: string) {
   );
 }
 
+function chartDateLabel(value: string, locale: SupportedLocale, monthly: boolean): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: "short",
+    ...(monthly ? { year: "2-digit" as const } : { day: "numeric" as const }),
+    timeZone: "UTC",
+  }).format(new Date(`${value}T12:00:00.000Z`));
+}
+
 function tabHref(selection: Selection, tab: DashboardOrderTab): string {
   const params = new URLSearchParams({ range: selection.range, orders: tab });
   if (selection.range === "custom") {
@@ -155,6 +172,32 @@ export function DashboardOverview({
   const can = new Set(permissions);
   const chart = compactSalesChart(snapshot.salesChart);
   const maxGross = Math.max(1, ...chart.map((bucket) => bucket.grossCents));
+  const soldUnits = snapshot.topSellingDishes.reduce((sum, dish) => sum + dish.netUnits, 0);
+  const donutColors = [
+    "var(--sara-palette-primary-main)",
+    "var(--sara-palette-info-main)",
+    "var(--sara-palette-warning-main)",
+    "var(--sara-palette-success-main)",
+    "var(--sara-palette-secondary-main)",
+  ];
+  const donutStops = snapshot.topSellingDishes.reduce<{ angle: number; stops: string[] }>(
+    (result, dish, index) => {
+      const end = result.angle + (soldUnits > 0 ? (dish.netUnits / soldUnits) * 360 : 0);
+      return {
+        angle: end,
+        stops: [
+          ...result.stops,
+          `${donutColors[index % donutColors.length]} ${result.angle}deg ${end}deg`,
+        ],
+      };
+    },
+    { angle: 0, stops: [] },
+  ).stops;
+  const rangeDays =
+    (Date.parse(`${selection.endDate}T00:00:00.000Z`) -
+      Date.parse(`${selection.startDate}T00:00:00.000Z`)) /
+    86_400_000;
+  const monthlyChart = rangeDays > 93;
   const totalStatus = Object.values(snapshot.orderStatusCounts).reduce(
     (sum, count) => sum + count,
     0,
@@ -372,308 +415,404 @@ export function DashboardOverview({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: "minmax(0, 2fr) minmax(300px, 1fr)" },
-          gap: 3,
+          gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(12, minmax(0, 1fr))" },
+          gap: { xs: 2, lg: 2.5 },
+          alignItems: "start",
         }}
       >
-        <Stack sx={{ gap: 3, minWidth: 0 }}>
-          {quickActions.length > 0 && (
-            <Paper component="section" aria-labelledby="dashboard-quick-actions" sx={surfaceSx}>
-              {heading("dashboard-quick-actions", labels.quickActions)}
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                {quickActions.map((action) => (
-                  <Button
-                    key={action.href}
-                    component={Link}
-                    href={action.href}
-                    variant="outlined"
-                    startIcon={action.icon}
-                  >
-                    {action.label}
-                  </Button>
-                ))}
-              </Box>
-            </Paper>
-          )}
-
-          <Paper component="section" aria-labelledby="dashboard-sales-trends" sx={surfaceSx}>
-            {heading("dashboard-sales-trends", labels.salesTrends)}
-            {chart.every((bucket) => bucket.grossCents === 0) ? (
-              empty(labels.noSales)
-            ) : (
-              <Box
-                component="ul"
-                aria-label={`${labels.salesTrends}: ${labels.grossSales}`}
-                sx={{
-                  listStyle: "none",
-                  display: "flex",
-                  alignItems: "end",
-                  gap: 1,
-                  height: 240,
-                  p: 0,
-                  m: 0,
-                  overflowX: "auto",
-                }}
-              >
-                {chart.map((bucket) => {
-                  const label =
-                    bucket.date === bucket.endDate
-                      ? bucket.date
-                      : `${bucket.date} – ${bucket.endDate}`;
-                  return (
-                    <Box
-                      component="li"
-                      key={bucket.date}
-                      sx={{
-                        display: "flex",
-                        flex: "1 0 44px",
-                        minWidth: 44,
-                        height: "100%",
-                        flexDirection: "column",
-                        justifyContent: "end",
-                        textAlign: "center",
-                      }}
-                    >
-                      <Box
-                        component="span"
-                        sx={{
-                          position: "absolute",
-                          width: 1,
-                          height: 1,
-                          overflow: "hidden",
-                          clip: "rect(0, 0, 0, 0)",
-                        }}
-                      >
-                        {label}: {labels.grossSales} {formatEuro(bucket.grossCents, locale)},{" "}
-                        {labels.refunds} {formatEuro(bucket.refundsCents, locale)},{" "}
-                        {labels.netSales} {signedEuro(bucket.netCents, locale)}
-                      </Box>
-                      <Box
-                        aria-hidden="true"
-                        sx={{
-                          minHeight: 3,
-                          height: `${Math.max(2, (bucket.grossCents / maxGross) * 175)}px`,
-                          bgcolor: "primary.main",
-                          borderRadius: "7px 7px 0 0",
-                          opacity: 0.9,
-                        }}
-                      />
-                      <Typography
-                        aria-hidden="true"
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mt: 1, fontSize: "0.65rem", whiteSpace: "nowrap" }}
-                      >
-                        {bucket.date.slice(5)}
-                      </Typography>
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
-          </Paper>
-
-          <Paper component="section" aria-labelledby="dashboard-recent-orders" sx={surfaceSx}>
-            {heading(
-              "dashboard-recent-orders",
-              labels.recentOrders,
-              can.has("orders:read") ? (
-                <Button component={Link} href="/dashboard/orders" size="small">
-                  {labels.seeAll}
-                </Button>
-              ) : undefined,
-            )}
-            <Box
-              component="nav"
-              aria-label={labels.recentOrders}
-              sx={{ display: "flex", gap: 1, overflowX: "auto", pb: 1, mb: 1 }}
-            >
-              {tabs.map((tab) => (
+        {quickActions.length > 0 && (
+          <Paper
+            component="section"
+            aria-labelledby="dashboard-quick-actions"
+            sx={{
+              ...surfaceSx,
+              minWidth: 0,
+              gridColumn: { xs: "1 / -1", md: "span 6", lg: "span 8" },
+            }}
+          >
+            {heading("dashboard-quick-actions", labels.quickActions)}
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+              {quickActions.map((action) => (
                 <Button
-                  key={tab.id}
-                  aria-current={selection.orderTab === tab.id ? "page" : undefined}
+                  key={action.href}
                   component={Link}
-                  href={tabHref(selection, tab.id)}
-                  size="small"
-                  variant={selection.orderTab === tab.id ? "contained" : "text"}
-                  sx={{ flexShrink: 0 }}
+                  href={action.href}
+                  variant="outlined"
+                  startIcon={action.icon}
+                  sx={{ justifyContent: "flex-start" }}
                 >
-                  {tab.label} ({formatNumber(tab.count, locale)})
+                  {action.label}
                 </Button>
               ))}
             </Box>
-            {recentOrders.length === 0 ? (
-              empty(labels.noOrders)
-            ) : (
-              <Stack divider={<Divider flexItem />}>
-                {recentOrders.map((order) => (
-                  <Stack
-                    key={order.code}
-                    direction={{ xs: "column", sm: "row" }}
+          </Paper>
+        )}
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-top-selling"
+          sx={{
+            ...surfaceSx,
+            minWidth: 0,
+            gridColumn: { xs: "1 / -1", md: "span 6", lg: "span 4" },
+          }}
+        >
+          {heading("dashboard-top-selling", labels.topSelling)}
+          {snapshot.topSellingDishes.length === 0 ? (
+            empty(labels.noTopSelling)
+          ) : (
+            <>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 1 }}>
+                <Box
+                  role="img"
+                  aria-label={`${formatNumber(soldUnits, locale)} ${labels.unitsSold}`}
+                  sx={{
+                    width: 144,
+                    height: 144,
+                    display: "grid",
+                    placeItems: "center",
+                    borderRadius: "50%",
+                    background: `conic-gradient(${donutStops.join(", ")})`,
+                  }}
+                >
+                  <Box
                     sx={{
-                      gap: 1,
-                      alignItems: { sm: "center" },
-                      justifyContent: "space-between",
-                      py: 1.5,
+                      width: 112,
+                      height: 112,
+                      display: "grid",
+                      alignContent: "center",
+                      justifyItems: "center",
+                      borderRadius: "50%",
+                      bgcolor: "background.paper",
                     }}
                   >
-                    <Box>
-                      <Typography sx={{ fontWeight: 700 }}>{order.code}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDate(order.createdAt, locale)}
-                      </Typography>
-                    </Box>
-                    <Chip size="small" label={labels.orderStatuses[order.status] ?? order.status} />
-                    <Typography sx={{ fontWeight: 700 }}>
-                      {formatEuro(order.totalCents, locale)}
+                    <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                      {formatNumber(soldUnits, locale)}
                     </Typography>
-                    {can.has("orders:read") && (
-                      <Button
-                        component={Link}
-                        href={`/dashboard/orders/${encodeURIComponent(order.code)}`}
-                        size="small"
-                        aria-label={`${labels.viewOrder} ${order.code}`}
-                      >
-                        {labels.viewOrder}
-                      </Button>
-                    )}
-                  </Stack>
-                ))}
-              </Stack>
-            )}
-          </Paper>
-        </Stack>
-
-        <Stack sx={{ gap: 3, minWidth: 0 }}>
-          <Paper component="section" aria-labelledby="dashboard-top-selling" sx={surfaceSx}>
-            {heading("dashboard-top-selling", labels.topSelling)}
-            {snapshot.topSellingDishes.length === 0 ? (
-              empty(labels.noDishes)
-            ) : (
-              <Stack sx={{ gap: 2 }}>
-                {snapshot.topSellingDishes.map((dish) => (
-                  <Box key={dish.dishId}>
-                    <Stack direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
-                      <Typography>{dish.name}</Typography>
-                      <Typography sx={{ fontWeight: 700 }}>
-                        {formatNumber(dish.netUnits, locale)}
-                      </Typography>
-                    </Stack>
-                    <Box
-                      aria-hidden="true"
-                      sx={{ mt: 0.75, height: 7, borderRadius: 4, bgcolor: "action.hover" }}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ textAlign: "center" }}
+                    >
+                      {labels.unitsSold}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+              <Stack spacing={1.25}>
+                {snapshot.topSellingDishes.map((dish, index) => {
+                  const share = soldUnits > 0 ? (dish.netUnits / soldUnits) * 100 : 0;
+                  return (
+                    <Stack
+                      key={dish.dishId}
+                      direction="row"
+                      sx={{ alignItems: "center", gap: 1, minWidth: 0 }}
                     >
                       <Box
+                        aria-hidden="true"
                         sx={{
-                          width: `${Math.max(2, (dish.netUnits / snapshot.topSellingDishes[0]!.netUnits) * 100)}%`,
-                          height: "100%",
-                          borderRadius: 4,
-                          bgcolor: "primary.main",
+                          width: 9,
+                          height: 9,
+                          flexShrink: 0,
+                          borderRadius: "50%",
+                          bgcolor: donutColors[index % donutColors.length],
                         }}
                       />
-                    </Box>
+                      <Typography noWrap sx={{ flex: 1, minWidth: 0 }}>
+                        {dish.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 700, whiteSpace: "nowrap" }}>
+                        {formatNumber(dish.netUnits, locale)}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ minWidth: 36, textAlign: "end" }}
+                      >
+                        {formatPercent(share, locale)}
+                      </Typography>
+                    </Stack>
+                  );
+                })}
+              </Stack>
+            </>
+          )}
+        </Paper>
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-sales-trends"
+          sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 8" } }}
+        >
+          {heading("dashboard-sales-trends", labels.salesTrends)}
+          {chart.every((bucket) => bucket.grossCents === 0) && (
+            <Typography color="text.secondary" variant="body2" sx={{ mb: 1 }}>
+              {labels.noSales}
+            </Typography>
+          )}
+          <Box
+            component="ul"
+            aria-label={`${labels.salesTrends}: ${labels.grossSales}`}
+            sx={{
+              listStyle: "none",
+              display: "flex",
+              alignItems: "end",
+              gap: { xs: 0.75, sm: 1.25 },
+              height: { xs: 188, sm: 232 },
+              p: 0,
+              m: 0,
+              overflowX: "auto",
+            }}
+          >
+            {chart.map((bucket) => {
+              const label =
+                bucket.date === bucket.endDate
+                  ? chartDateLabel(bucket.date, locale, monthlyChart)
+                  : `${chartDateLabel(bucket.date, locale, monthlyChart)} – ${chartDateLabel(bucket.endDate, locale, monthlyChart)}`;
+              return (
+                <Box
+                  component="li"
+                  key={bucket.date}
+                  sx={{
+                    display: "flex",
+                    flex: "1 0 32px",
+                    minWidth: 32,
+                    height: "100%",
+                    flexDirection: "column",
+                    justifyContent: "end",
+                    textAlign: "center",
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      position: "absolute",
+                      width: 1,
+                      height: 1,
+                      overflow: "hidden",
+                      clip: "rect(0, 0, 0, 0)",
+                    }}
+                  >
+                    {label}: {labels.grossSales} {formatEuro(bucket.grossCents, locale)},{" "}
+                    {labels.refunds} {formatEuro(bucket.refundsCents, locale)}, {labels.netSales}{" "}
+                    {signedEuro(bucket.netCents, locale)}
+                  </Box>
+                  <Box
+                    aria-hidden="true"
+                    sx={{
+                      minHeight: 4,
+                      height: `${Math.max(4, (bucket.grossCents / maxGross) * 156)}px`,
+                      bgcolor: "primary.main",
+                      borderRadius: "4px 4px 0 0",
+                      opacity: bucket.grossCents > 0 ? 0.9 : 0.24,
+                      transition: "height 180ms ease",
+                    }}
+                  />
+                  <Typography
+                    aria-hidden="true"
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1, fontSize: "0.65rem", whiteSpace: "nowrap" }}
+                  >
+                    {chartDateLabel(bucket.date, locale, monthlyChart)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Paper>
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-sales-summary"
+          sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 4" } }}
+        >
+          {heading("dashboard-sales-summary", labels.salesSummary)}
+          <Stack spacing={1.5}>
+            {[
+              [labels.grossSales, formatEuro(snapshot.totals.grossSalesCents, locale)],
+              [labels.refunds, formatEuro(snapshot.totals.refundsCents, locale)],
+              [labels.netSales, signedEuro(snapshot.totals.netSalesCents, locale)],
+              [labels.paidOrders, formatNumber(snapshot.totals.paidOrders, locale)],
+              [
+                labels.averageOrder,
+                snapshot.totals.averageOrderValueCents === null
+                  ? "—"
+                  : formatEuro(snapshot.totals.averageOrderValueCents, locale),
+              ],
+            ].map(([label, value]) => (
+              <Stack key={label} direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
+                <Typography color="text.secondary">{label}</Typography>
+                <Typography sx={{ fontWeight: 700, textAlign: "end" }}>{value}</Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Paper>
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-recent-orders"
+          sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 8" } }}
+        >
+          {heading(
+            "dashboard-recent-orders",
+            labels.recentOrders,
+            can.has("orders:read") ? (
+              <Button component={Link} href="/dashboard/orders" size="small">
+                {labels.seeAll}
+              </Button>
+            ) : undefined,
+          )}
+          <Box
+            component="nav"
+            aria-label={labels.recentOrders}
+            sx={{ display: "flex", gap: 0.75, overflowX: "auto", pb: 1, mb: 1 }}
+          >
+            {tabs.map((tab) => (
+              <Button
+                key={tab.id}
+                aria-current={selection.orderTab === tab.id ? "page" : undefined}
+                component={Link}
+                href={tabHref(selection, tab.id)}
+                size="small"
+                variant={selection.orderTab === tab.id ? "contained" : "text"}
+                sx={{ flexShrink: 0 }}
+              >
+                {tab.label} ({formatNumber(tab.count, locale)})
+              </Button>
+            ))}
+          </Box>
+          {recentOrders.length === 0 ? (
+            empty(labels.noOrders)
+          ) : (
+            <Stack divider={<Divider flexItem />}>
+              {recentOrders.map((order) => (
+                <Stack
+                  key={order.code}
+                  direction={{ xs: "column", sm: "row" }}
+                  sx={{
+                    gap: 1,
+                    alignItems: { sm: "center" },
+                    justifyContent: "space-between",
+                    py: 1.5,
+                  }}
+                >
+                  <Box sx={{ minWidth: 100 }}>
+                    <Typography sx={{ fontWeight: 700 }}>{order.code}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatDate(order.createdAt, locale)}
+                    </Typography>
+                  </Box>
+                  <Chip size="small" label={labels.orderStatuses[order.status] ?? order.status} />
+                  <Typography sx={{ fontWeight: 700 }}>
+                    {formatEuro(order.totalCents, locale)}
+                  </Typography>
+                  {can.has("orders:read") && (
+                    <Button
+                      component={Link}
+                      href={`/dashboard/orders/${encodeURIComponent(order.code)}`}
+                      size="small"
+                      aria-label={`${labels.viewOrder} ${order.code}`}
+                    >
+                      {labels.viewOrder}
+                    </Button>
+                  )}
+                </Stack>
+              ))}
+            </Stack>
+          )}
+        </Paper>
+
+        {can.has("logs:read") && (
+          <Paper
+            component="section"
+            aria-labelledby="dashboard-recent-activity"
+            sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 4" } }}
+          >
+            {heading(
+              "dashboard-recent-activity",
+              labels.recentActivity,
+              <Button component={Link} href="/dashboard/activity" size="small">
+                {labels.seeAll}
+              </Button>,
+            )}
+            {snapshot.recentActivity.length === 0 ? (
+              empty(labels.noActivity)
+            ) : (
+              <Stack divider={<Divider flexItem />}>
+                {snapshot.recentActivity.slice(0, 5).map((event) => (
+                  <Box key={event.id} sx={{ py: 1.2 }}>
+                    <Typography sx={{ fontWeight: 600 }}>{event.message}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatDateTime(new Date(event.occurredAt), locale)}
+                    </Typography>
                   </Box>
                 ))}
               </Stack>
             )}
           </Paper>
-          <Paper component="section" aria-labelledby="dashboard-sales-summary" sx={surfaceSx}>
-            {heading("dashboard-sales-summary", labels.salesSummary)}
-            <Stack sx={{ gap: 1.5 }}>
-              {[
-                [labels.grossSales, formatEuro(snapshot.totals.grossSalesCents, locale)],
-                [labels.refunds, formatEuro(snapshot.totals.refundsCents, locale)],
-                [labels.netSales, signedEuro(snapshot.totals.netSalesCents, locale)],
-                [labels.paidOrders, formatNumber(snapshot.totals.paidOrders, locale)],
-                [
-                  labels.averageOrder,
-                  snapshot.totals.averageOrderValueCents === null
-                    ? "—"
-                    : formatEuro(snapshot.totals.averageOrderValueCents, locale),
-                ],
-              ].map(([label, value]) => (
-                <Stack key={label} direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
-                  <Typography color="text.secondary">{label}</Typography>
-                  <Typography sx={{ fontWeight: 700 }}>{value}</Typography>
+        )}
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-best-customers"
+          sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 6" } }}
+        >
+          {heading("dashboard-best-customers", labels.bestCustomers)}
+          {snapshot.bestCustomers.length === 0 ? (
+            empty(labels.noCustomers)
+          ) : (
+            <Stack spacing={1.5}>
+              {snapshot.bestCustomers.map((customer, index) => (
+                <Stack
+                  key={customer.customerId}
+                  direction="row"
+                  sx={{ justifyContent: "space-between", gap: 1 }}
+                >
+                  <Typography>
+                    {formatNumber(index + 1, locale)}. {customer.displayName ?? labels.customers}
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700 }}>
+                    {signedEuro(customer.netCents, locale)}
+                  </Typography>
                 </Stack>
               ))}
             </Stack>
-          </Paper>
-          <Paper component="section" aria-labelledby="dashboard-best-customers" sx={surfaceSx}>
-            {heading("dashboard-best-customers", labels.bestCustomers)}
-            {snapshot.bestCustomers.length === 0 ? (
-              empty(labels.noCustomers)
-            ) : (
-              <Stack sx={{ gap: 1.5 }}>
-                {snapshot.bestCustomers.map((customer, index) => (
-                  <Stack
-                    key={customer.customerId}
-                    direction="row"
-                    sx={{ justifyContent: "space-between", gap: 1 }}
-                  >
-                    <Typography>
-                      {index + 1}. {customer.displayName ?? labels.customers}
-                    </Typography>
-                    <Typography sx={{ fontWeight: 700 }}>
-                      {signedEuro(customer.netCents, locale)}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            )}
-          </Paper>
-          <Paper component="section" aria-labelledby="dashboard-most-visited" sx={surfaceSx}>
-            {heading("dashboard-most-visited", labels.mostVisited)}
-            {snapshot.mostVisitedDishes.items.length === 0 ? (
-              empty(labels.noDishes)
-            ) : (
-              <Stack sx={{ gap: 1.5 }}>
-                {snapshot.mostVisitedDishes.items.map((dish) => (
-                  <Stack
-                    key={dish.dishId}
-                    direction="row"
-                    sx={{ justifyContent: "space-between", gap: 1 }}
-                  >
-                    <Typography>{dish.name}</Typography>
-                    <Typography color="text.secondary">
-                      {formatNumber(dish.views, locale)} {labels.views}
-                    </Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            )}
-            {!snapshot.freshness.viewPeriodComplete && (
-              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 2 }}>
-                {labels.viewsUnavailable}
-              </Typography>
-            )}
-          </Paper>
-          {can.has("logs:read") && (
-            <Paper component="section" aria-labelledby="dashboard-recent-activity" sx={surfaceSx}>
-              {heading(
-                "dashboard-recent-activity",
-                labels.recentActivity,
-                <Button component={Link} href="/dashboard/activity" size="small">
-                  {labels.seeAll}
-                </Button>,
-              )}
-              {snapshot.recentActivity.length === 0 ? (
-                empty(labels.noActivity)
-              ) : (
-                <Stack divider={<Divider flexItem />}>
-                  {snapshot.recentActivity.map((event) => (
-                    <Box key={event.id} sx={{ py: 1.2 }}>
-                      <Typography sx={{ fontWeight: 600 }}>{event.message}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDateTime(new Date(event.occurredAt), locale)}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Stack>
-              )}
-            </Paper>
           )}
-        </Stack>
+        </Paper>
+
+        <Paper
+          component="section"
+          aria-labelledby="dashboard-most-visited"
+          sx={{ ...surfaceSx, minWidth: 0, gridColumn: { xs: "1 / -1", md: "span 6" } }}
+        >
+          {heading("dashboard-most-visited", labels.mostVisited)}
+          {snapshot.mostVisitedDishes.items.length === 0 ? (
+            empty(labels.noDishes)
+          ) : (
+            <Stack spacing={1.5}>
+              {snapshot.mostVisitedDishes.items.map((dish, index) => (
+                <Stack
+                  key={dish.dishId}
+                  direction="row"
+                  sx={{ justifyContent: "space-between", gap: 1 }}
+                >
+                  <Typography>
+                    {formatNumber(index + 1, locale)}. {dish.name}
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                    {formatNumber(dish.views, locale)} {labels.views}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          )}
+          {!snapshot.freshness.viewPeriodComplete && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 2 }}>
+              {labels.viewsUnavailable}
+            </Typography>
+          )}
+        </Paper>
       </Box>
     </Box>
   );
