@@ -26,7 +26,7 @@ import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -196,9 +196,12 @@ function previewSlug(value: string): string {
     .replace(/-+$/gu, "");
 }
 
-function localName(option: Option): string {
+function localName(option: Option, locale: string = "en"): string {
   return (
-    option.translations.find((value) => value.locale === "en")?.name ?? option.slug ?? option.id
+    option.translations.find((value) => value.locale === locale)?.name ||
+    option.translations.find((value) => value.locale === "en")?.name ||
+    option.slug ||
+    option.id
   );
 }
 
@@ -302,6 +305,7 @@ export function DishEditor({
   canUploadMedia: boolean;
 }) {
   const t = useTranslations("dashboard.dishEditor");
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -314,7 +318,6 @@ export function DishEditor({
   const [tab, setTab] = useState<Language>("en");
   const [categories, setCategories] = useState<readonly Option[]>([]);
   const [ingredientOptions, setIngredientOptions] = useState<readonly Option[]>([]);
-  const [ingredientToAdd, setIngredientToAdd] = useState("");
   const [loading, setLoading] = useState(editing);
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -444,16 +447,15 @@ export function DishEditor({
   const leave = () => {
     if (!dirty || window.confirm(t("leaveWarning"))) router.push("/dashboard/dishes");
   };
-  const addIngredient = () => {
-    if (!ingredientToAdd || values.ingredients.some((row) => row.ingredientId === ingredientToAdd))
+  const addIngredient = (ingredientId: string) => {
+    if (!ingredientId || values.ingredients.some((row) => row.ingredientId === ingredientId))
       return;
     update({
       ingredients: [
         ...values.ingredients,
-        { ingredientId: ingredientToAdd, quantityAmount: "", quantityUnit: "", note: "" },
+        { ingredientId, quantityAmount: "", quantityUnit: "", note: "" },
       ],
     });
-    setIngredientToAdd("");
   };
   const updateIngredient = (index: number, patch: Partial<IngredientRow>) =>
     update({
@@ -485,10 +487,12 @@ export function DishEditor({
           name: entry.name.trim(),
           ...(entry.excerpt.trim() ? { excerpt: entry.excerpt.trim() } : {}),
           description: entry.description,
-          specifications: entry.specifications.map((item) => ({
-            label: item.label.trim(),
-            value: item.value.trim(),
-          })),
+          specifications: entry.specifications
+            .filter((item) => item.label.trim() || item.value.trim())
+            .map((item) => ({
+              label: item.label.trim(),
+              value: item.value.trim(),
+            })),
         },
       ];
     });
@@ -510,8 +514,8 @@ export function DishEditor({
         type: values.discountType,
         amountCents: values.discountType === "fixed" ? Math.round(discountNumber * 100) : null,
         basisPoints: values.discountType === "percentage" ? Math.round(discountNumber * 100) : null,
-        startsAt: instant(values.discountStartsAt),
-        endsAt: instant(values.discountEndsAt),
+        startsAt: values.discountType === "none" ? null : instant(values.discountStartsAt),
+        endsAt: values.discountType === "none" ? null : instant(values.discountEndsAt),
       },
       portionAmount: Number(values.portionAmount),
       portionUnit: values.portionUnit,
@@ -542,16 +546,37 @@ export function DishEditor({
     const parsed = sharedDishCreateSchema.safeParse(payload);
     const invalidSlug =
       Boolean(values.slugOverride) && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(values.slugOverride);
-    const incompletePublished =
-      status === "published" &&
-      (LANGUAGES.some((language) => !values.translations[language].name.trim()) ||
-        values.mediaIds.length === 0 ||
-        values.categoryIds.length === 0 ||
-        values.ingredients.length === 0);
-    const invalidSchedule =
-      values.availabilityMode === "scheduled" && !values.availableFrom && !values.availableUntil;
-    if (!parsed.success || invalidSlug || incompletePublished || invalidSchedule || !slug) {
-      setServerError(incompletePublished ? t("publishRequirements") : t("validationError"));
+    if (!parsed.success || invalidSlug || !slug) {
+      const issues: string[] = [];
+      if (!values.translations.en.name.trim()) issues.push(t("issueEnglishName"));
+      else if (!slug || invalidSlug) issues.push(t("issueSlug"));
+      if (!parsed.success) {
+        for (const issue of parsed.error.issues) {
+          const [field, index, part] = issue.path;
+          if (field === "translations" && typeof index === "number") {
+            const language = payload.translations[index]?.locale;
+            const label = language ? t(`language.${language}`) : "";
+            issues.push(
+              part === "specifications"
+                ? t("issueSpecification", { language: label })
+                : t("issueTranslation", { language: label }),
+            );
+          } else if (field === "ingredients") issues.push(t("issueIngredient"));
+          else if (field === "discount") issues.push(t("issueDiscount"));
+          else if (field === "availability") issues.push(t("issueAvailability"));
+          else if (field === "basePriceCents") issues.push(t("issuePrice"));
+          else if (field === "portionAmount") issues.push(t("issuePortion"));
+          else if (field === "leadTimeMinutes") issues.push(t("issueWaiting"));
+          else if (field === "maxQuantityPerOrder") issues.push(t("issueMaxQuantity"));
+          else if (field === "featuredOrder") issues.push(t("issueFeatured"));
+          else if (field === "mediaIds") issues.push(t("issueMedia"));
+          else if (field === "categoryIds") issues.push(t("issueCategories"));
+          else if (field === "relatedDishIds" || field === "relatedBlogIds")
+            issues.push(t("issueRelations"));
+          else if (field !== "translations") issues.push(t("validationError"));
+        }
+      }
+      setServerError([...new Set(issues)].join(" ") || t("validationError"));
       return;
     }
     setSaving(true);
@@ -563,7 +588,27 @@ export function DishEditor({
         body: JSON.stringify(parsed.data),
       });
       if (!response.ok) {
-        setServerError(response.status === 409 ? t("conflict") : t("saveError"));
+        if (response.status === 400) {
+          const body = (await response.json().catch(() => null)) as {
+            error?: { details?: { issues?: { code?: string; path?: (string | number)[] }[] } };
+          } | null;
+          const messages = (body?.error?.details?.issues ?? []).map((issue) => {
+            const field = issue.path?.[0];
+            if (field === "mediaIds") return t("issueMedia");
+            if (field === "categoryIds") return t("issueCategories");
+            if (field === "ingredients") return t("issueIngredientReference");
+            if (
+              field === "relatedDishIds" ||
+              field === "relatedBlogIds" ||
+              issue.code === "circular_relationship" ||
+              issue.code === "self_relationship"
+            )
+              return t("issueRelations");
+            if (field === "slugOverride") return t("issueSlug");
+            return t("serverValidationError");
+          });
+          setServerError([...new Set(messages)].join(" ") || t("serverValidationError"));
+        } else setServerError(response.status === 409 ? t("conflict") : t("saveError"));
         return;
       }
       const savedValues = statusOverride ? { ...values, status: statusOverride } : values;
@@ -610,7 +655,7 @@ export function DishEditor({
     );
 
   const current = values.translations[tab];
-  const fieldError = attempted && !values.translations.en.name.trim();
+  const fieldError = attempted && !current.name.trim() && tab === "en";
   return (
     <Stack spacing={3}>
       <Stack
@@ -626,7 +671,7 @@ export function DishEditor({
           </Typography>
           <Typography color="text.secondary">{t("description")}</Typography>
         </Box>
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" sx={{ gap: 1 }}>
           <Button
             variant="outlined"
             disabled={saving}
@@ -677,9 +722,9 @@ export function DishEditor({
             label={t("name")}
             value={current.name}
             required={tab === "en"}
-            error={fieldError && tab === "en"}
+            error={fieldError}
             onChange={(event) => updateTranslation(tab, { name: event.target.value })}
-            slotProps={{ htmlInput: { maxLength: 160 } }}
+            slotProps={{ htmlInput: { maxLength: 160, dir: tab === "fa" ? "rtl" : "ltr" } }}
           />
           <TextField
             label={t("excerpt")}
@@ -687,7 +732,7 @@ export function DishEditor({
             multiline
             minRows={2}
             onChange={(event) => updateTranslation(tab, { excerpt: event.target.value })}
-            slotProps={{ htmlInput: { maxLength: 500 } }}
+            slotProps={{ htmlInput: { maxLength: 500, dir: tab === "fa" ? "rtl" : "ltr" } }}
             helperText={`${current.excerpt.length}/500`}
           />
           <Box>
@@ -699,6 +744,7 @@ export function DishEditor({
               {t("richDescription")}
             </Typography>
             <DishRichEditor
+              direction={tab === "fa" ? "rtl" : "ltr"}
               value={current.description}
               onChange={(description) => updateTranslation(tab, { description })}
               labelledBy={`dish-description-${tab}`}
@@ -735,6 +781,7 @@ export function DishEditor({
                     fullWidth
                     size="small"
                     label={t("specificationLabel")}
+                    slotProps={{ htmlInput: { dir: tab === "fa" ? "rtl" : "ltr" } }}
                     value={specification.label}
                     onChange={(event) =>
                       updateTranslation(tab, {
@@ -748,6 +795,7 @@ export function DishEditor({
                     fullWidth
                     size="small"
                     label={t("specificationValue")}
+                    slotProps={{ htmlInput: { dir: tab === "fa" ? "rtl" : "ltr" } }}
                     value={specification.value}
                     onChange={(event) =>
                       updateTranslation(tab, {
@@ -818,6 +866,7 @@ export function DishEditor({
                             id: selectedId,
                             translations: [],
                           },
+                          locale,
                         ),
                       )
                       .join(", ")
@@ -826,7 +875,7 @@ export function DishEditor({
                   {categories.map((option) => (
                     <MenuItem key={option.id} value={option.id}>
                       <Checkbox checked={values.categoryIds.includes(option.id)} />
-                      <ListItemText primary={localName(option)} />
+                      <ListItemText primary={localName(option, locale)} />
                     </MenuItem>
                   ))}
                 </Select>
@@ -897,8 +946,8 @@ export function DishEditor({
                 <Select
                   labelId="ingredient-add"
                   label={t("addIngredient")}
-                  value={ingredientToAdd}
-                  onChange={(event) => setIngredientToAdd(event.target.value)}
+                  value=""
+                  onChange={(event) => addIngredient(event.target.value)}
                 >
                   {ingredientOptions
                     .filter(
@@ -906,19 +955,11 @@ export function DishEditor({
                     )
                     .map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {localName(option)}
+                        {localName(option, locale)}
                       </MenuItem>
                     ))}
                 </Select>
               </FormControl>
-              <Button
-                variant="outlined"
-                startIcon={<AddRounded />}
-                disabled={!ingredientToAdd}
-                onClick={addIngredient}
-              >
-                {t("add")}
-              </Button>
             </Stack>
             <Stack spacing={2} sx={{ mt: 2 }}>
               {values.ingredients.map((row, index) => (
@@ -934,6 +975,7 @@ export function DishEditor({
                             id: row.ingredientId,
                             translations: [],
                           },
+                          locale,
                         )}
                       </Typography>
                       <IconButton
