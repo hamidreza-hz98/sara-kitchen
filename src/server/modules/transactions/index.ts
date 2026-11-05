@@ -97,8 +97,14 @@ export {
   type MbWaySandboxOptions,
 } from "./provider/mbway-sandbox-provider";
 export { getLocalMbWaySandboxProvider } from "./provider/local-mbway-provider";
+export {
+  createConfiguredSibsMbWaySandboxProvider,
+  createSibsMbWaySandboxProvider,
+  SibsMbWaySandboxProvider,
+} from "./provider/sibs-mbway-sandbox-provider";
 
 export {
+  persistMbWaySandboxSession,
   persistMbWaySandboxInitiation,
   type StoredMbWayInitiation,
 } from "./service/mbway-sandbox-initiation";
