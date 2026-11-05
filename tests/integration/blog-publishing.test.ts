@@ -6,11 +6,13 @@ vi.mock("server-only", () => ({}));
 import { createStoredRichText } from "@/lib/rich-text";
 import {
   createBlogRepository,
+  createBlogServices,
   createBlogViewRepository,
   evaluateBlogViewSignal,
   getBlogModel,
   getBlogViewReceiptModel,
 } from "@/server/modules/blogs";
+import { createAutomaticSeoSynchronizer, getPageSeoModel } from "@/server/modules/seo";
 
 import { startTestMongoDatabase, type TestMongoDatabase } from "../helpers/mongodb";
 
@@ -34,6 +36,45 @@ describe("blog publishing persistence", () => {
     if (client?.connection.readyState !== 0) await client?.disconnect();
     await database?.stop();
   });
+
+  it("creates a blog with plain translation and author data and synchronizes SEO", async () => {
+    if (!client) throw new Error("Test MongoDB did not start.");
+    const repository = createBlogRepository(client.connection);
+    const seo = createAutomaticSeoSynchronizer(client.connection, {
+      siteUrl: "https://example.com",
+    });
+    const service = createBlogServices({
+      repository,
+      seo: { sync: seo.blog, remove: async () => undefined },
+      inspectReferences: async () => ({ missing: [], archived: [] }),
+      removeInboundDishRelationships: async () => [],
+      audit: async () => undefined,
+      invalidate: () => undefined,
+      previewSecret: "preview-secret-longer-than-thirty-two-characters",
+    });
+    const created = await service.create(
+      { id: authorId, displayName: "Sara Kazemi", role: "content_editor" },
+      {
+        translations: [{ locale: "en", title: "Create a blog", excerpt: "", content }],
+      },
+    );
+    expect(created.translations).toEqual([
+      { locale: "en", title: "Create a blog", excerpt: "", content },
+    ]);
+    expect(created.authorSnapshot).toEqual({ displayName: "Sara Kazemi" });
+    expect(created.seoPageId).toBeTruthy();
+    expect(
+      await getPageSeoModel(client.connection).findById(created.seoPageId).lean(),
+    ).toMatchObject({ entityKind: "blog" });
+    expect((await repository.findById(created.id))?.translations).toEqual(created.translations);
+    const actor = { id: authorId, displayName: "Sara Kazemi", role: "content_editor" as const };
+    await service.publish(actor, created.id);
+    await expect(service.getPublicBySlug(created.slug, "fa")).resolves.toMatchObject({
+      title: "Create a blog",
+      excerpt: "",
+    });
+    await service.unpublish(actor, created.id);
+  }, 30_000);
 
   it("never exposes draft, scheduled, or archived content through public repository reads", async () => {
     if (!client) throw new Error("Test MongoDB did not start.");
