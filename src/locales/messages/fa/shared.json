@@ -8,6 +8,10 @@
     "hide": "پنهان کردن گذرواژه"
   },
   "brandName": "آشپزخانه سارا",
+  "theme": {
+    "switchToLight": "تغییر به پوسته روشن",
+    "switchToDark": "تغییر به پوسته تاریک"
+  },
   "actions": {
     "save": "ذخیره",
     "cancel": "لغو",
