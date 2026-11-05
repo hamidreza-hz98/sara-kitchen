@@ -150,18 +150,20 @@ The typed values preserve those exact thresholds so layouts do not drift when tr
 
 ## Radius source map
 
-The most common exported classes are `rounded-lg` (400), `rounded-full` (346), `rounded-xl` (283),
-`rounded-2xl` (65), and `rounded-3xl` (23). The normalized names below retain their pixel values.
+The supplied exports frequently use large rounded surfaces. After reviewing the implemented screens,
+the runtime scale is intentionally tighter so shape does not overpower spacing and content. The `pill`
+token remains available for true capsule indicators; everyday cards, controls, and dialogs use the
+smaller values below.
 
-| Token                      |    Value | Source                         |
-| -------------------------- | -------: | ------------------------------ |
-| `designTokens.radius.none` |     0 px | S09; square/reset state        |
-| `designTokens.radius.xs`   |     4 px | S01–S09; configured default    |
-| `designTokens.radius.sm`   |     8 px | S01–S09; configured `lg`       |
-| `designTokens.radius.md`   |    12 px | S01–S09; configured `xl`       |
-| `designTokens.radius.lg`   |    16 px | S01/S04/S05/S09; `rounded-2xl` |
-| `designTokens.radius.xl`   |    24 px | S01/S04/S05/S09; `rounded-3xl` |
-| `designTokens.radius.pill` | 9,999 px | S01–S10; configured full/pill  |
+| Token                      |    Value | Source                          |
+| -------------------------- | -------: | ------------------------------- |
+| `designTokens.radius.none` |     0 px | S09; square/reset state         |
+| `designTokens.radius.xs`   |     3 px | S01–S09; restrained reset scale |
+| `designTokens.radius.sm`   |     5 px | S01–S09; compact controls       |
+| `designTokens.radius.md`   |     7 px | S01–S09; standard surfaces      |
+| `designTokens.radius.lg`   |     9 px | S01/S04/S05/S09; cards          |
+| `designTokens.radius.xl`   |    12 px | S01/S04/S05/S09; dialogs        |
+| `designTokens.radius.pill` | 9,999 px | S01–S10; capsule indicators     |
 
 ## Shadow source map
 
