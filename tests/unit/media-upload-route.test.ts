@@ -44,7 +44,7 @@ vi.mock("@/server/modules/media", async (importOriginal) => {
 });
 
 import { GET, POST } from "@/app/api/media/route";
-import { UploadPolicyError } from "@/server/modules/media";
+import { ImageProcessingError, UploadPolicyError } from "@/server/modules/media";
 
 function uploadRequest(
   options: { cookie?: boolean; sizeHeader?: number; translations?: string } = {},
@@ -118,7 +118,7 @@ describe("media upload Route Handler", () => {
   });
 
   it("rejects an oversized body and malformed translations before service invocation", async () => {
-    expect((await POST(uploadRequest({ sizeHeader: 4 * 1024 * 1024 }))).status).toBe(400);
+    expect((await POST(uploadRequest({ sizeHeader: 11 * 1024 * 1024 }))).status).toBe(400);
     expect((await POST(uploadRequest({ translations: "not-json" }))).status).toBe(400);
     expect(state.create).not.toHaveBeenCalled();
   });
@@ -130,6 +130,16 @@ describe("media upload Route Handler", () => {
     await expect(response.json()).resolves.toMatchObject({
       ok: false,
       error: { code: "VALIDATION_ERROR" },
+    });
+  });
+
+  it("treats processing timeouts as retryable service failures", async () => {
+    state.create.mockRejectedValue(new ImageProcessingError("processing_timeout"));
+    const response = await POST(uploadRequest());
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      error: { code: "SERVICE_UNAVAILABLE" },
     });
   });
 
