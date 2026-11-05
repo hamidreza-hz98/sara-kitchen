@@ -9,6 +9,7 @@ export default async function CategoryModifyPage() {
     <CategoryEditor
       canCreate={permissions.has("categories:create")}
       canUpdate={permissions.has("categories:update")}
+      canUploadMedia={permissions.has("media:create")}
     />
   );
 }
