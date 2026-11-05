@@ -61,16 +61,20 @@ const items = [
   },
 ] as const;
 
-function renderLibrary() {
-  return render(
+function library() {
+  return (
     <NextIntlClientProvider locale="en" messages={messages} timeZone={PROJECT_TIME_ZONE}>
       <ThemeProvider theme={appTheme} defaultMode="light">
         <FeedbackProvider>
           <MediaLibrary capabilities={{ create: true, delete: true, update: true }} />
         </FeedbackProvider>
       </ThemeProvider>
-    </NextIntlClientProvider>,
+    </NextIntlClientProvider>
   );
+}
+
+function renderLibrary() {
+  return render(library());
 }
 
 beforeEach(() => {
@@ -104,6 +108,40 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("media library", () => {
+  it("switches between grid and list without loading or refetching media", async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderLibrary();
+    await screen.findByText("saffron-rice.webp");
+    const calls = vi.mocked(fetch).mock.calls.length;
+
+    await user.click(screen.getByRole("button", { name: /list view/i }));
+    expect(screen.getByText("saffron-rice.webp")).toBeVisible();
+    navigation.query = "view=list&kind=image";
+    rerender(library());
+    expect(screen.getByText("saffron-rice.webp")).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: /grid view/i }));
+    navigation.query = "view=grid&kind=image";
+    rerender(library());
+    expect(screen.getByText("saffron-rice.webp")).toBeVisible();
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(calls);
+  });
+
+  it("refreshes and returns to recent media after another page uploads", async () => {
+    renderLibrary();
+    await screen.findByText("saffron-rice.webp");
+    const fetcher = vi.mocked(fetch);
+    const previous = fetcher.mock.calls.length;
+    window.dispatchEvent(new Event("sara-media-uploaded"));
+    await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThan(previous));
+    expect(navigation.replace).toHaveBeenCalledWith(
+      expect.stringContaining("sort=createdAt%3Adesc"),
+      { scroll: false },
+    );
+    const [destination] = navigation.replace.mock.calls.at(-1) as [string];
+    expect(destination).not.toContain("kind=");
+  });
+
   it("renders responsive grid controls, preview, selection, and safe delete states", async () => {
     const user = userEvent.setup();
     renderLibrary();
