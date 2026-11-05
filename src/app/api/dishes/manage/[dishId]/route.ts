@@ -57,3 +57,28 @@ export async function PATCH(request: NextRequest, context: RouteContext): Promis
     }
   });
 }
+
+export async function DELETE(request: NextRequest, context: RouteContext): Promise<Response> {
+  return handleApiRoute(request, async ({ requestId }) => {
+    const { connection, actor, validation } = await dishAdminRequestContext(
+      request,
+      "dishes:delete",
+      true,
+    );
+    const { dishId } = await parseRouteParameters(
+      context.params,
+      dishIdParametersSchema,
+      validation,
+    );
+    try {
+      return apiSuccess(
+        await resolveDishServices(connection, requestId).delete(
+          { id: actor.id, role: actor.role },
+          dishId,
+        ),
+      );
+    } catch (error) {
+      return translateDishError(error);
+    }
+  });
+}
