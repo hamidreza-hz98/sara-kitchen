@@ -130,7 +130,39 @@ export function createInitialSettingsPayload(
     };
   }
   if (section === "social") {
-    return { data: { links: [] }, translations: [{ locale: "en", value: { labels: [] } }] };
+    return {
+      data: {
+        links: [
+          {
+            id: "instagram",
+            platform: "instagram",
+            destination: { type: "handle", handle: "@sarakitchen.porto" },
+            iconKey: "instagram",
+            active: true,
+            order: 0,
+          },
+          {
+            id: "telegram",
+            platform: "telegram",
+            destination: { type: "handle", handle: "@sara_kitchen" },
+            iconKey: "telegram",
+            active: true,
+            order: 1,
+          },
+        ],
+      },
+      translations: [
+        {
+          locale: "en",
+          value: {
+            labels: [
+              { id: "instagram", label: "@sarakitchen.porto" },
+              { id: "telegram", label: "@sara_kitchen" },
+            ],
+          },
+        },
+      ],
+    };
   }
   if (section === "about") {
     return {
