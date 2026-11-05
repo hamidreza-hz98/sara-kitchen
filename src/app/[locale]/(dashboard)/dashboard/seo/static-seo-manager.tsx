@@ -14,7 +14,7 @@ import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { MediaPicker } from "@/components/media";
@@ -125,6 +125,8 @@ export function StaticSeoManager({
   canUpdate: boolean;
   canUploadMedia: boolean;
 }) {
+  const locale = useLocale();
+  const direction = locale === "fa" ? "rtl" : "ltr";
   const t = useTranslations("dashboard.seoControls");
   const [records, setRecords] = useState<readonly Snapshot[]>([]);
   const [key, setKey] = useState<PageKey>("home");
@@ -132,8 +134,30 @@ export function StaticSeoManager({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
+  const currentShareImageUrl = form.shareImageMediaId ? shareImageUrl : null;
   const record = useMemo(() => records.find((item) => item.key === key), [key, records]);
   const permitted = record ? canUpdate : canCreate;
+
+  useEffect(() => {
+    const id = form.shareImageMediaId;
+    if (!id) return;
+
+    const controller = new AbortController();
+    fetch(`/api/media/${id}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        const body = (await response.json()) as {
+          data?: { preview?: { url: string } | null };
+        };
+        if (!controller.signal.aborted) setShareImageUrl(body.data?.preview?.url ?? null);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setShareImageUrl(null);
+      });
+
+    return () => controller.abort();
+  }, [form.shareImageMediaId]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -216,17 +240,18 @@ export function StaticSeoManager({
   };
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2.5} dir={direction}>
       <Box>
         <Typography variant="h4">{t("staticTitle")}</Typography>
         <Typography color="text.secondary">{t("staticIntro")}</Typography>
       </Box>
-      <FormControl sx={{ maxWidth: 360 }}>
+      <FormControl sx={{ maxWidth: 420, width: "100%" }}>
         <InputLabel id="seo-page-key">{t("staticPage")}</InputLabel>
         <Select
           labelId="seo-page-key"
           label={t("staticPage")}
           value={key}
+          dir={direction}
           onChange={(event) => choose(event.target.value as PageKey)}
         >
           {PAGE_KEYS.map((item) => (
@@ -243,65 +268,76 @@ export function StaticSeoManager({
           <Alert severity={record ? "info" : "warning"}>
             {record ? t("manualRecord") : t("missingRecord")}
           </Alert>
-          <Paper sx={{ p: { xs: 2, md: 3 } }}>
-            <SeoFields
-              disabled={!permitted || saving}
-              ownershipEditable={false}
-              values={form.seo}
-              onChange={(seo) => setForm((current) => ({ ...current, seo }))}
-            />
-          </Paper>
-          <Paper sx={{ p: { xs: 2, md: 3 } }}>
-            <Stack spacing={2}>
-              <Typography variant="h6">{t("discovery")}</Typography>
-              <MediaPicker
-                allowedKinds={["image"]}
-                canUpload={canUploadMedia}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: "minmax(0, 1fr) 320px" },
+              alignItems: "start",
+              gap: 2,
+            }}
+          >
+            <Paper sx={{ p: { xs: 2, md: 3 }, minWidth: 0 }}>
+              <SeoFields
                 disabled={!permitted || saving}
-                label={t("shareImage")}
-                value={form.shareImageMediaId}
-                onChange={(shareImageMediaId) =>
-                  setForm((current) => ({ ...current, shareImageMediaId }))
-                }
+                ownershipEditable={false}
+                shareImageUrl={currentShareImageUrl}
+                values={form.seo}
+                onChange={(seo) => setForm((current) => ({ ...current, seo }))}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={form.index}
-                    disabled={!permitted || saving}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, index: event.target.checked }))
-                    }
-                  />
-                }
-                label={t("allowIndexing")}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={form.follow}
-                    disabled={!permitted || saving}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, follow: event.target.checked }))
-                    }
-                  />
-                }
-                label={t("followLinks")}
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={form.active}
-                    disabled={!permitted || saving}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, active: event.target.checked }))
-                    }
-                  />
-                }
-                label={t("active")}
-              />
-            </Stack>
-          </Paper>
+            </Paper>
+            <Paper
+              sx={{
+                p: { xs: 2, md: 2.5 },
+                minWidth: 0,
+                position: { lg: "sticky" },
+                top: { lg: 16 },
+              }}
+            >
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="h6">{t("discovery")}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("discoveryHint")}
+                  </Typography>
+                </Box>
+                <MediaPicker
+                  allowedKinds={["image"]}
+                  canUpload={canUploadMedia}
+                  disabled={!permitted || saving}
+                  label={t("shareImage")}
+                  value={form.shareImageMediaId}
+                  onChange={(shareImageMediaId) =>
+                    setForm((current) => ({ ...current, shareImageMediaId }))
+                  }
+                />
+                <Stack spacing={0.5}>
+                  {(
+                    [
+                      ["index", "allowIndexing"],
+                      ["follow", "followLinks"],
+                      ["active", "active"],
+                    ] as const
+                  ).map(([field, label]) => (
+                    <FormControlLabel
+                      key={field}
+                      labelPlacement={direction === "rtl" ? "start" : "end"}
+                      sx={{ m: 0, width: "100%", justifyContent: "space-between" }}
+                      control={
+                        <Switch
+                          checked={form[field]}
+                          disabled={!permitted || saving}
+                          onChange={(event) =>
+                            setForm((current) => ({ ...current, [field]: event.target.checked }))
+                          }
+                        />
+                      }
+                      label={t(label)}
+                    />
+                  ))}
+                </Stack>
+              </Stack>
+            </Paper>
+          </Box>
           {message ? (
             <Alert severity={message === t("saved") ? "success" : "error"}>{message}</Alert>
           ) : null}
