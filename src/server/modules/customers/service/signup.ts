@@ -10,15 +10,15 @@ function isDuplicateKey(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && error.code === 11_000;
 }
 
-/** Intentionally returns no identity or creation status to the public caller. */
+/** Returns a new ID only to auth orchestration; duplicate status is hidden at the route boundary. */
 export async function registerCustomer(
   connection: Connection,
   input: CustomerSignupInput,
-): Promise<void> {
+): Promise<string | null> {
   const now = new Date();
   const passwordHash = await hashCustomerPassword(input.password);
   try {
-    await getCustomerModel(connection).create({
+    const customer = await getCustomerModel(connection).create({
       firstName: input.firstName,
       lastName: input.lastName,
       mobile: input.mobile,
@@ -30,8 +30,10 @@ export async function registerCustomer(
       mobileVerifiedAt: null,
       emailVerifiedAt: null,
     });
+    return customer._id.toHexString();
   } catch (error) {
     // Unique indexes, not an existence query, resolve concurrent registrations.
     if (!isDuplicateKey(error)) throw error;
+    return null;
   }
 }
