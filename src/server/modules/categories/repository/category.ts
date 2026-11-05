@@ -66,6 +66,7 @@ export interface CategoryRepository {
   ): Promise<CategorySnapshot>;
   rollbackCreate(current: CategorySnapshot): Promise<boolean>;
   softDelete(current: CategorySnapshot, actorId: string, now: Date): Promise<CategorySnapshot>;
+  hardDeleteArchived(current: CategorySnapshot): Promise<void>;
   restore(current: CategorySnapshot, actorId: string): Promise<CategorySnapshot>;
 }
 
@@ -136,6 +137,7 @@ export function createCategoryRepository(connection: Connection): CategoryReposi
     async list(options) {
       const filter: Record<string, unknown> = { deletedAt: null };
       if (options.status) filter.status = options.status;
+      else filter.status = { $ne: "archived" };
       if (options.search) filter.$text = { $search: options.search };
       const sortBy = options.sortBy ?? "sortOrder";
       const direction = options.sortDirection === "desc" ? -1 : 1;
@@ -203,6 +205,15 @@ export function createCategoryRepository(connection: Connection): CategoryReposi
       document.updatedBy = createActorMetadata("admin", actorId);
       await document.save();
       return snapshot(document);
+    },
+    async hardDeleteArchived(current) {
+      const result = await Category.deleteOne({
+        _id: new Types.ObjectId(current.id),
+        __v: current.version,
+        deletedAt: null,
+        status: "archived",
+      });
+      if (result.deletedCount !== 1) throw new CategoryRepositoryConflictError();
     },
     async restore(current, actorId) {
       const document = await load(current);
