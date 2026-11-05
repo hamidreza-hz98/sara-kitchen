@@ -88,11 +88,11 @@ export const breakpointTokens = {
 
 export const radiusTokens = {
   none: 0,
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  xs: 2,
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 10,
   pill: 9999,
 } as const;
 
