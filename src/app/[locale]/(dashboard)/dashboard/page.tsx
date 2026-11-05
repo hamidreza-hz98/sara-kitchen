@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
+import Link from "@/components/ui/client-next-link";
 import { hasAdminPermission } from "@/constants/admin-access";
 import { isSupportedLocale } from "@/constants";
 import { ErrorState } from "@/components/ui";
@@ -84,6 +84,7 @@ export default async function DashboardPage({
         refunds: t("refunds"),
         netSales: t("netSales"),
         noSales: t("noSales"),
+        noTopSelling: t("noTopSelling"),
         recentOrders: t("recentOrders"),
         all: t("all"),
         awaiting: t("awaiting"),
@@ -104,6 +105,7 @@ export default async function DashboardPage({
         paidOrders: t("paidOrders"),
         averageOrder: t("averageOrder"),
         views: t("views"),
+        unitsSold: t("unitsSold"),
         orderStatuses: {
           pending_payment: status("pending_payment"),
           confirmed: status("confirmed"),
