@@ -27,8 +27,9 @@ const validEnvironment = {
   KITCHEN_LONGITUDE: "-8.6291",
   MBWAY_ENABLED: "false",
   MBWAY_API_URL: "",
-  MBWAY_MERCHANT_ID: "",
-  MBWAY_API_KEY: "",
+  MBWAY_TERMINAL_ID: "",
+  MBWAY_CLIENT_ID: "",
+  MBWAY_AUTH_TOKEN: "",
   MBWAY_WEBHOOK_SECRET: "",
   WHATSAPP_ENABLED: "false",
   WHATSAPP_API_URL: "",
@@ -69,7 +70,7 @@ describe("environment validation", () => {
         ...validEnvironment,
         MBWAY_ENABLED: "true",
       }),
-    ).toThrowError(/MBWAY_API_URL is required when the integration is enabled/);
+    ).toThrowError(/MBWAY_TERMINAL_ID is required when the integration is enabled/);
 
     expect(() =>
       validateEnvironment({
@@ -161,10 +162,12 @@ describe("environment validation", () => {
       expect(entries[key]).toMatch(/^replace-with/);
     }
 
+    expect(entries.MBWAY_API_URL).toBe("https://spg.qly.site1.sibs.pt/api/v2");
+
     for (const key of [
-      "MBWAY_API_URL",
-      "MBWAY_MERCHANT_ID",
-      "MBWAY_API_KEY",
+      "MBWAY_TERMINAL_ID",
+      "MBWAY_CLIENT_ID",
+      "MBWAY_AUTH_TOKEN",
       "MBWAY_WEBHOOK_SECRET",
       "WHATSAPP_API_URL",
       "WHATSAPP_PHONE_NUMBER_ID",
