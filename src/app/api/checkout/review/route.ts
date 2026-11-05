@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { apiSuccess, ApiError, handleApiRoute } from "@/server/http";
+import { getServerEnvironment } from "@/server/environment";
 import { createAddressRepository } from "@/server/modules/addresses";
 import { getCheckoutPolicies } from "@/server/modules/settings";
 
@@ -16,6 +17,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest): Promise<Response> {
   return handleApiRoute(request, async ({ requestId }) => {
+    const paymentsEnabled = getServerEnvironment().MBWAY_ENABLED;
     const context = await cartRequestContext(request, { createGuest: false, mutation: false });
     if (context.identity?.kind !== "customer") throw ApiError.authentication();
     try {
@@ -47,8 +49,8 @@ export async function GET(request: NextRequest): Promise<Response> {
               }
             : null,
           policies,
-          paymentMethods: [{ type: "mbway", enabled: false }],
-          submissionAvailable: false,
+          paymentMethods: [{ type: "mbway", enabled: paymentsEnabled }],
+          submissionAvailable: paymentsEnabled,
         },
         { headers: { "Cache-Control": "private, no-store" } },
       );
